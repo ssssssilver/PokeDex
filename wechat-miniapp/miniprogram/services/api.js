@@ -2,6 +2,7 @@ const config = require('../config');
 const local = require('../utils/pokemon');
 const ptcgSample = require('../data/ptcg-sample');
 const pocketSample = require('../data/pocket-sample');
+const staticApi = require('./static-api');
 
 function hasWx() {
   return typeof wx !== 'undefined';
@@ -280,6 +281,9 @@ function cloudCall(action, data, fallback) {
 }
 
 function apiCall(action, data, fallback) {
+  if (config.useStaticApi) {
+    return staticApi.call(action, data).catch(() => fallback());
+  }
   if (config.useRemoteApi) {
     return remoteCall(action, data, fallback);
   }

@@ -2,7 +2,9 @@ const defaults = {
   cloudEnv: '',
   useCloudApi: false,
   useRemoteApi: false,
+  useStaticApi: false,
   apiBaseUrl: '',
+  staticBaseUrl: '',
   requestTimeoutMs: 10000,
   pageSize: 30
 };

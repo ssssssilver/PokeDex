@@ -28,3 +28,9 @@ wechat-miniapp/
 - `docs/self-hosted-api.md`
 - `docs/wechat-miniapp-v2-ptcg-requirements.md`
 - `wechat-miniapp/README.md`
+
+## OSS static data mode
+
+Production can run without the Node API. Local sync jobs build versioned snapshots and publish them to Alibaba Cloud OSS; the miniapp performs filtering, quizzes, team analysis, and pack simulation on-device.
+
+See `docs/oss-static-deployment.md` for deployment and scheduled sync instructions.
