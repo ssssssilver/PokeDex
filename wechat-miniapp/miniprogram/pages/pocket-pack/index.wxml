@@ -1,0 +1,23 @@
+<view class="page pocket-pack-page">
+  <view wx:if="{{selectedPack}}" class="pack-head">
+    <view class="pack-identity">
+      <image wx:if="{{selectedPack.image}}" class="pack-cover" src="{{selectedPack.image}}" mode="aspectFit" />
+      <view class="pack-copy"><view class="pack-series">{{selectedPack.expansion_id}}</view><view class="pack-title">{{selectedPack.name_zh}}</view><view class="pack-desc">{{selectedPack.description_zh}}</view></view>
+    </view>
+    <view class="pack-stats"><view><strong>{{selectedPack.card_ids.length}}</strong><text>卡池</text></view><view><strong>{{selectedPack.is_promo ? 1 : 5}}</strong><text>每包张数</text></view><view><strong>{{selectedPack.is_promo ? '等概率' : '0.05%'}}</strong><text>{{selectedPack.is_promo ? '抽取规则' : '稀有包'}}</text></view></view>
+  </view>
+
+  <scroll-view wx:if="{{packs.length}}" scroll-x class="pack-options"><view wx:for="{{packs}}" wx:key="id" class="pack-option {{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectPack"><image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFit" /><view class="pack-option-copy"><text>{{item.expansion_id}}</text><view>{{item.name_zh}}</view></view></view></scroll-view>
+
+  <view wx:if="{{loading}}" class="pack-state">卡包加载中</view>
+  <view wx:elif="{{error && !cards.length}}" class="pack-state error">{{error}}</view>
+  <view wx:elif="{{selectedPack}}" class="open-command {{opening ? 'disabled' : ''}}" bindtap="openPack">{{opening ? '开包中' : '开一包'}}</view>
+
+  <view wx:if="{{result}}" class="result-head"><view><text>{{result.is_promo ? '特典包 · 等概率' : (result.is_rare_pack ? '稀有包' : '普通包')}}</text><strong>{{result.pack_type}}</strong></view><view>{{result.count}} 张</view></view>
+  <view wx:if="{{cards.length}}" class="pull-grid">
+    <view wx:for="{{cards}}" wx:key="slot" class="pull-card" data-id="{{item.id}}" bindtap="openCard">
+      <view class="slot-number">{{item.slot}}</view><view class="pull-art"><image src="{{item.image}}" mode="aspectFit" /></view><view class="pull-name">{{item.title}}</view><view class="pull-meta">{{item.setText}} · {{item.rarity}}</view>
+    </view>
+  </view>
+  <view wx:elif="{{!loading && !opening && !error}}" class="pack-state">尚未开包</view>
+</view>

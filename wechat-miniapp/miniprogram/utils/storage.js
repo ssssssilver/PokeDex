@@ -1,11 +1,16 @@
 const FAVORITES_KEY = 'pokechill:favorites';
 const RECENT_KEY = 'pokechill:recent';
 const TEAM_KEY = 'pokechill:team';
+const TEAMS_KEY = 'pokechill:teams';
+const ACTIVE_TEAM_KEY = 'pokechill:team:active';
 const QUIZ_KEY = 'pokechill:quiz';
 const CARD_FAVORITES_KEY = 'pokechill:card:favorites';
 const CARD_RECENT_KEY = 'pokechill:card:recent';
 const CARD_OWNED_KEY = 'pokechill:card:owned';
 const CARD_WISHLIST_KEY = 'pokechill:card:wishlist';
+const POCKET_FAVORITES_KEY = 'pokechill:pocket:favorites';
+const POCKET_RECENT_KEY = 'pokechill:pocket:recent';
+const POCKET_OWNED_KEY = 'pokechill:pocket:owned';
 
 function read(key, fallback) {
   try {
@@ -59,12 +64,86 @@ function addRecent(pokemon) {
   write(RECENT_KEY, [compact].concat(rest).slice(0, 8));
 }
 
-function getTeamSlots() {
-  return read(TEAM_KEY, []);
+function normalizeTeam(team, index) {
+  return {
+    id: String((team && team.id) || `team-${index + 1}`),
+    name: String((team && team.name) || `队伍 ${index + 1}`).slice(0, 12),
+    memberIds: ((team && team.memberIds) || []).map(Number).filter(Boolean).slice(0, 6)
+  };
 }
 
-function setTeamSlots(ids) {
-  write(TEAM_KEY, (ids || []).map(Number).slice(0, 6));
+function getTeams() {
+  const saved = read(TEAMS_KEY, []);
+  if (Array.isArray(saved) && saved.length) return saved.map(normalizeTeam);
+  const migrated = [normalizeTeam({ id: 'team-1', name: '队伍 1', memberIds: read(TEAM_KEY, []) }, 0)];
+  write(TEAMS_KEY, migrated);
+  write(ACTIVE_TEAM_KEY, migrated[0].id);
+  return migrated;
+}
+
+function saveTeams(teams) {
+  const normalized = (teams || []).map(normalizeTeam).slice(0, 8);
+  write(TEAMS_KEY, normalized.length ? normalized : [normalizeTeam({}, 0)]);
+  return normalized;
+}
+
+function getActiveTeamId() {
+  const teams = getTeams();
+  const saved = String(read(ACTIVE_TEAM_KEY, ''));
+  return teams.some((team) => team.id === saved) ? saved : teams[0].id;
+}
+
+function setActiveTeamId(id) {
+  const team = getTeams().find((item) => item.id === String(id));
+  if (!team) return false;
+  write(ACTIVE_TEAM_KEY, team.id);
+  write(TEAM_KEY, team.memberIds);
+  return true;
+}
+
+function getActiveTeam() {
+  const teams = getTeams();
+  return teams.find((team) => team.id === getActiveTeamId()) || teams[0];
+}
+
+function createTeam() {
+  const teams = getTeams();
+  if (teams.length >= 8) return null;
+  const id = `team-${Date.now()}`;
+  const team = normalizeTeam({ id, name: `队伍 ${teams.length + 1}`, memberIds: [] }, teams.length);
+  saveTeams(teams.concat(team));
+  setActiveTeamId(id);
+  return team;
+}
+
+function renameTeam(id, name) {
+  const clean = String(name || '').trim().slice(0, 12);
+  if (!clean) return false;
+  const teams = getTeams().map((team) => team.id === String(id) ? Object.assign({}, team, { name: clean }) : team);
+  saveTeams(teams);
+  return true;
+}
+
+function deleteTeam(id) {
+  const teams = getTeams();
+  if (teams.length <= 1) return false;
+  const wasActive = getActiveTeamId() === String(id);
+  const remaining = teams.filter((team) => team.id !== String(id));
+  saveTeams(remaining);
+  if (wasActive) setActiveTeamId(remaining[0].id);
+  return true;
+}
+
+function getTeamSlots() {
+  return getActiveTeam().memberIds.slice();
+}
+
+function setTeamSlots(ids, teamId) {
+  const id = String(teamId || getActiveTeamId());
+  const memberIds = (ids || []).map(Number).filter(Boolean).slice(0, 6);
+  const teams = getTeams().map((team) => team.id === id ? Object.assign({}, team, { memberIds }) : team);
+  saveTeams(teams);
+  if (id === getActiveTeamId()) write(TEAM_KEY, memberIds);
 }
 
 function addTeamSlot(id) {
@@ -161,12 +240,63 @@ function toggleCardWishlist(id) {
   return !exists;
 }
 
+function getPocketFavorites() {
+  return read(POCKET_FAVORITES_KEY, []);
+}
+
+function togglePocketFavorite(id) {
+  const key = String(id);
+  const values = getPocketFavorites();
+  const exists = values.includes(key);
+  write(POCKET_FAVORITES_KEY, exists ? values.filter((item) => item !== key) : values.concat(key));
+  return !exists;
+}
+
+function getPocketOwned() {
+  return read(POCKET_OWNED_KEY, []);
+}
+
+function togglePocketOwned(id) {
+  const key = String(id);
+  const values = getPocketOwned();
+  const exists = values.includes(key);
+  write(POCKET_OWNED_KEY, exists ? values.filter((item) => item !== key) : values.concat(key));
+  return !exists;
+}
+
+function getPocketRecent() {
+  return read(POCKET_RECENT_KEY, []);
+}
+
+function addPocketRecent(card) {
+  if (!card || !card.id) return;
+  const collection = (card.collections || [])[0] || {};
+  const compact = {
+    id: card.id,
+    name_zh: card.name_zh,
+    name_en: card.name_en,
+    image: card.image,
+    rarity: card.rarity,
+    expansion_id: collection.expansion_id,
+    number: collection.number
+  };
+  const remaining = getPocketRecent().filter((item) => item.id !== compact.id);
+  write(POCKET_RECENT_KEY, [compact].concat(remaining).slice(0, 8));
+}
+
 module.exports = {
   getFavorites,
   isFavorite,
   toggleFavorite,
   getRecentViews,
   addRecent,
+  getTeams,
+  getActiveTeamId,
+  setActiveTeamId,
+  getActiveTeam,
+  createTeam,
+  renameTeam,
+  deleteTeam,
   getTeamSlots,
   setTeamSlots,
   addTeamSlot,
@@ -182,5 +312,11 @@ module.exports = {
   toggleCardOwned,
   getWishlistCards,
   isCardWishlisted,
-  toggleCardWishlist
+  toggleCardWishlist,
+  getPocketFavorites,
+  togglePocketFavorite,
+  getPocketOwned,
+  togglePocketOwned,
+  getPocketRecent,
+  addPocketRecent
 };

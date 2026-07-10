@@ -1,9 +1,32 @@
 .team-summary {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 28rpx;
 }
+
+.team-switcher { display: flex; align-items: stretch; gap: 10rpx; margin-bottom: 16rpx; }
+.team-tabs { flex: 1; min-width: 0; white-space: nowrap; }
+.team-tab-row { display: inline-flex; gap: 10rpx; }
+.team-tab { display: inline-flex; flex-direction: column; justify-content: center; min-width: 150rpx; min-height: 76rpx; padding: 8rpx 16rpx; border: 1rpx solid #d9e2ec; border-radius: 8rpx; background: #fff; color: #475569; box-sizing: border-box; }
+.team-tab text { overflow: hidden; max-width: 170rpx; font-size: 24rpx; font-weight: 900; text-overflow: ellipsis; }
+.team-tab small { margin-top: 2rpx; color: #94a3b8; font-size: 18rpx; }
+.team-tab.active { border-color: #0f766e; background: #e6fffb; color: #0f766e; }
+.add-team { display: flex; align-items: center; justify-content: center; flex: 0 0 76rpx; min-height: 76rpx; border: 1rpx solid #0f766e; border-radius: 8rpx; background: #fff; color: #0f766e; font-size: 42rpx; }
+.active-team-name { margin-top: 4rpx; color: #182230; font-size: 30rpx; font-weight: 900; }
+.team-commands { position: absolute; top: 20rpx; right: 22rpx; display: flex; gap: 12rpx; }
+.team-commands view { padding: 8rpx 12rpx; color: #0f766e; font-size: 21rpx; font-weight: 800; }
+.team-commands .danger { color: #b42318; }
+.team-summary .score { margin-top: 44rpx; }
+.selected-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8rpx; margin: 16rpx 0; }
+.selected-slot { position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; aspect-ratio: 1 / 1.2; border: 1rpx dashed #cbd5e1; border-radius: 8rpx; background: #f8fafc; }
+.selected-slot.filled { border-style: solid; border-color: #b8e5dc; background: #eaf8f5; }
+.selected-slot image { width: 100%; height: 82%; }
+.selected-slot > text:not(.slot-empty) { position: absolute; right: 2rpx; bottom: 2rpx; left: 2rpx; overflow: hidden; color: #334155; font-size: 16rpx; font-weight: 800; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.slot-empty { color: #94a3b8; font-size: 32rpx; }
+.slot-remove { position: absolute; z-index: 2; top: -6rpx; right: -4rpx; display: flex; align-items: center; justify-content: center; width: 30rpx; height: 30rpx; border-radius: 50%; background: #b42318; color: #fff; font-size: 22rpx; line-height: 30rpx; }
+.team-empty-analysis { margin-top: 18rpx; padding: 28rpx; color: #64748b; text-align: center; }
 
 .team-count {
   color: #101828;
@@ -106,4 +129,3 @@
   font-weight: 900;
   text-align: center;
 }
-

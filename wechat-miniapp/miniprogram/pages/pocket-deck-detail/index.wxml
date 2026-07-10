@@ -1,0 +1,20 @@
+<view class="page pocket-deck-detail">
+  <view wx:if="{{loading}}" class="detail-state">赛事牌表加载中</view>
+  <view wx:elif="{{error}}" class="detail-state error" bindtap="retry">{{error}}</view>
+  <block wx:elif="{{deck}}">
+    <view class="deck-head">
+      <view class="deck-rank">#{{deck.archetype.rank || '-'}}</view><view wx:if="{{deck.archetype.images && deck.archetype.images.length}}" class="deck-main-icons"><image wx:for="{{deck.archetype.images}}" wx:key="*this" src="{{item}}" mode="aspectFit" /></view><view class="deck-head-copy"><view class="deck-title">{{deck.name}}</view><view class="deck-sub">{{deck.resultText}}</view></view>
+      <view class="deck-energy"><text>能量</text><strong>{{deck.energy}}</strong></view>
+    </view>
+    <view class="deck-metrics"><view><strong>{{deck.total_cards}}</strong><text>卡牌总数</text></view><view><strong>{{deck.shareText}}</strong><text>使用率</text></view><view><strong>{{deck.winRateText}}</strong><text>胜率</text></view></view>
+    <view class="section-title"><text>完整牌表</text><text class="muted">{{deck.cards.length}} 种</text></view>
+    <view class="deck-card-grid">
+      <view wx:for="{{deck.cards}}" wx:key="id" class="deck-card" data-id="{{item.id}}" bindtap="openCard">
+        <view class="deck-card-art" data-src="{{item.image}}" catchtap="previewCard"><image src="{{item.image}}" mode="aspectFit" /></view><view class="count-badge">×{{item.count}}</view>
+        <view class="deck-card-name">{{item.displayName}}</view><view class="deck-card-set">{{item.setText}}</view>
+      </view>
+    </view>
+    <view class="source-line"><text>{{deck.representative.tournament}}</text><text>Limitless Pocket</text></view>
+  </block>
+  <view wx:if="{{deck}}" class="copy-bar" bindtap="copyDeck">复制完整牌表</view>
+</view>

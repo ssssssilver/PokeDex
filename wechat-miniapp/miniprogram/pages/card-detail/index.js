@@ -5,12 +5,15 @@ const ENERGY_BY_NAME = {
   '草': { id: 'Grass', name: '草', symbol: '草', color: '#2f9e44' },
   '火': { id: 'Fire', name: '火', symbol: '火', color: '#e85d3f' },
   '水': { id: 'Water', name: '水', symbol: '水', color: '#2f80ed' },
-  '电': { id: 'Lightning', name: '电', symbol: '电', color: '#d99a00' },
-  '超能力': { id: 'Psychic', name: '超能力', symbol: '超', color: '#db2777' },
+  '雷': { id: 'Lightning', name: '雷', symbol: '雷', color: '#d99a00' },
+  '电': { id: 'Lightning', name: '雷', symbol: '雷', color: '#d99a00' },
+  '超': { id: 'Psychic', name: '超', symbol: '超', color: '#db2777' },
+  '超能力': { id: 'Psychic', name: '超', symbol: '超', color: '#db2777' },
   '斗': { id: 'Fighting', name: '斗', symbol: '斗', color: '#c2410c' },
   '恶': { id: 'Darkness', name: '恶', symbol: '恶', color: '#374151' },
   '钢': { id: 'Metal', name: '钢', symbol: '钢', color: '#64748b' },
-  '妖精': { id: 'Fairy', name: '妖精', symbol: '妖', color: '#ec4899' },
+  '妖': { id: 'Fairy', name: '妖', symbol: '妖', color: '#ec4899' },
+  '妖精': { id: 'Fairy', name: '妖', symbol: '妖', color: '#ec4899' },
   '龙': { id: 'Dragon', name: '龙', symbol: '龙', color: '#2563eb' },
   '无色': { id: 'Colorless', name: '无色', symbol: '无', color: '#8a8f98' }
 };
@@ -73,6 +76,19 @@ function buildBattleRows(card) {
 function decorateCard(card) {
   const title = card.display_name || card.name_zh || card.name;
   const descriptionText = card.description_zh || card.flavor_text || '';
+  const descriptionEnglish = card.description_zh ? (card.flavor_text_en || card.flavor_text || '') : '';
+  const decorateTextBlock = (item) => Object.assign({}, item, {
+    display_name: item.name_zh || item.name,
+    english_name: item.name_zh && item.name_zh !== item.name ? item.name : '',
+    display_text: item.text_zh || item.text || item.original_text || '',
+    english_text: item.text_zh ? (item.original_text || item.text || '') : ''
+  });
+  const ruleBlocks = (card.rule_blocks || (card.rules || []).map((rule) => ({ original_text: rule })))
+    .map((rule, index) => ({
+      key: `${index}-${rule.text_zh || rule.original_text || ''}`,
+      display_text: rule.text_zh || rule.original_text || '',
+      english_text: rule.text_zh ? rule.original_text || '' : ''
+    }));
   return Object.assign({
     type_energy: [],
     abilities: [],
@@ -88,11 +104,14 @@ function decorateCard(card) {
     title,
     subtitle: card.name_zh && card.name_zh !== card.name ? card.name : '',
     type_energy: normalizeEnergies(card.type_energy),
-    attacks: (card.attacks || []).map((attack) => Object.assign({}, attack, {
+    abilities: (card.abilities || []).map(decorateTextBlock),
+    attacks: (card.attacks || []).map((attack) => Object.assign({}, decorateTextBlock(attack), {
       cost_energy: normalizeEnergies(attack.cost_energy, attack.cost_text)
     })),
+    ruleBlocks,
     retreat_cost_energy: normalizeEnergies(card.retreat_cost_energy, card.retreat_cost_text),
     descriptionText,
+    descriptionEnglish,
     descriptionSource: card.description_source || (descriptionText ? '原卡牌描述' : ''),
     typeText: (card.type_names || []).join(' / '),
     legalitiesText: (card.legalities_text || []).map((item) => `${item.name}${item.status_name ? `：${item.status_name}` : ''}`).join('、')

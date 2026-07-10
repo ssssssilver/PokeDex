@@ -9,6 +9,8 @@ const {
   asArray,
   decorateEnergyList,
   formatLegalities,
+  localizeAbilityType,
+  localizeCardName,
   localizeCardText,
   normalizeKeyword,
   titleCase
@@ -221,18 +223,36 @@ function enrichStoredEnergyList(list, rawTypes) {
   return decorateEnergyList(rawTypes || []);
 }
 
-function decorateTextBlocks(card) {
+function decorateTextBlocks(card, nameZh) {
+  const translatedText = (value) => {
+    const original = value || '';
+    let translated = localizeCardText(original);
+    if (nameZh && card.name) {
+      translated = translated.replace(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), nameZh);
+    }
+    const englishResidue = translated.match(/[A-Za-z]+/g) || [];
+    return translated && translated !== original && englishResidue.length <= 2 ? translated : '';
+  };
   return {
     abilities: (card.abilities || []).map((ability) => Object.assign({}, ability, {
-      text_zh: localizeCardText(ability.text),
+      name_zh: ability.name_zh || localizeCardName(ability.name),
+      original_name: ability.name || '',
+      type_name: localizeAbilityType(ability.type_name || ability.type),
+      text_zh: translatedText(ability.text),
       original_text: ability.text || ''
     })),
     attacks: (card.attacks || []).map((attack) => Object.assign({}, attack, {
+      name_zh: attack.name_zh || localizeCardName(attack.name),
+      original_name: attack.name || '',
       cost_energy: enrichStoredEnergyList(attack.cost_energy, attack.cost),
-      text_zh: localizeCardText(attack.text),
+      text_zh: translatedText(attack.text),
       original_text: attack.text || ''
     })),
-    rules: (card.rules || []).map((rule) => localizeCardText(rule) || rule)
+    rules: (card.rules || []).map((rule) => translatedText(rule) || rule),
+    ruleBlocks: (card.rules || []).map((rule) => ({
+      text_zh: translatedText(rule),
+      original_text: rule || ''
+    }))
   };
 }
 
@@ -241,8 +261,8 @@ function decorateCard(card, context) {
   const pokemonMap = context.pokemonMap || {};
   const set = (context.setMap || {})[String(card.set_id || '')] || (card.set && card.set.id ? card.set : null);
   const decoratedSet = decorateSet(set, context);
-  const textBlocks = decorateTextBlocks(card);
   const nameZh = deriveChineseName(card, pokemonMap);
+  const textBlocks = decorateTextBlocks(card, nameZh);
   const next = Object.assign({}, card, {
     name_zh: nameZh,
     display_name: nameZh || card.name,
@@ -250,6 +270,8 @@ function decorateCard(card, context) {
     abilities: textBlocks.abilities,
     attacks: textBlocks.attacks,
     rules: textBlocks.rules,
+    rule_blocks: textBlocks.ruleBlocks,
+    flavor_text_en: card.flavor_text || '',
     retreat_cost_energy: enrichStoredEnergyList(card.retreat_cost_energy, card.retreat_cost),
     pokemon_refs: (card.national_pokedex_numbers || [])
       .map((id) => pokemonMap[Number(id)])

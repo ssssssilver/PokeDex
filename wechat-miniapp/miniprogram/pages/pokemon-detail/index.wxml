@@ -49,7 +49,7 @@
     <view class="model-credit">{{activeModel.sourceName}} · {{activeModel.credit}}</view>
   </view>
 
-  <view wx:if="{{relatedCards.length}}" class="card info-card">
+  <view wx:if="{{physicalRelatedCardTotal || pocketRelatedCardTotal}}" class="card info-card">
     <view class="relation-head">
       <view>
         <view class="info-title">相关卡牌</view>
@@ -57,12 +57,17 @@
       </view>
       <view class="chart-link" bindtap="openRelatedCards">全部</view>
     </view>
-    <scroll-view scroll-x class="related-card-scroll">
-      <view wx:for="{{relatedCards}}" wx:key="id" class="related-card" data-id="{{item.id}}" bindtap="openCard">
+    <view class="related-card-tabs">
+      <view class="{{relatedCardMode === 'physical' ? 'active' : ''}}" data-mode="physical" bindtap="selectRelatedCardMode">实体卡牌 <text>{{physicalRelatedCardTotal}}</text></view>
+      <view class="{{relatedCardMode === 'pocket' ? 'active' : ''}}" data-mode="pocket" bindtap="selectRelatedCardMode">Pocket卡牌 <text>{{pocketRelatedCardTotal}}</text></view>
+    </view>
+    <scroll-view wx:if="{{relatedCards.length}}" scroll-x class="related-card-scroll">
+      <view wx:for="{{relatedCards}}" wx:key="id" class="related-card" data-id="{{item.id}}" data-source="{{item.cardSource}}" bindtap="openRelatedCard">
         <image src="{{item.image}}" mode="aspectFit" />
         <view class="related-card-name">{{item.display_name || item.name_zh || item.name}}</view>
       </view>
     </scroll-view>
+    <view wx:else class="section-empty">暂无{{relatedCardMode === 'pocket' ? ' Pocket' : '实体'}}关联卡牌</view>
   </view>
 
   <view class="card info-card">

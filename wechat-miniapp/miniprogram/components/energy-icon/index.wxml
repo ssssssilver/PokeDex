@@ -1,0 +1,3 @@
+<view class="energy-symbol energy-{{iconType}}" aria-label="{{label || type}}">
+  <image src="/assets/energy/energy-icons.jpg" mode="widthFix" />
+</view>

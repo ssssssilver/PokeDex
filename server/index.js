@@ -8,6 +8,11 @@ const { syncPokeapi } = require('./pokeapi-sync');
 const { PtcgCacheStore } = require('./ptcg-cache-store');
 const { PtcgService } = require('./ptcg-service');
 const { syncPtcg } = require('./ptcg-sync');
+const { PocketCacheStore } = require('./pocket-cache-store');
+const { PocketService } = require('./pocket-service');
+const { syncPocket } = require('./pocket-sync');
+const { PocketScheduler } = require('./pocket-scheduler');
+const { PocketDeckService } = require('./pocket-deck-service');
 const { createSyncScheduler } = require('./sync-scheduler');
 const { HotDeckService } = require('./deck-service');
 const { PokemonModel3dService } = require('./projectpokemon-3d-service');
@@ -230,6 +235,80 @@ async function servePtcgSetImage(req, res, pathname, service) {
   res.end(buffer);
 }
 
+async function servePocketCardImage(req, res, pathname, service) {
+  const prefix = '/assets/pocket/cards/';
+  const id = decodeURIComponent(pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '');
+  if (!id || id.includes('/') || id.includes('\\')) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+  const info = service.getImageInfo(id);
+  if (!info) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+  if (fs.existsSync(info.filePath)) {
+    res.writeHead(200, {
+      'Content-Type': contentTypeFor(info.filePath),
+      'Cache-Control': 'public, max-age=86400',
+      'Access-Control-Allow-Origin': '*'
+    });
+    fs.createReadStream(info.filePath).pipe(res);
+    return;
+  }
+  const response = await fetch(info.remote, { headers: { 'User-Agent': 'PokeChill/1.0' } });
+  if (!response.ok) {
+    sendJson(res, 502, { error: `Unable to fetch Pocket card image: ${response.status}` });
+    return;
+  }
+  const buffer = Buffer.from(await response.arrayBuffer());
+  ensureDir(path.dirname(info.filePath));
+  fs.writeFileSync(info.filePath, buffer);
+  res.writeHead(200, {
+    'Content-Type': response.headers.get('content-type') || 'image/png',
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(buffer);
+}
+
+async function servePocketPackImage(req, res, pathname, service) {
+  const prefix = '/assets/pocket/packs/';
+  const id = decodeURIComponent(pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '');
+  if (!id || id.includes('/') || id.includes('\\')) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+  const info = service.getPackImageInfo(id);
+  if (!info) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+  if (fs.existsSync(info.filePath)) {
+    res.writeHead(200, {
+      'Content-Type': contentTypeFor(info.filePath),
+      'Cache-Control': 'public, max-age=86400',
+      'Access-Control-Allow-Origin': '*'
+    });
+    fs.createReadStream(info.filePath).pipe(res);
+    return;
+  }
+  const response = await fetch(info.remote, { headers: { 'User-Agent': 'PokeChill/1.0' } });
+  if (!response.ok) {
+    sendJson(res, 502, { error: `Unable to fetch Pocket pack image: ${response.status}` });
+    return;
+  }
+  const buffer = Buffer.from(await response.arrayBuffer());
+  ensureDir(path.dirname(info.filePath));
+  fs.writeFileSync(info.filePath, buffer);
+  res.writeHead(200, {
+    'Content-Type': response.headers.get('content-type') || 'image/png',
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(buffer);
+}
+
 async function serveLimitlessPokemonImage(req, res, pathname, service) {
   const prefix = '/assets/limitless/pokemon/';
   const assetPath = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '';
@@ -270,6 +349,46 @@ async function serveLimitlessPokemonImage(req, res, pathname, service) {
   res.end(buffer);
 }
 
+async function serveLimitlessCardImage(req, res, pathname, service) {
+  const prefix = '/assets/limitless/cards/';
+  const assetPath = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '';
+  const info = service.getCardImageInfo(decodeURIComponent(assetPath || ''));
+  if (!info) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  if (fs.existsSync(info.filePath)) {
+    res.writeHead(200, {
+      'Content-Type': contentTypeFor(info.filePath),
+      'Cache-Control': 'public, max-age=86400',
+      'Access-Control-Allow-Origin': '*'
+    });
+    fs.createReadStream(info.filePath).pipe(res);
+    return;
+  }
+
+  const response = await fetch(info.remote, {
+    headers: {
+      'User-Agent': 'PokeChill/1.0'
+    }
+  });
+  if (!response.ok) {
+    sendJson(res, 502, { error: `Unable to fetch deck card image: ${response.status}` });
+    return;
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  ensureDir(path.dirname(info.filePath));
+  fs.writeFileSync(info.filePath, buffer);
+  res.writeHead(200, {
+    'Content-Type': response.headers.get('content-type') || contentTypeFor(info.filePath),
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(buffer);
+}
+
 function createApp(options = {}) {
   const host = options.host || process.env.POKECHILL_HOST || DEFAULT_HOST;
   const port = Number(options.port || process.env.POKECHILL_PORT || DEFAULT_PORT);
@@ -281,12 +400,17 @@ function createApp(options = {}) {
   const ptcgStore = options.ptcgStore || new PtcgCacheStore({
     filePath: path.join(dataDir, 'ptcg-cache.json')
   });
+  const pocketStore = options.pocketStore || new PocketCacheStore({
+    filePath: path.join(dataDir, 'pocket-cache.json')
+  });
   const service = new PokedexService(store, { publicBaseUrl });
   const ptcgService = new PtcgService(ptcgStore, {
     publicBaseUrl,
     pokemonStore: store,
     dataDir
   });
+  const pocketService = new PocketService(pocketStore, { publicBaseUrl, dataDir });
+  const pocketDeckService = new PocketDeckService(pocketStore, { publicBaseUrl, dataDir });
   const hotDeckService = new HotDeckService({
     publicBaseUrl,
     dataDir
@@ -301,6 +425,11 @@ function createApp(options = {}) {
     dataDir,
     syncFn: syncPokeapi,
     scheduler: options.scheduler || {}
+  });
+  const pocketScheduler = new PocketScheduler({
+    store: pocketStore,
+    dataDir,
+    scheduler: options.pocketScheduler || {}
   });
 
   async function handler(req, res) {
@@ -346,8 +475,23 @@ function createApp(options = {}) {
         return;
       }
 
+      if (pathname.startsWith('/assets/pocket/cards/')) {
+        await servePocketCardImage(req, res, pathname, pocketService);
+        return;
+      }
+
+      if (pathname.startsWith('/assets/pocket/packs/')) {
+        await servePocketPackImage(req, res, pathname, pocketService);
+        return;
+      }
+
       if (pathname.startsWith('/assets/limitless/pokemon/')) {
         await serveLimitlessPokemonImage(req, res, pathname, hotDeckService);
+        return;
+      }
+
+      if (pathname.startsWith('/assets/limitless/cards/')) {
+        await serveLimitlessCardImage(req, res, pathname, hotDeckService);
         return;
       }
 
@@ -362,6 +506,12 @@ function createApp(options = {}) {
             started: scheduler.status().state.started,
             running: scheduler.status().state.running,
             due: scheduler.status().due
+          },
+          pocketScheduler: {
+            enabled: pocketScheduler.status().enabled,
+            started: pocketScheduler.status().state.started,
+            running: pocketScheduler.status().state.running,
+            due: pocketScheduler.status().due
           }
         });
         return;
@@ -441,6 +591,103 @@ function createApp(options = {}) {
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/api/pocket/cards') {
+        sendJson(res, 200, pocketService.listCards(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      const pocketCardMatch = pathname.match(/^\/api\/pocket\/cards\/([^/]+)$/);
+      if (req.method === 'GET' && pocketCardMatch) {
+        sendJson(res, 200, pocketService.getCard(decodeURIComponent(pocketCardMatch[1])));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pocket/expansions') {
+        sendJson(res, 200, pocketService.listExpansions(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pocket/packs') {
+        sendJson(res, 200, pocketService.listPacks(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      const pocketPackMatch = pathname.match(/^\/api\/pocket\/packs\/([^/]+)$/);
+      if (req.method === 'GET' && pocketPackMatch) {
+        sendJson(res, 200, pocketService.getPack(decodeURIComponent(pocketPackMatch[1])));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pocket/rarities') {
+        sendJson(res, 200, pocketService.getRarities());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pocket/pull-rates') {
+        sendJson(res, 200, pocketService.getPullRates(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/pocket/open-pack') {
+        sendJson(res, 200, pocketService.openPack(await parseJsonBody(req)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pocket/events') {
+        sendJson(res, 200, pocketService.listEvents(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      const pocketCollections = {
+        '/api/pocket/missions': 'missions',
+        '/api/pocket/battles': 'battles',
+        '/api/pocket/shops': 'shops',
+        '/api/pocket/wonder-picks': 'wonder_picks',
+        '/api/pocket/profile-decorations': 'profile_decorations',
+        '/api/pocket/peripheral-goods': 'peripheral_goods',
+        '/api/pocket/rental-decks': 'rental_decks',
+        '/api/pocket/preset-decks': 'preset_decks',
+        '/api/pocket/pvp-ranks': 'pvp_ranks',
+        '/api/pocket/hot-decks': 'hot_decks'
+      };
+      if (req.method === 'GET' && pocketCollections[pathname]) {
+        sendJson(res, 200, pocketService.listCollection(
+          pocketCollections[pathname],
+          queryObject(currentUrl.searchParams)
+        ));
+        return;
+      }
+
+      if (req.method === 'GET' && (pathname === '/api/pocket/meta' || pathname === '/api/pocket/sync-status')) {
+        sendJson(res, 200, pocketService.getMeta());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pocket/sync-runs') {
+        sendJson(res, 200, pocketService.getRuns(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      const pocketHotDeckMatch = pathname.match(/^\/api\/pocket\/hot-decks\/([^/]+)$/);
+      if (req.method === 'GET' && pocketHotDeckMatch) {
+        sendJson(res, 200, await pocketDeckService.getDetail(
+          decodeURIComponent(pocketHotDeckMatch[1]),
+          queryObject(currentUrl.searchParams)
+        ));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pocket/scheduler') {
+        sendJson(res, 200, pocketScheduler.status());
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/pocket/scheduler/run') {
+        const body = await parseJsonBody(req);
+        sendJson(res, 200, await pocketScheduler.runIfDue(body.reason || 'manual-api', body));
+        return;
+      }
+
       if (req.method === 'GET' && pathname === '/api/pokemon-3d/sync-status') {
         sendJson(res, 200, {
           item: pokemonModel3dService.getMeta(),
@@ -451,6 +698,11 @@ function createApp(options = {}) {
 
       if (req.method === 'GET' && pathname === '/api/decks/hot') {
         sendJson(res, 200, await hotDeckService.listHotDecks(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/decks/detail') {
+        sendJson(res, 200, await hotDeckService.getDeckDetail(queryObject(currentUrl.searchParams)));
         return;
       }
 
@@ -546,6 +798,12 @@ function createApp(options = {}) {
         return;
       }
 
+      if (req.method === 'POST' && pathname === '/api/sync/pocket') {
+        const result = await syncPocket(pocketStore, await parseJsonBody(req), { dataDir });
+        sendJson(res, 200, result);
+        return;
+      }
+
       if (req.method === 'POST' && pathname === '/api/sync/projectpokemon-3d') {
         const result = await pokemonModel3dService.sync(await parseJsonBody(req));
         sendJson(res, 200, result);
@@ -567,11 +825,15 @@ function createApp(options = {}) {
     dataDir,
     store,
     ptcgStore,
+    pocketStore,
     service,
     ptcgService,
+    pocketService,
+    pocketDeckService,
     hotDeckService,
     pokemonModel3dService,
     scheduler,
+    pocketScheduler,
     handler,
     server: http.createServer(handler)
   };
@@ -580,6 +842,7 @@ function createApp(options = {}) {
 if (require.main === module) {
   const app = createApp();
   app.scheduler.start();
+  app.pocketScheduler.start();
   app.server.listen(app.port, app.host, () => {
     console.log(`PokeChill self-hosted API listening on ${app.publicBaseUrl}`);
     console.log(`Cache file: ${app.store.filePath}`);

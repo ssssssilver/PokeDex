@@ -1,6 +1,7 @@
 const config = require('../config');
 const local = require('../utils/pokemon');
 const ptcgSample = require('../data/ptcg-sample');
+const pocketSample = require('../data/pocket-sample');
 
 function hasWx() {
   return typeof wx !== 'undefined';
@@ -172,6 +173,54 @@ function remoteRoute(action, data) {
   }
   if (action === 'getHotDecks') {
     return { method: 'GET', path: `/api/decks/hot?${buildQuery(payload)}` };
+  }
+  if (action === 'getHotDeckDetail') {
+    return { method: 'GET', path: `/api/decks/detail?${buildQuery(payload)}` };
+  }
+  if (action === 'listPocketCards') {
+    return { method: 'GET', path: `/api/pocket/cards?${buildQuery(payload)}` };
+  }
+  if (action === 'getPocketCard') {
+    return { method: 'GET', path: `/api/pocket/cards/${encodeURIComponent(payload.id)}` };
+  }
+  if (action === 'getPocketMeta') {
+    return { method: 'GET', path: '/api/pocket/meta' };
+  }
+  if (action === 'listPocketExpansions') {
+    return { method: 'GET', path: `/api/pocket/expansions?${buildQuery(payload)}` };
+  }
+  if (action === 'listPocketPacks') {
+    return { method: 'GET', path: `/api/pocket/packs?${buildQuery(payload)}` };
+  }
+  if (action === 'getPocketPullRates') {
+    return { method: 'GET', path: `/api/pocket/pull-rates?${buildQuery(payload)}` };
+  }
+  if (action === 'getPocketRarities') {
+    return { method: 'GET', path: '/api/pocket/rarities' };
+  }
+  if (action === 'openPocketPack') {
+    return { method: 'POST', path: '/api/pocket/open-pack', data: payload };
+  }
+  if (action === 'listPocketEvents') {
+    return { method: 'GET', path: `/api/pocket/events?${buildQuery(payload)}` };
+  }
+  if (action === 'listPocketMissions') {
+    return { method: 'GET', path: `/api/pocket/missions?${buildQuery(payload)}` };
+  }
+  if (action === 'listPocketBattles') {
+    return { method: 'GET', path: `/api/pocket/battles?${buildQuery(payload)}` };
+  }
+  if (action === 'listPocketShops') {
+    return { method: 'GET', path: `/api/pocket/shops?${buildQuery(payload)}` };
+  }
+  if (action === 'listPocketWonderPicks') {
+    return { method: 'GET', path: `/api/pocket/wonder-picks?${buildQuery(payload)}` };
+  }
+  if (action === 'listPocketHotDecks') {
+    return { method: 'GET', path: `/api/pocket/hot-decks?${buildQuery(payload)}` };
+  }
+  if (action === 'getPocketHotDeck') {
+    return { method: 'GET', path: `/api/pocket/hot-decks/${encodeURIComponent(payload.id)}` };
   }
   return null;
 }
@@ -525,13 +574,281 @@ function openCardPack(payload) {
 function getHotDecks(options) {
   return apiCall('getHotDecks', Object.assign({ limit: 6 }, options || {}), () => ({
     items: [
-      { rank: 1, name: 'Dragapult ex', points: 2227, share: '49.22%', image: '', source: 'Limitless TCG' },
-      { rank: 2, name: "N's Zoroark ex", points: 363, share: '8.02%', image: '', source: 'Limitless TCG' },
-      { rank: 3, name: 'Crustle Mysterious Rock Inn', points: 278, share: '6.14%', image: '', source: 'Limitless TCG' }
+      { rank: 1, name: 'Dragapult ex', points: 2227, share: '49.22%', url: 'https://limitlesstcg.com/decks/284', image: '', images: [], source: 'Limitless TCG' },
+      { rank: 2, name: "N's Zoroark ex", points: 363, share: '8.02%', url: 'https://limitlesstcg.com/decks/268', image: '', images: [], source: 'Limitless TCG' },
+      { rank: 3, name: 'Crustle Mysterious Rock Inn', points: 278, share: '6.14%', url: 'https://limitlesstcg.com/decks/283', image: '', images: [], source: 'Limitless TCG' }
     ].slice(0, Number((options && options.limit) || 6)),
     total: 3,
     source: 'local-hot-deck-seed',
     stale: true
+  }));
+}
+
+function buildDeckCopyText(sections) {
+  return (sections || []).map((section) => [
+    `${section.title}: ${section.count}`,
+    ...(section.cards || []).map((card) => card.line || `${card.count} ${card.name} ${card.set} ${card.number}`.trim())
+  ].join('\n')).join('\n\n');
+}
+
+function sampleDeckCardImage(set, number) {
+  const setCode = String(set || '').toUpperCase();
+  const rawNumber = String(number || '');
+  const cardNumber = /^\d+$/.test(rawNumber) ? rawNumber.padStart(3, '0') : rawNumber;
+  if (!setCode || !cardNumber) return '';
+  return normalizeRemoteUrl(`/assets/limitless/cards/${encodeURIComponent(setCode)}/${encodeURIComponent(`${setCode}_${cardNumber}_R_EN_LG.png`)}`);
+}
+
+function sampleHotDeckDetail(deck) {
+  const source = deck || {};
+  const sections = [
+    {
+      title: 'Pokemon',
+      displayTitle: '宝可梦',
+      count: 19,
+      cards: [
+        { count: 4, name: 'Dreepy', set: 'TWM', number: '128' },
+        { count: 4, name: 'Drakloak', set: 'TWM', number: '129' },
+        { count: 2, name: 'Dragapult ex', set: 'TWM', number: '130' },
+        { count: 2, name: 'Duskull', set: 'PRE', number: '35' },
+        { count: 2, name: 'Dusclops', set: 'PRE', number: '36' },
+        { count: 1, name: 'Dusknoir', set: 'PRE', number: '37' },
+        { count: 1, name: 'Budew', set: 'ASC', number: '16' },
+        { count: 1, name: 'Fezandipiti ex', set: 'ASC', number: '142' },
+        { count: 1, name: 'Meowth ex', set: 'POR', number: '62' },
+        { count: 1, name: 'Munkidori', set: 'TWM', number: '95' }
+      ]
+    },
+    {
+      title: 'Trainer',
+      displayTitle: '训练家',
+      count: 33,
+      cards: [
+        { count: 4, name: "Lillie's Determination", set: 'MEG', number: '119' },
+        { count: 3, name: 'Crispin', set: 'SCR', number: '133' },
+        { count: 2, name: "Boss's Orders", set: 'MEG', number: '114' },
+        { count: 1, name: 'Dawn', set: 'PFL', number: '87' },
+        { count: 4, name: 'Ultra Ball', set: 'MEG', number: '131' },
+        { count: 4, name: 'Poke Pad', set: 'POR', number: '81' },
+        { count: 4, name: 'Buddy-Buddy Poffin', set: 'TEF', number: '144' },
+        { count: 4, name: 'Crushing Hammer', set: 'POR', number: '71' },
+        { count: 2, name: 'Night Stretcher', set: 'ASC', number: '196' },
+        { count: 1, name: 'Unfair Stamp', set: 'TWM', number: '165' },
+        { count: 1, name: 'Special Red Card', set: 'CRI', number: '82' },
+        { count: 1, name: 'Handheld Fan', set: 'TWM', number: '150' },
+        { count: 1, name: "Team Rocket's Watchtower", set: 'DRI', number: '180' },
+        { count: 1, name: 'Jamming Tower', set: 'TWM', number: '153' }
+      ]
+    },
+    {
+      title: 'Energy',
+      displayTitle: '能量',
+      count: 8,
+      cards: [
+        { count: 3, name: 'Psychic Energy', set: 'MEE', number: '5' },
+        { count: 3, name: 'Fire Energy', set: 'MEE', number: '2' },
+        { count: 2, name: 'Darkness Energy', set: 'MEE', number: '7' }
+      ]
+    }
+  ].map((section) => Object.assign({}, section, {
+    cards: section.cards.map((card) => Object.assign({}, card, {
+      image: sampleDeckCardImage(card.set, card.number),
+      line: `${card.count} ${card.name} ${card.set} ${card.number}`
+    }))
+  }));
+
+  return {
+    item: {
+      rank: Number(source.rank || 1),
+      name: source.name || 'Dragapult Dusknoir',
+      overviewName: source.name || 'Dragapult ex',
+      points: Number(source.points || 2227),
+      share: source.share || '49.22%',
+      url: source.url || 'https://limitlesstcg.com/decks/284',
+      overviewUrl: source.url || 'https://limitlesstcg.com/decks/284',
+      decklistUrl: source.url || 'https://limitlesstcg.com/decks/284',
+      source: 'Limitless TCG',
+      sourceUrl: source.url || 'https://limitlesstcg.com/decks/284',
+      description: '本地示例牌表。连接自有服务后会读取 Limitless 最新卡组。',
+      latestResult: {
+        place: '2nd',
+        player: 'Sample Player',
+        variants: []
+      },
+      sections,
+      totalCards: sections.reduce((sum, section) => sum + section.count, 0),
+      copyText: buildDeckCopyText(sections)
+    },
+    source: 'local-hot-deck-seed',
+    stale: true
+  };
+}
+
+function getHotDeckDetail(deck) {
+  return apiCall('getHotDeckDetail', deck || {}, () => sampleHotDeckDetail(deck));
+}
+
+function paginatePocket(items, options) {
+  const page = Math.max(1, Number((options && options.page) || 1));
+  const pageSize = Math.max(1, Number((options && (options.pageSize || options.limit)) || 30));
+  const offset = (page - 1) * pageSize;
+  return {
+    items: items.slice(offset, offset + pageSize),
+    total: items.length,
+    page,
+    pageSize,
+    totalPages: Math.max(1, Math.ceil(items.length / pageSize)),
+    hasMore: offset + pageSize < items.length,
+    source: 'local-pocket-seed'
+  };
+}
+
+function listPocketCards(options) {
+  const filters = options || {};
+  return apiCall('listPocketCards', filters, () => {
+    const keyword = String(filters.q || filters.keyword || '').trim().toLowerCase();
+    const expansion = String(filters.expansion || '').toLowerCase();
+    const rarity = String(filters.rarity || '').toLowerCase();
+    const type = String(filters.type || '').toLowerCase();
+    const pokemonId = Number(filters.pokemonId || 0);
+    const items = pocketSample.CARDS.filter((card) => {
+      if (keyword && ![card.name_zh, card.name_en, card.id, card.artist]
+        .concat((card.collections || []).flatMap((item) => [item.expansion_id, item.expansion_name_zh, item.number]))
+        .join(' ').toLowerCase().includes(keyword)) return false;
+      if (expansion && !(card.collections || []).some((item) => String(item.expansion_id).toLowerCase() === expansion)) return false;
+      if (rarity && String(card.rarity).toLowerCase() !== rarity) return false;
+      if (type && String(card.card_type).toLowerCase() !== type) return false;
+      if (pokemonId && Number(card.national_pokedex_number || 0) !== pokemonId) return false;
+      return true;
+    });
+    return paginatePocket(items, filters);
+  });
+}
+
+function getPocketCard(id) {
+  return apiCall('getPocketCard', { id }, () => ({
+    item: pocketSample.CARDS.find((card) => card.id === String(id)) || null,
+    source: 'local-pocket-seed'
+  }));
+}
+
+function getPocketMeta() {
+  return apiCall('getPocketMeta', {}, () => ({
+    item: { status: 'local' },
+    counts: {
+      cards: pocketSample.CARDS.length,
+      expansions: pocketSample.EXPANSIONS.length,
+      packs: pocketSample.PACKS.length,
+      events: pocketSample.EVENTS.length
+    },
+    sources: {},
+    source: 'local-pocket-seed'
+  }));
+}
+
+function listPocketExpansions(options) {
+  return apiCall('listPocketExpansions', options || {}, () => paginatePocket(pocketSample.EXPANSIONS, options || {}));
+}
+
+function listPocketPacks(options) {
+  return apiCall('listPocketPacks', options || {}, () => paginatePocket(pocketSample.PACKS, options || {}));
+}
+
+function getPocketPullRates(expansion) {
+  const payload = typeof expansion === 'object' ? expansion : { expansion };
+  return apiCall('getPocketPullRates', payload, () => ({
+    item: {
+      'Regular Pack': {
+        appearance_rate: 99.95,
+        cards: 5,
+        slots: { 1: { C: 100 }, 2: { C: 100 }, 3: { C: 100 }, 4: { U: 90, R: 10 }, 5: { U: 60, R: 30, RR: 10 } }
+      }
+    },
+    source: 'local-pocket-seed'
+  }));
+}
+
+function getPocketRarities() {
+  return apiCall('getPocketRarities', {}, () => ({
+    item: {
+      C: { label: 'Common', group: 'Diamond', count: 1 },
+      U: { label: 'Uncommon', group: 'Diamond', count: 2 },
+      R: { label: 'Rare', group: 'Diamond', count: 3 },
+      RR: { label: 'Double Rare', group: 'Diamond', count: 4 }
+    },
+    source: 'local-pocket-seed'
+  }));
+}
+
+function openPocketPack(payload) {
+  return apiCall('openPocketPack', payload || {}, () => {
+    const cards = Array.from({ length: 5 }, (unused, index) => Object.assign({},
+      pocketSample.CARDS[Math.floor(Math.random() * pocketSample.CARDS.length)], { slot: index + 1 }));
+    return {
+      item: {
+        id: `local-pocket-pack-${Date.now()}`,
+        pack: pocketSample.PACKS[0],
+        pack_type: 'Regular Pack',
+        is_rare_pack: false,
+        cards,
+        count: cards.length
+      },
+      source: 'local-pocket-seed'
+    };
+  });
+}
+
+function listPocketEvents(options) {
+  return apiCall('listPocketEvents', options || {}, () => paginatePocket(pocketSample.EVENTS, options || {}));
+}
+
+function pocketCollection(action, sampleFilter, options) {
+  return apiCall(action, options || {}, () => paginatePocket(
+    pocketSample.EVENTS.filter((event) => sampleFilter.includes(event.type)), options || {}
+  ));
+}
+
+function listPocketMissions(options) {
+  return pocketCollection('listPocketMissions', ['missionGroup'], options);
+}
+
+function listPocketBattles(options) {
+  return pocketCollection('listPocketBattles', ['soloBattle', 'pvpEmblemBattle', 'rankedPvpSeason'], options);
+}
+
+function listPocketShops(options) {
+  return pocketCollection('listPocketShops', ['itemShop', 'pokeGoldShop'], options);
+}
+
+function listPocketWonderPicks(options) {
+  return pocketCollection('listPocketWonderPicks', ['wonderPickFree', 'wonderPickChansey'], options);
+}
+
+function listPocketHotDecks(options) {
+  return apiCall('listPocketHotDecks', options || {}, () => paginatePocket(pocketSample.HOT_DECKS, options || {}));
+}
+
+function getPocketHotDeck(id) {
+  return apiCall('getPocketHotDeck', { id }, () => ({
+    item: {
+      id,
+      name: pocketSample.HOT_DECKS[0].name,
+      total_cards: 20,
+      energy: 'Psychic',
+      cards: pocketSample.CARDS.slice(0, 2).map((card) => ({
+        id: card.id,
+        count: 2,
+        name: card.name_en,
+        name_zh: card.name_zh,
+        set: 'A1',
+        number: (card.collections[0] || {}).number,
+        image: card.image
+      })),
+      copy_text: '2 Mewtwo ex A1 129\n2 Gardevoir A1 132\n\nEnergy: Psychic',
+      representative: { player: 'Sample Player', tournament: 'Pocket Tournament', place: 1 },
+      archetype: pocketSample.HOT_DECKS[0]
+    },
+    source: 'local-pocket-seed'
   }));
 }
 
@@ -556,5 +873,21 @@ module.exports = {
   getDailyCardQuiz,
   submitDailyCardQuiz,
   openCardPack,
-  getHotDecks
+  getHotDecks,
+  getHotDeckDetail,
+  listPocketCards,
+  getPocketCard,
+  getPocketMeta,
+  listPocketExpansions,
+  listPocketPacks,
+  getPocketPullRates,
+  getPocketRarities,
+  openPocketPack,
+  listPocketEvents,
+  listPocketMissions,
+  listPocketBattles,
+  listPocketShops,
+  listPocketWonderPicks,
+  listPocketHotDecks,
+  getPocketHotDeck
 };

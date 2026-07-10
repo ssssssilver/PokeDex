@@ -566,8 +566,13 @@ Page({
     encounterMethods: [],
     encounterCount: 0,
     evolution: [],
+    relatedCardMode: 'physical',
     relatedCards: [],
     relatedCardTotal: 0,
+    physicalRelatedCards: [],
+    physicalRelatedCardTotal: 0,
+    pocketRelatedCards: [],
+    pocketRelatedCardTotal: 0,
     favorite: false,
     modelForms: [],
     modelVariantOptions: [],
@@ -637,16 +642,31 @@ Page({
   },
 
   loadRelatedCards(id) {
-    api.getPokemonCards(id, { page: 1, pageSize: 6 }).then((result) => {
+    Promise.all([
+      api.getPokemonCards(id, { page: 1, pageSize: 6 }).catch(() => ({ items: [], total: 0 })),
+      api.listPocketCards({ pokemonId: id, page: 1, pageSize: 6 }).catch(() => ({ items: [], total: 0 }))
+    ]).then(([physical, pocket]) => {
+      const physicalCards = (physical.items || []).map((card) => Object.assign({}, card, { cardSource: 'physical' }));
+      const pocketCards = (pocket.items || []).map((card) => Object.assign({}, card, { cardSource: 'pocket' }));
+      const mode = physicalCards.length || !pocketCards.length ? 'physical' : 'pocket';
       this.setData({
-        relatedCards: result.items || [],
-        relatedCardTotal: Number(result.total || 0)
+        relatedCardMode: mode,
+        relatedCards: mode === 'physical' ? physicalCards : pocketCards,
+        relatedCardTotal: Number(mode === 'physical' ? physical.total : pocket.total) || 0,
+        physicalRelatedCards: physicalCards,
+        physicalRelatedCardTotal: Number(physical.total || 0),
+        pocketRelatedCards: pocketCards,
+        pocketRelatedCardTotal: Number(pocket.total || 0)
       });
-    }).catch(() => {
-      this.setData({
-        relatedCards: [],
-        relatedCardTotal: 0
-      });
+    });
+  },
+
+  selectRelatedCardMode(event) {
+    const mode = event.currentTarget.dataset.mode === 'pocket' ? 'pocket' : 'physical';
+    this.setData({
+      relatedCardMode: mode,
+      relatedCards: mode === 'pocket' ? this.data.pocketRelatedCards : this.data.physicalRelatedCards,
+      relatedCardTotal: mode === 'pocket' ? this.data.pocketRelatedCardTotal : this.data.physicalRelatedCardTotal
     });
   },
 
@@ -710,11 +730,18 @@ Page({
     wx.redirectTo({ url: `/pages/pokemon-detail/index?id=${event.currentTarget.dataset.id}` });
   },
 
-  openCard(event) {
-    wx.navigateTo({ url: `/pages/card-detail/index?id=${encodeURIComponent(event.currentTarget.dataset.id)}` });
+  openRelatedCard(event) {
+    const id = encodeURIComponent(event.currentTarget.dataset.id);
+    const source = event.currentTarget.dataset.source;
+    wx.navigateTo({ url: source === 'pocket' ? `/pages/pocket-card-detail/index?id=${id}` : `/pages/card-detail/index?id=${id}` });
   },
 
   openRelatedCards() {
+    if (this.data.relatedCardMode === 'pocket') {
+      wx.setStorageSync('pokechill:pendingPocketPokemonId', this.data.pokemon.id);
+      wx.switchTab({ url: '/pages/pocket/index' });
+      return;
+    }
     wx.setStorageSync('pokechill:pendingCardPokemonId', this.data.pokemon.id);
     wx.switchTab({ url: '/pages/carddex/index' });
   },

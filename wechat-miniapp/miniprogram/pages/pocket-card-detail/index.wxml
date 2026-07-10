@@ -1,0 +1,59 @@
+<view class="page pocket-detail-page">
+  <view wx:if="{{loading}}" class="detail-state">卡牌详情加载中</view>
+  <view wx:elif="{{error}}" class="detail-state error" bindtap="retry">{{error}}</view>
+  <block wx:elif="{{card}}">
+    <view class="detail-top">
+      <view class="detail-art" bindtap="previewImage"><image src="{{card.image}}" mode="aspectFit" /></view>
+      <view class="detail-copy">
+        <view class="detail-code">{{card.collectionRows[0].expansion_id}} #{{card.collectionRows[0].number}}</view>
+        <view class="detail-name">{{card.name_zh}}</view>
+        <view class="detail-en">{{card.name_en}}</view>
+        <view class="detail-badges"><energy-icon type="{{card.type.iconType}}" label="{{card.type.name}}能量" /><text class="rarity">{{card.rarity}}</text><text wx:if="{{card.is_ex}}" class="ex">ex</text></view>
+      </view>
+    </view>
+
+    <view class="detail-section stats-section">
+      <view class="section-heading">基础数据</view>
+      <view class="stats-grid">
+        <view><text>HP</text><strong>{{card.hp || '-'}}</strong></view>
+        <view><text>卡牌类型</text><strong>{{card.card_type === 'pokemon' ? '宝可梦' : '训练家'}}</strong></view>
+        <view><text>弱点</text><view wx:if="{{card.weakness}}" class="weakness-energy"><energy-icon type="{{card.weakness.iconType}}" label="{{card.weakness.name}}能量" /><strong>+{{card.weakness.bonus}}</strong></view><strong wx:else>-</strong></view>
+        <view><text>撤退费用</text><view class="energy-line"><energy-icon wx:for="{{card.retreatItems}}" wx:key="id" type="{{item.iconType}}" label="{{item.name}}能量" /><strong wx:if="{{!card.retreatItems.length}}">0</strong></view></view>
+      </view>
+    </view>
+
+    <view wx:if="{{card.abilities.length}}" class="detail-section">
+      <view class="section-heading">特性</view>
+      <view wx:for="{{card.abilities}}" wx:key="id" class="move-row"><view class="move-head"><view class="ability-label">特性</view><view class="move-name">{{item.name_zh}}</view></view><view wx:if="{{item.descriptionText}}" class="move-text">{{item.descriptionText}}</view></view>
+    </view>
+
+    <view wx:if="{{card.attacks.length}}" class="detail-section">
+      <view class="section-heading">招式</view>
+      <view wx:for="{{card.attacks}}" wx:key="id" class="move-row">
+        <view class="move-head"><view class="energy-line"><energy-icon wx:for="{{item.costItems}}" wx:for-item="energy" wx:key="id" type="{{energy.iconType}}" label="{{energy.name}}能量" /></view><view class="move-name">{{item.name_zh}}</view><view class="move-damage">{{item.damageText}}</view></view>
+        <view wx:if="{{item.descriptionText}}" class="move-text">{{item.descriptionText}}</view>
+      </view>
+    </view>
+
+    <view class="detail-section">
+      <view class="section-heading">图鉴编号</view>
+      <view class="collection-list"><view wx:for="{{card.collectionRows}}" wx:key="key" class="collection-row"><text>{{item.text}}</text><text>{{card.mirror_type === 'normalMirror' ? '镜面' : ''}}</text></view></view>
+    </view>
+
+    <view class="detail-section">
+      <view class="section-heading">获得方式</view>
+      <view class="acquisition-list"><view wx:for="{{card.acquisitionRows}}" wx:key="label"><text>{{item.label}}</text><text>{{item.value}}</text></view></view>
+    </view>
+
+    <view wx:if="{{relatedPokemon}}" class="detail-section">
+      <view class="section-heading">关联宝可梦</view>
+      <view class="related-pokemon" bindtap="openPokemon">
+        <image src="{{relatedPokemon.image}}" mode="aspectFit" />
+        <view><strong>{{relatedPokemon.name_zh}}</strong><text>#{{relatedPokemon.id}} {{relatedPokemon.name_en}}</text></view>
+        <text class="related-arrow">›</text>
+      </view>
+    </view>
+  </block>
+
+  <view wx:if="{{card}}" class="detail-actions"><view class="action-secondary {{favorite ? 'active' : ''}}" bindtap="toggleFavorite">{{favorite ? '★ 已收藏' : '☆ 收藏'}}</view><view class="action-primary {{owned ? 'owned' : ''}}" bindtap="toggleOwned">{{owned ? '已拥有' : '标记拥有'}}</view></view>
+</view>

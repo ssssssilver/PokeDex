@@ -12,7 +12,7 @@
       <view class="hero-name">{{card.title}}</view>
       <view wx:if="{{card.subtitle}}" class="hero-subtitle">{{card.subtitle}}</view>
       <view class="hero-tags">
-        <view wx:for="{{card.type_energy}}" wx:key="id" class="energy-badge" style="background: {{item.color}}">{{item.name}}</view>
+        <energy-icon wx:for="{{card.type_energy}}" wx:key="id" type="{{item.id}}" label="{{item.name}}能量" />
         <view wx:if="{{card.rarity_name}}" class="plain-badge">{{card.rarity_name}}</view>
       </view>
       <view class="hero-actions">
@@ -36,14 +36,17 @@
   <view wx:if="{{card.descriptionText}}" class="card info-card">
     <view class="section-title compact">中文描述</view>
     <view class="block-copy">{{card.descriptionText}}</view>
+    <view wx:if="{{card.descriptionEnglish}}" class="translation-en">{{card.descriptionEnglish}}</view>
     <view wx:if="{{card.descriptionSource}}" class="description-source">{{card.descriptionSource}}</view>
   </view>
 
   <view wx:if="{{card.abilities.length}}" class="card info-card">
     <view class="section-title compact">特性</view>
     <view wx:for="{{card.abilities}}" wx:key="name" class="text-block">
-      <view class="block-title">{{item.name}}<text wx:if="{{item.type_name}}"> · {{item.type_name}}</text></view>
-      <view class="block-copy">{{item.text_zh || item.text}}</view>
+      <view class="block-title">{{item.display_name}}<text wx:if="{{item.type_name}}"> · {{item.type_name}}</text></view>
+      <view wx:if="{{item.english_name}}" class="block-name-en">{{item.english_name}}</view>
+      <view wx:if="{{item.display_text}}" class="block-copy">{{item.display_text}}</view>
+      <view wx:if="{{item.english_text}}" class="translation-en">{{item.english_text}}</view>
     </view>
   </view>
 
@@ -51,18 +54,22 @@
     <view class="section-title compact">招式</view>
     <view wx:for="{{card.attacks}}" wx:key="name" class="attack-row">
       <view class="attack-head">
-        <view class="block-title">{{item.name}}</view>
+        <view>
+          <view class="block-title">{{item.display_name}}</view>
+          <view wx:if="{{item.english_name}}" class="block-name-en">{{item.english_name}}</view>
+        </view>
         <view class="damage">{{item.damage || '-'}}</view>
       </view>
       <view class="cost-line">
         <text class="cost-label">费用</text>
         <view class="energy-icon-row">
-          <view wx:for="{{item.cost_energy}}" wx:key="id" class="energy-icon" style="background: {{item.color}}">{{item.symbol}}</view>
+          <energy-icon wx:for="{{item.cost_energy}}" wx:key="id" type="{{item.id}}" label="{{item.name}}能量" />
           <text wx:if="{{!item.cost_energy.length}}" class="muted">-</text>
         </view>
         <text class="cost-total">总能量 {{item.converted_energy_cost}}</text>
       </view>
-      <view wx:if="{{item.text_zh || item.text}}" class="block-copy">{{item.text_zh || item.text}}</view>
+      <view wx:if="{{item.display_text}}" class="block-copy">{{item.display_text}}</view>
+      <view wx:if="{{item.english_text}}" class="translation-en">{{item.english_text}}</view>
     </view>
   </view>
 
@@ -77,7 +84,7 @@
     <view class="retreat-cost-row">
       <view class="muted">撤退费用</view>
       <view class="energy-icon-row">
-        <view wx:for="{{card.retreat_cost_energy}}" wx:key="id" class="energy-icon" style="background: {{item.color}}">{{item.symbol}}</view>
+        <energy-icon wx:for="{{card.retreat_cost_energy}}" wx:key="id" type="{{item.id}}" label="{{item.name}}能量" />
         <text wx:if="{{!card.retreat_cost_energy.length}}" class="muted">无</text>
       </view>
       <view class="cost-total">{{card.converted_retreat_cost || 0}} 能量</view>
@@ -85,21 +92,24 @@
     <view wx:if="{{card.weaknesses.length}}" class="relation-group">
       <view class="muted">弱点</view>
       <view class="relation-row">
-        <view wx:for="{{card.weaknesses}}" wx:key="type" class="relation-chip" style="background: {{item.type_color}}">{{item.type_name}} {{item.value}}</view>
+        <view wx:for="{{card.weaknesses}}" wx:key="type" class="relation-chip"><energy-icon type="{{item.type}}" label="{{item.type_name}}能量" /><text>{{item.type_name}} {{item.value}}</text></view>
       </view>
     </view>
     <view wx:if="{{card.resistances.length}}" class="relation-group">
       <view class="muted">抵抗</view>
       <view class="relation-row">
-        <view wx:for="{{card.resistances}}" wx:key="type" class="relation-chip" style="background: {{item.type_color}}">{{item.type_name}} {{item.value}}</view>
+        <view wx:for="{{card.resistances}}" wx:key="type" class="relation-chip"><energy-icon type="{{item.type}}" label="{{item.type_name}}能量" /><text>{{item.type_name}} {{item.value}}</text></view>
       </view>
     </view>
   </view>
 
-  <view wx:if="{{card.rules.length || card.legalitiesText}}" class="card info-card">
+  <view wx:if="{{card.ruleBlocks.length || card.legalitiesText}}" class="card info-card">
     <view class="section-title compact">规则</view>
     <view wx:if="{{card.legalitiesText}}" class="block-copy">{{card.legalitiesText}}</view>
-    <view wx:for="{{card.rules}}" wx:key="*this" class="rule-row">{{item}}</view>
+    <view wx:for="{{card.ruleBlocks}}" wx:key="key" class="rule-row">
+      <view>{{item.display_text}}</view>
+      <view wx:if="{{item.english_text}}" class="translation-en rule-translation-en">{{item.english_text}}</view>
+    </view>
   </view>
 
   <view wx:if="{{card.pokemon_refs.length}}" class="card info-card">

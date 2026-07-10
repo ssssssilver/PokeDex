@@ -1,0 +1,91 @@
+<view class="page deck-detail-page">
+  <view wx:if="{{loading}}" class="card loading-card">
+    <view class="loading-title">正在加载卡组</view>
+    <view class="muted">从 Limitless 获取最新牌表...</view>
+  </view>
+
+  <block wx:elif="{{deck}}">
+    <view class="card deck-hero">
+      <view class="deck-topline">
+        <view class="deck-rank" wx:if="{{deck.rank}}">#{{deck.rank}}</view>
+        <view class="deck-source">{{deck.source}}</view>
+      </view>
+      <view class="deck-title">{{deck.name}}</view>
+      <view class="deck-description" wx:if="{{deck.description}}">{{deck.description}}</view>
+
+      <view class="deck-meta-grid">
+        <view class="deck-meta-item">
+          <view class="meta-value">{{deck.totalCards}}</view>
+          <view class="muted">卡牌</view>
+        </view>
+        <view class="deck-meta-item">
+          <view class="meta-value">{{deck.points || '-'}}</view>
+          <view class="muted">积分</view>
+        </view>
+        <view class="deck-meta-item">
+          <view class="meta-value">{{deck.share || '-'}}</view>
+          <view class="muted">占比</view>
+        </view>
+      </view>
+
+      <view wx:if="{{deck.latestText}}" class="latest-result">
+        <view class="latest-label">最新结果</view>
+        <view class="latest-value">{{deck.latestText}}</view>
+      </view>
+
+      <view wx:if="{{deck.images && deck.images.length}}" class="deck-hero-icons">
+        <image wx:for="{{deck.images}}" wx:key="src" src="{{item.src}}" mode="aspectFit" />
+      </view>
+
+      <view class="deck-actions">
+        <view class="button-primary" bindtap="copyDeck">一键复制卡组</view>
+        <view class="button-secondary" bindtap="copySource">复制来源</view>
+      </view>
+    </view>
+
+    <view wx:if="{{deck.galleryCards.length}}" class="section deck-gallery-section">
+      <view class="section-title">
+        <text>卡组全览</text>
+        <text class="muted">{{deck.galleryCards.length}} 种 · {{deck.totalCards}} 张</text>
+      </view>
+      <scroll-view scroll-x enhanced show-scrollbar="{{false}}" class="deck-gallery-scroll">
+        <view class="deck-gallery-row">
+          <view wx:for="{{deck.galleryCards}}" wx:key="image" class="deck-gallery-item" bindtap="previewCard" data-src="{{item.image}}">
+            <view class="deck-card-thumb-wrap">
+              <image class="deck-card-thumb" src="{{item.image}}" mode="aspectFit" lazy-load />
+              <view class="deck-card-quantity">×{{item.count}}</view>
+            </view>
+            <view class="deck-gallery-name">{{item.name}}</view>
+            <view class="deck-gallery-set">{{item.setLine}}</view>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+
+    <view wx:for="{{deck.sections}}" wx:key="title" class="section">
+      <view class="section-title">
+        <text>{{item.displayTitle}}</text>
+        <text class="muted">{{item.countText}}</text>
+      </view>
+      <view class="card deck-section-card">
+        <view wx:for="{{item.cards}}" wx:for-item="card" wx:key="line" class="deck-card-row">
+          <view class="deck-card-count">{{card.count}}</view>
+          <view class="deck-card-main">
+            <view class="deck-card-name">{{card.name}}</view>
+            <view class="muted">{{card.setLine}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="copy-panel">
+      <view class="button-primary" bindtap="copyDeck">一键复制卡组</view>
+    </view>
+  </block>
+
+  <view wx:else class="card empty-state">
+    <view class="title">卡组详情加载失败</view>
+    <view class="hint">{{error || '请稍后重试'}}</view>
+    <view class="button-primary retry-button" bindtap="retry">重新加载</view>
+  </view>
+</view>

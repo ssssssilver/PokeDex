@@ -1,0 +1,15 @@
+<view class="page events-page">
+  <scroll-view scroll-x class="event-tabs"><view wx:for="{{tabs}}" wx:key="id" class="event-tab {{activeTab === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="switchTab">{{item.name}}</view></scroll-view>
+  <view wx:if="{{loading}}" class="event-state">内容加载中</view>
+  <view wx:elif="{{error}}" class="event-state error" bindtap="retry">{{error}}</view>
+  <view wx:elif="{{items.length}}" class="event-cards">
+    <view wx:for="{{items}}" wx:key="id" class="event-card" data-id="{{item.id}}" bindtap="toggleDetail">
+      <view class="event-top"><view class="event-type">{{item.typeText}}</view><view class="event-status {{item.status === 'upcoming' ? 'upcoming' : ''}}">{{item.statusText}}</view></view>
+      <view class="event-name">{{item.name_zh || item.typeText}}</view>
+      <view class="event-range">{{item.rangeText}}</view>
+      <view wx:if="{{item.detailLines.length}}" class="event-more">{{item.expanded ? '收起' : '查看内容'}}</view>
+      <view wx:if="{{item.expanded}}" class="event-detail"><view wx:for="{{item.detailLines}}" wx:key="*this">{{item}}</view></view>
+    </view>
+  </view>
+  <view wx:else class="event-state">当前栏目暂无内容</view>
+</view>

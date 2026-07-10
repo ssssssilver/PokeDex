@@ -7,7 +7,7 @@ const CARDS = [
     supertype: 'Pokémon',
     supertype_name: '宝可梦',
     subtypes: ['Stage 2'],
-    subtype_names: ['二阶进化'],
+    subtype_names: ['2阶进化'],
     hp: '120',
     types: ['Fire'],
     type_names: ['火'],
@@ -27,9 +27,12 @@ const CARDS = [
     attacks: [
       {
         name: 'Fire Spin',
+        name_zh: '火焰旋涡',
         cost_text: '火、火、火、火',
         damage: '100',
         text: 'Discard 2 Energy cards attached to Charizard in order to use this attack.',
+        text_zh: '选择喷火龙身上附着的2个能量，放于弃牌区。',
+        original_text: 'Discard 2 Energy cards attached to Charizard in order to use this attack.',
         converted_energy_cost: 4
       }
     ],
@@ -46,7 +49,7 @@ const CARDS = [
     supertype: 'Pokémon',
     supertype_name: '宝可梦',
     subtypes: ['Stage 2'],
-    subtype_names: ['二阶进化'],
+    subtype_names: ['2阶进化'],
     hp: '170',
     types: ['Fire'],
     type_names: ['火'],
@@ -64,8 +67,8 @@ const CARDS = [
     image: 'https://images.pokemontcg.io/swsh4/25.png',
     image_small: 'https://images.pokemontcg.io/swsh4/25.png',
     image_large: 'https://images.pokemontcg.io/swsh4/25_hires.png',
-    abilities: [{ name: 'Battle Sense', type: 'Ability', type_name: 'Ability', text: 'Once during your turn, you may look at the top 3 cards of your deck and put 1 of them into your hand. Discard the other cards.' }],
-    attacks: [{ name: 'Royal Blaze', cost_text: '火、火', damage: '100+', text: 'This attack does 50 more damage for each Leon card in your discard pile.', converted_energy_cost: 2 }],
+    abilities: [{ name: 'Battle Sense', name_zh: '战斗感知', type: 'Ability', type_name: '特性', text: 'Once during your turn, you may look at the top 3 cards of your deck and put 1 of them into your hand. Discard the other cards.', text_zh: '在自己的回合时，可使用1次。查看自己牌库上方的3张卡牌，选择其中1张加入手牌。将其余卡牌放于弃牌区。', original_text: 'Once during your turn, you may look at the top 3 cards of your deck and put 1 of them into your hand. Discard the other cards.' }],
+    attacks: [{ name: 'Royal Blaze', name_zh: '皇家烈焰', cost_text: '火、火', damage: '100+', text: 'This attack does 50 more damage for each Leon card in your discard pile.', text_zh: '自己的弃牌区中每有1张“丹帝”，则追加造成50伤害。', original_text: 'This attack does 50 more damage for each Leon card in your discard pile.', converted_energy_cost: 2 }],
     weaknesses: [{ type: 'Water', type_name: '水', type_color: '#2f80ed', value: '×2' }],
     retreat_cost_text: '无色、无色、无色',
     converted_retreat_cost: 3,
@@ -99,7 +102,7 @@ const CARDS = [
     image: 'https://images.pokemontcg.io/base1/44.png',
     image_small: 'https://images.pokemontcg.io/base1/44.png',
     image_large: 'https://images.pokemontcg.io/base1/44_hires.png',
-    attacks: [{ name: 'Leech Seed', cost_text: '草、草', damage: '20', text: 'Unless all damage from this attack is prevented, remove 1 damage counter from Bulbasaur.', converted_energy_cost: 2 }],
+    attacks: [{ name: 'Leech Seed', name_zh: '寄生种子', cost_text: '草、草', damage: '20', text: 'Unless all damage from this attack is prevented, remove 1 damage counter from Bulbasaur.', text_zh: '若这个招式的伤害未被完全抵消，则将妙蛙种子的HP回复10。', original_text: 'Unless all damage from this attack is prevented, remove 1 damage counter from Bulbasaur.', converted_energy_cost: 2 }],
     weaknesses: [{ type: 'Fire', type_name: '火', type_color: '#e85d3f', value: '×2' }],
     retreat_cost_text: '无色',
     converted_retreat_cost: 1,
@@ -116,8 +119,8 @@ const CARDS = [
     subtype_names: ['基础'],
     hp: '40',
     types: ['Lightning'],
-    type_names: ['电'],
-    type_energy: [{ id: 'Lightning', name: '电', color: '#d99a00' }],
+    type_names: ['雷'],
+    type_energy: [{ id: 'Lightning', name: '雷', color: '#d99a00' }],
     set_id: 'base1',
     set_name: 'Base',
     set_series: 'Base',
@@ -131,8 +134,8 @@ const CARDS = [
     image_small: 'https://images.pokemontcg.io/base1/58.png',
     image_large: 'https://images.pokemontcg.io/base1/58_hires.png',
     attacks: [
-      { name: 'Gnaw', cost_text: '无色', damage: '10', text: '', converted_energy_cost: 1 },
-      { name: 'Thunder Jolt', cost_text: '电、无色', damage: '30', text: 'Flip a coin. If tails, Pikachu does 10 damage to itself.', converted_energy_cost: 2 }
+      { name: 'Gnaw', name_zh: '啃咬', cost_text: '无色', damage: '10', text: '', converted_energy_cost: 1 },
+      { name: 'Thunder Jolt', name_zh: '电击冲击', cost_text: '雷、无色', damage: '30', text: 'Flip a coin. If tails, Pikachu does 10 damage to itself.', text_zh: '抛掷1次硬币。若为反面，则皮卡丘也受到10伤害。', original_text: 'Flip a coin. If tails, Pikachu does 10 damage to itself.', converted_energy_cost: 2 }
     ],
     weaknesses: [{ type: 'Fighting', type_name: '斗', type_color: '#c2410c', value: '×2' }],
     retreat_cost_text: '无色',

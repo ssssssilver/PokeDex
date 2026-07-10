@@ -1,51 +1,24 @@
 <view class="page play-page">
-  <view class="play-header">
-    <view class="title">轻玩法</view>
-    <view class="muted">用图鉴数据做一点小挑战。</view>
+  <view class="play-header"><view class="title">玩法盒子</view><view class="muted">按数据栏目选择轻玩法。</view></view>
+  <view class="play-categories"><view wx:for="{{categories}}" wx:key="id" class="{{activeCategory === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="selectCategory">{{item.name}}</view></view>
+
+  <view wx:if="{{activeCategory === 'pokemon'}}" class="play-list">
+    <view class="category-heading"><text>宝可梦玩法</text><small>图鉴与属性数据</small></view>
+    <view class="card play-card" bindtap="openQuiz"><view class="play-icon">猜</view><view class="play-copy"><view class="play-title">每日猜宝可梦</view><view class="muted">根据属性和世代线索四选一。</view></view></view>
+    <view class="card play-card" bindtap="openTeam"><view class="play-icon">队</view><view class="play-copy"><view class="play-title">队伍属性分析</view><view class="muted">维护多个六人队伍，检查共同弱点。</view></view></view>
+    <view class="card play-card" bindtap="openTypes"><view class="play-icon">属</view><view class="play-copy"><view class="play-title">属性克制速查</view><view class="muted">快速查看弱点、抗性和免疫。</view></view></view>
   </view>
 
-  <view class="play-list">
-    <view class="card play-card" bindtap="openQuiz">
-      <view class="play-icon">猜</view>
-      <view class="play-copy">
-        <view class="play-title">每日猜宝可梦</view>
-        <view class="muted">根据属性、世代和剪影来猜。</view>
-      </view>
-    </view>
-    <view class="card play-card" bindtap="openTeam">
-      <view class="play-icon">队</view>
-      <view class="play-copy">
-        <view class="play-title">队伍属性分析</view>
-        <view class="muted">选择最多 6 只，查看共同弱点。</view>
-      </view>
-    </view>
-    <view class="card play-card" bindtap="openTypes">
-      <view class="play-icon">属</view>
-      <view class="play-copy">
-        <view class="play-title">属性克制速查</view>
-        <view class="muted">快速看弱点、抗性和免疫。</view>
-      </view>
-    </view>
-    <view class="card play-card" bindtap="openCardQuiz">
-      <view class="play-icon">卡</view>
-      <view class="play-copy">
-        <view class="play-title">今日猜卡牌</view>
-        <view class="muted">根据卡图、系列和稀有度提示来猜。</view>
-      </view>
-    </view>
-    <view class="card play-card" bindtap="openCardPack">
-      <view class="play-icon">包</view>
-      <view class="play-copy">
-        <view class="play-title">每日开包</view>
-        <view class="muted">选择系列，开一包 10 张卡。</view>
-      </view>
-    </view>
-    <view class="card play-card disabled" bindtap="showChallenge">
-      <view class="play-icon">限</view>
-      <view class="play-copy">
-        <view class="play-title">随机挑战生成器</view>
-        <view class="muted">下一版：生成限定属性/世代挑战。</view>
-      </view>
-    </view>
+  <view wx:elif="{{activeCategory === 'card'}}" class="play-list">
+    <view class="category-heading"><text>实体卡牌玩法</text><small>PTCG 数据</small></view>
+    <view class="card play-card" bindtap="openCardQuiz"><view class="play-icon coral">猜</view><view class="play-copy"><view class="play-title">今日猜卡牌</view><view class="muted">根据卡图、系列和稀有度提示作答。</view></view></view>
+    <view class="card play-card" bindtap="openCardPack"><view class="play-icon blue">包</view><view class="play-copy"><view class="play-title">模拟开包</view><view class="muted">选择实体卡系列并手动开包。</view></view></view>
+  </view>
+
+  <view wx:else class="play-list">
+    <view class="category-heading"><text>Pocket 玩法</text><small>移动端卡牌数据</small></view>
+    <view class="card play-card" bindtap="openPocketPack"><view class="play-icon blue">包</view><view class="play-copy"><view class="play-title">Pocket 模拟开包</view><view class="muted">普通包与特典包采用对应抽取规则。</view></view></view>
+    <view class="card play-card" data-tab="missions" bindtap="openPocketEvents"><view class="play-icon gold">任</view><view class="play-copy"><view class="play-title">任务与活动</view><view class="muted">查看当前活动、任务和奖励入口。</view></view></view>
+    <view class="card play-card" bindtap="openPocketDecks"><view class="play-icon coral">组</view><view class="play-copy"><view class="play-title">热门卡组挑战</view><view class="muted">从当前环境热门原型寻找组牌灵感。</view></view></view>
   </view>
 </view>

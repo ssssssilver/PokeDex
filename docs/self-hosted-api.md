@@ -83,7 +83,9 @@ http://127.0.0.1:8787/assets/ptcg/cards/base1-4/small
 http://127.0.0.1:8787/assets/ptcg/cards/base1-4/large
 ```
 
-卡牌数据第一版优先中文化固定枚举：属性、卡牌大类、子类型、稀有度和赛制状态。卡牌效果文本如果上游只有英文，会先保留英文。
+卡牌数据会中文化固定枚举，并按简体中文版 PTCG 的规则术语翻译常见效果模板。详情页同时保留英文名称与英文效果；无法可靠翻译的专属名称或复杂效果直接显示英文，避免中英夹杂或误译。
+
+简中术语和文案风格参考 [duanxr/PTCG-CHS-Datasets](https://github.com/duanxr/PTCG-CHS-Datasets)。该数据集仅作为术语研究参考，不打包、不缓存，也不随本项目再分发；使用者应自行阅读并遵守其非商业和禁止再分发条款。
 
 ## ProjectPokemon 3D 动态图
 

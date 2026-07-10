@@ -45,7 +45,7 @@
             <text wx:if="{{item.metaText}}">{{item.metaText}}</text>
           </view>
           <view wx:if="{{item.type_energy.length}}" class="energy-row">
-            <view wx:for="{{item.type_energy}}" wx:key="id" class="energy-badge" style="background: {{item.color}}">{{item.name}}</view>
+            <energy-icon wx:for="{{item.type_energy}}" wx:key="id" type="{{item.id}}" label="{{item.name}}能量" />
           </view>
         </view>
       </view>

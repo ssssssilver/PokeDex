@@ -1,0 +1,14 @@
+<view class="page pocket-decks-page">
+  <view class="deck-summary"><view><text>{{total}}</text><view>当前赛制卡组原型</view></view><view class="summary-source">LIMITLESS POCKET</view></view>
+  <view wx:if="{{loading}}" class="deck-state">排行榜加载中</view>
+  <view wx:elif="{{error}}" class="deck-state error" bindtap="retry">{{error}}</view>
+  <view wx:elif="{{decks.length}}" class="ranking-list">
+    <view wx:for="{{decks}}" wx:key="id" class="ranking-row" data-id="{{item.id}}" bindtap="openDeck">
+      <view class="ranking-number">{{item.rank}}</view>
+      <view class="ranking-icons"><image wx:for="{{item.images}}" wx:for-item="icon" wx:key="*this" src="{{icon}}" mode="aspectFit" /></view>
+      <view class="ranking-copy"><view class="ranking-name">{{item.name}}</view><view class="ranking-score">{{item.scoreText}} · {{item.count}} 副牌表</view></view>
+      <view class="ranking-metrics"><strong>{{item.shareText}}</strong><text>使用率</text><strong>{{item.winRateText}}</strong><text>胜率</text></view>
+    </view>
+  </view>
+  <view wx:else class="deck-state">暂无热门卡组</view>
+</view>
