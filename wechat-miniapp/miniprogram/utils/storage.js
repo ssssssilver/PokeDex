@@ -46,8 +46,26 @@ function toggleFavorite(id) {
   return !exists;
 }
 
-function getRecentViews() {
-  return read(RECENT_KEY, []);
+function getRecentViews(currentPokemon) {
+  const recent = read(RECENT_KEY, []);
+  if (!Array.isArray(currentPokemon) || !currentPokemon.length || !recent.length) return recent;
+  const currentById = new Map(currentPokemon.map((pokemon) => [Number(pokemon.id), pokemon]));
+  let changed = false;
+  const refreshed = recent.map((saved) => {
+    const current = currentById.get(Number(saved.id));
+    if (!current) return saved;
+    const next = Object.assign({}, saved, {
+      name_zh: current.name_zh,
+      name_en: current.name_en,
+      image: current.image,
+      types: current.types,
+      typeNames: current.typeNames || []
+    });
+    if (next.image !== saved.image) changed = true;
+    return next;
+  });
+  if (changed) write(RECENT_KEY, refreshed);
+  return refreshed;
 }
 
 function addRecent(pokemon) {

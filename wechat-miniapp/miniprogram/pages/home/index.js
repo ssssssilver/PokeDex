@@ -58,7 +58,7 @@ Page({
         hotDecks: deckResult.items || [],
         pocketEvents: (pocketEventResult.items || []).slice(0, 3).map(decoratePocketEvent),
         pocketDecks: pocketDeckResult.items || [],
-        recent: storage.getRecentViews(),
+        recent: storage.getRecentViews(pokemon),
         recentCards: storage.getRecentCards(),
         recentPocketCards: storage.getPocketRecent()
       });

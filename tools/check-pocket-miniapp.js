@@ -68,6 +68,7 @@ const pocketTabWxml = fs.readFileSync(path.join(root, 'pages', 'pocket', 'index.
 const pokemonDetailWxml = fs.readFileSync(path.join(root, 'pages', 'pokemon-detail', 'index.wxml'), 'utf8');
 const homeWxml = fs.readFileSync(path.join(root, 'pages', 'home', 'index.wxml'), 'utf8');
 const homeSource = fs.readFileSync(path.join(root, 'pages', 'home', 'index.js'), 'utf8');
+const storageSource = fs.readFileSync(path.join(root, 'utils', 'storage.js'), 'utf8');
 const profileWxml = fs.readFileSync(path.join(root, 'pages', 'profile', 'index.wxml'), 'utf8');
 const quizWxml = fs.readFileSync(path.join(root, 'pages', 'quiz', 'index.wxml'), 'utf8');
 checks.push(check(!pocketSources.includes('/pages/card-detail/index'), 'Pocket pages do not open physical-card detail'));
@@ -81,11 +82,23 @@ checks.push(check(!pokemonDetailWxml.includes('related-card-name'), 'related Pok
 checks.push(check(homeWxml.includes('宝可梦猜谜') && !homeWxml.includes('每日猜谜'), 'Pokemon quiz is labeled as a random light game'));
 checks.push(check(!homeWxml.includes('快速发现宝可梦'), 'home removes quick Pokemon discovery'));
 checks.push(check(!homeSource.includes('quiz.answerId'), 'daily Pokemon is independent from the quiz answer'));
+checks.push(check(homeSource.includes('getRecentViews(pokemon)') && storageSource.includes('currentById'), 'legacy recent Pokemon images migrate to current OSS URLs'));
 checks.push(check(balancedWxml(path.join(root, 'pages', 'profile', 'index.wxml')), 'profile WXML has balanced tags'));
 checks.push(check(['宝可梦', '实体卡牌', 'Pocket'].every((label) => profileWxml.includes(label)), 'profile groups saved data by product domain'));
 checks.push(check(!profileWxml.includes('最近查看') && !profileWxml.includes('数据源') && !profileWxml.includes('同步'), 'profile removes recent and sync diagnostics'));
 checks.push(check(profileWxml.includes('open-type="feedback"') && !profileWxml.includes('联系邮箱'), 'profile keeps native feedback without a duplicate contact email'));
 checks.push(check(quizWxml.includes('随机挑战') && quizWxml.includes('再猜一题'), 'Pokemon quiz supports repeated random rounds'));
+
+const originalWx = global.wx;
+const storedValues = new Map([['pokechill:recent', [{ id: 11, name_zh: '铁甲蛹', image: 'http://127.0.0.1:8787/assets/local-pokemon/metapod.png' }]]]);
+global.wx = {
+  getStorageSync(key) { return storedValues.get(key); },
+  setStorageSync(key, value) { storedValues.set(key, value); }
+};
+const storage = require(path.join(root, 'utils', 'storage'));
+const migratedRecent = storage.getRecentViews([{ id: 11, name_zh: '铁甲蛹', name_en: 'Metapod', image: 'https://example.test/metapod.png', types: ['bug'], typeNames: ['虫'] }]);
+checks.push(check(migratedRecent[0].image === 'https://example.test/metapod.png', 'stored localhost Pokemon images are migrated to the active dataset URL'));
+global.wx = originalWx;
 
 const failed = checks.filter((item) => !item.ok);
 process.stdout.write(`${JSON.stringify({ ok: failed.length === 0, checks, failed }, null, 2)}\n`);
