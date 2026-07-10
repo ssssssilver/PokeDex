@@ -72,6 +72,13 @@ async function main() {
   assert.strictEqual(pocketPage.total, 3305);
   const pocketSearch = await staticApi.call('listPocketCards', { keyword: '\u5999\u86d9', page: 1, pageSize: 20 });
   assert(pocketSearch.total > 0);
+  const pikachuPocketCards = await staticApi.call('listPocketCards', { pokemonId: 25, page: 1, pageSize: 100 });
+  assert(pikachuPocketCards.total > 0);
+  assert(pikachuPocketCards.items.every((card) => /^Pikachu(?: ex)?$/i.test(card.name_en)),
+    `Pikachu Pocket relation contains unrelated cards: ${pikachuPocketCards.items.map((card) => `${card.name_en}:${card.national_pokedex_number}`).join(', ')}`);
+  const scytherPocketCards = await staticApi.call('listPocketCards', { pokemonId: 123, page: 1, pageSize: 100 });
+  assert(scytherPocketCards.items.every((card) => /^Scyther(?: ex)?$/i.test(card.name_en)),
+    `Scyther Pocket relation contains unrelated cards: ${scytherPocketCards.items.map((card) => `${card.name_en}:${card.national_pokedex_number}`).join(', ')}`);
   const pocketDetail = await staticApi.call('getPocketCard', { id: pocketSearch.items[0].id });
   assert(pocketDetail.item);
 

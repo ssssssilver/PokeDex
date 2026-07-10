@@ -44,6 +44,14 @@ function parseSource(source, text) {
   return source.format === 'json' ? JSON.parse(text) : text;
 }
 
+function loadPokedexRows(dataDir) {
+  const filePath = path.join(dataDir, 'pokedex-cache.json');
+  const cache = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+  const rows = Object.values(cache.pokemon_summary || {});
+  if (!rows.length) throw new Error(`Pokedex cache has no Pokemon summaries: ${filePath}`);
+  return rows;
+}
+
 async function fetchSource(source, options) {
   const filePath = sourcePath(options.dataDir, source);
   try {
@@ -127,6 +135,7 @@ async function syncPocket(store, event = {}, context = {}) {
     const resources = await Promise.all(SOURCE_PLAN.map((source) => fetchSource(source, options)));
     const payload = Object.fromEntries(resources.map((resource) => [resource.name, resource.data]));
     payload.locale = extractRaenonxMessages(payload.raenonxLocale);
+    payload.pokedex = loadPokedexRows(options.dataDir);
     const normalized = normalizePocketData(payload);
     normalized.sourceMeta = Object.fromEntries(resources.map((resource) => [resource.name, resource.meta]));
     if (!options.dryRun) store.replaceSnapshot(normalized);

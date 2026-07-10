@@ -203,16 +203,53 @@ function normalizeAbility(ability, locale) {
   };
 }
 
-function nationalDexNumber(pokemonId) {
-  const match = String(pokemonId || '').match(/^PK_(\d+)$/i);
-  if (!match) return null;
-  const encoded = Number(match[1]);
-  return Number.isFinite(encoded) ? Math.floor(encoded / 10) : null;
+function pokemonNameKey(value) {
+  return String(value || '')
+    .normalize('NFKD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[’‘]/g, "'")
+    .replace(/♀/g, ' female ')
+    .replace(/♂/g, ' male ')
+    .toLowerCase()
+    .replace(/\s+ex$/i, '')
+    .replace(/[^a-z0-9\u3040-\u30ff\u3400-\u9fff]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
-function normalizeCards(master, locale, chaseCards, deckgymCards) {
+function buildNationalDexResolver(pokemonRows) {
+  const exact = new Map();
+  const englishCandidates = [];
+  (pokemonRows || []).forEach((pokemon) => {
+    const id = Number(pokemon && pokemon.id || 0);
+    if (!id) return;
+    [pokemon.name_en, pokemon.name_zh, pokemon.name_ja].forEach((name) => {
+      const key = pokemonNameKey(name);
+      if (key && !exact.has(key)) exact.set(key, id);
+    });
+    const englishKey = pokemonNameKey(pokemon.name_en);
+    if (englishKey) englishCandidates.push({ key: englishKey, id });
+  });
+  englishCandidates.sort((a, b) => b.key.length - a.key.length);
+
+  return (card) => {
+    const names = [card && card.name_en, card && card.rules && card.rules.name, card && card.name_zh];
+    for (const name of names) {
+      const key = pokemonNameKey(name);
+      if (key && exact.has(key)) return exact.get(key);
+    }
+    const englishKey = pokemonNameKey(names[0] || names[1]);
+    if (!englishKey) return null;
+    const padded = ` ${englishKey} `;
+    const match = englishCandidates.find((candidate) => padded.includes(` ${candidate.key} `));
+    return match ? match.id : null;
+  };
+}
+
+function normalizeCards(master, locale, chaseCards, deckgymCards, pokemonRows) {
   const chaseMap = new Map(chaseCards.map((card) => [chaseKey(card), card]).filter(([key]) => key));
   const deckgymMap = new Map(deckgymCards.map(deckgymEntry).filter(Boolean).map((entry) => [entry.key, entry]));
+  const resolveNationalDexNumber = buildNationalDexResolver(pokemonRows);
   return Object.values(master.cardEntryMap || {}).map((card) => {
     const play = card.play || {};
     const collections = (card.collectionNums || []).map((entry) => ({
@@ -227,7 +264,7 @@ function normalizeCards(master, locale, chaseCards, deckgymCards) {
     const deckgym = deckgymMap.get(primary.key) || null;
     const nameId = play.characterI18nId;
     const pokemonId = play.pokemonId || '';
-    return {
+    const normalized = {
       id: card.cardId,
       name_zh: localizeText(locale.Card && locale.Card.Name, nameId),
       name_en: (chase && chase.name) || (deckgym && deckgym.card.name) || '',
@@ -246,7 +283,7 @@ function normalizeCards(master, locale, chaseCards, deckgymCards) {
       source: card.source || {},
       hp: play.hp === undefined ? null : Number(play.hp),
       pokemon_id: pokemonId,
-      national_pokedex_number: nationalDexNumber(pokemonId),
+      national_pokedex_number: null,
       types: play.types || [],
       evolution: play.evolution || null,
       retreat: play.retreat === undefined ? null : Number(play.retreat),
@@ -259,9 +296,14 @@ function normalizeCards(master, locale, chaseCards, deckgymCards) {
         game_data: 'raenonx-global-master',
         locale_zh: 'raenonx-zh-flight-messages',
         image: chase ? 'chase-mew' : '',
-        english_rules: deckgym ? 'deckgym-core' : ''
+        english_rules: deckgym ? 'deckgym-core' : '',
+        national_pokedex_number: 'pokedex-name-map'
       }
     };
+    normalized.national_pokedex_number = card.cardType === 'pokemon'
+      ? resolveNationalDexNumber(normalized)
+      : null;
+    return normalized;
   });
 }
 
@@ -397,7 +439,7 @@ function normalizeNamedMap(map, dictionary) {
 function normalizePocketData(payload) {
   const master = payload.raenonxMaster;
   const locale = payload.locale;
-  const cards = normalizeCards(master, locale, payload.chaseCards, payload.deckgymCards);
+  const cards = normalizeCards(master, locale, payload.chaseCards, payload.deckgymCards, payload.pokedex);
   const events = normalizeEvents(payload.raenonxEvents, locale, cards);
   const hotDecks = normalizeHotDecks(payload.limitlessDecks);
   return {
@@ -436,6 +478,7 @@ function normalizePocketData(payload) {
 module.exports = {
   SOURCE_URLS,
   extractRaenonxMessages,
+  buildNationalDexResolver,
   normalizePocketData,
   normalizeHotDecks,
   requestJson,

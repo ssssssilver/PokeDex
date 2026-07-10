@@ -165,8 +165,7 @@
   margin-top: 16rpx;
 }
 
-.model-variant-button,
-.model-preview-button {
+.model-variant-button {
   flex: 1;
   min-height: 62rpx;
   border-radius: 8rpx;
@@ -181,12 +180,6 @@
 .model-variant-button.active {
   background: #0f766e;
   color: #fff;
-}
-
-.model-preview-button {
-  flex: 0 0 128rpx;
-  background: #fff7ed;
-  color: #c2410c;
 }
 
 .info-card {

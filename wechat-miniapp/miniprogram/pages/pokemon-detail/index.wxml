@@ -43,7 +43,6 @@
 
     <view class="model-variant-row">
       <view wx:for="{{modelVariantOptions}}" wx:key="id" class="model-variant-button {{activeModelVariant === item.id ? 'active' : ''}}" data-variant="{{item.id}}" bindtap="selectModelVariant">{{item.name}}</view>
-      <view class="model-preview-button" bindtap="previewModel3d">预览</view>
     </view>
 
     <view class="model-credit">{{activeModel.sourceName}} · {{activeModel.credit}}</view>

@@ -1,5 +1,7 @@
 const path = require('path');
+const { CacheStore } = require('../server/cache-store');
 const { PocketCacheStore } = require('../server/pocket-cache-store');
+const { buildNationalDexResolver } = require('../server/pocket-source');
 
 function option(name, fallback) {
   const prefix = `--${name}=`;
@@ -18,7 +20,18 @@ function check(condition, message, evidence) {
 function main() {
   const dataDir = path.resolve(option('data-dir', path.join(__dirname, '..', 'server', '.data')));
   const store = new PocketCacheStore({ filePath: path.join(dataDir, 'pocket-cache.json') });
+  const pokemonStore = new CacheStore({ filePath: path.join(dataDir, 'pokedex-cache.json') });
   const cards = store.getCards();
+  const pokemonCards = cards.filter((card) => card.card_type === 'pokemon');
+  const resolveNationalDexNumber = buildNationalDexResolver(pokemonStore.getSummaries());
+  const dexMappingMismatches = pokemonCards.filter((card) =>
+    Number(card.national_pokedex_number || 0) !== Number(resolveNationalDexNumber(card) || 0));
+  const associationSamples = Object.fromEntries([1, 25, 95, 123, 150].map((id) => [
+    id,
+    Array.from(new Set(pokemonCards
+      .filter((card) => Number(card.national_pokedex_number) === id)
+      .map((card) => card.name_en)))
+  ]));
   const packs = store.getPacks();
   const events = store.getEvents();
   const sources = store.getSourceMeta();
@@ -32,7 +45,10 @@ function main() {
     packs: packs.length,
     packsWithImage: packs.filter((pack) => pack.image).length,
     promoPacks: packs.filter((pack) => pack.is_promo).length,
-    pokemonCardsWithDexNumber: cards.filter((card) => card.card_type === 'pokemon' && card.national_pokedex_number).length,
+    pokemonCards: pokemonCards.length,
+    pokemonCardsWithDexNumber: pokemonCards.filter((card) => card.national_pokedex_number).length,
+    dexMappingMismatchCount: dexMappingMismatches.length,
+    associationSamples,
     events: events.length,
     missions: store.getCollection('missions').length,
     battles: store.getCollection('battles').length,
@@ -52,7 +68,12 @@ function main() {
   check(metrics.expansions >= 20 && metrics.packs >= 50, 'Pocket expansion or pack coverage is incomplete', metrics);
   check(metrics.packsWithImage === metrics.packs, 'Some Pocket packs have no image', metrics);
   check(metrics.promoPacks > 0, 'Pocket promo packs are not identified', metrics);
-  check(metrics.pokemonCardsWithDexNumber > 0, 'Pocket Pokémon cards have no National Pokédex mapping', metrics);
+  check(metrics.pokemonCardsWithDexNumber === metrics.pokemonCards, 'Some Pocket Pokemon cards have no National Pokedex mapping', metrics);
+  check(metrics.dexMappingMismatchCount === 0, 'Pocket card National Pokedex mappings do not match card names', dexMappingMismatches.slice(0, 20));
+  check((associationSamples[25] || []).every((name) => /^Pikachu(?: ex)?$/i.test(name)), 'Pikachu has unrelated Pocket cards', associationSamples[25]);
+  check((associationSamples[95] || []).every((name) => /^Onix(?: ex)?$/i.test(name)), 'Onix has unrelated Pocket cards', associationSamples[95]);
+  check((associationSamples[123] || []).every((name) => /^Scyther(?: ex)?$/i.test(name)), 'Scyther has unrelated Pocket cards', associationSamples[123]);
+  check((associationSamples[150] || []).every((name) => /^Mewtwo(?: ex)?$/i.test(name)), 'Mewtwo has unrelated Pocket cards', associationSamples[150]);
   check(metrics.events > 0 && metrics.missions > 0 && metrics.battles > 0, 'Pocket live operation data is incomplete', metrics);
   check(metrics.shops > 0 && metrics.wonderPicks > 0, 'Pocket shop or wonder-pick data is incomplete', metrics);
   check(metrics.sourceCount === 10, 'Not all configured Pocket sources were recorded', metrics);

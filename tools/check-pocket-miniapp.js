@@ -63,11 +63,14 @@ expectedApiMethods.forEach((method) => {
 
 const pocketSources = expectedPages.map((page) => fs.readFileSync(path.join(root, `${page}.js`), 'utf8')).join('\n');
 const pocketTabWxml = fs.readFileSync(path.join(root, 'pages', 'pocket', 'index.wxml'), 'utf8');
+const pokemonDetailWxml = fs.readFileSync(path.join(root, 'pages', 'pokemon-detail', 'index.wxml'), 'utf8');
 checks.push(check(!pocketSources.includes('/pages/card-detail/index'), 'Pocket pages do not open physical-card detail'));
 checks.push(check(!pocketSources.includes('/pages/card-pack/index'), 'Pocket pages do not open physical-card pack simulator'));
 checks.push(check(pocketTabWxml.includes('card-list') && pocketTabWxml.includes('card-row'), 'Pocket tab uses the physical-card dex list pattern'));
 checks.push(check(!pocketTabWxml.includes('LIVE'), 'Pocket dex has no channel LIVE treatment'));
 checks.push(check(pocketTabWxml.includes('resetFilters') && pocketTabWxml.includes('filter-panel'), 'Pocket search filters expose applied state and reset controls'));
+checks.push(check(!pokemonDetailWxml.includes('model-preview-button'), 'Pokemon 3D controls do not duplicate the hero preview button'));
+checks.push(check(pokemonDetailWxml.includes('detail-image-wrap') && pokemonDetailWxml.includes('bindtap="previewModel3d"'), 'Pokemon hero image keeps 3D preview interaction'));
 
 const failed = checks.filter((item) => !item.ok);
 process.stdout.write(`${JSON.stringify({ ok: failed.length === 0, checks, failed }, null, 2)}\n`);
