@@ -6,7 +6,7 @@
   "appid": "wx6c0713247a0dc235",
   "projectname": "pokechill-miniapp",
   "setting": {
-    "urlCheck": false,
+    "urlCheck": true,
     "es6": true,
     "enhance": true,
     "postcss": true,
