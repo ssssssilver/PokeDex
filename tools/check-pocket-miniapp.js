@@ -81,6 +81,7 @@ checks.push(check(pokemonDetailWxml.includes('detail-image-wrap') && pokemonDeta
 checks.push(check(!pokemonDetailWxml.includes('related-card-name'), 'related Pokemon cards do not repeat the Pokemon name'));
 checks.push(check(homeWxml.includes('宝可梦猜谜') && !homeWxml.includes('每日猜谜'), 'Pokemon quiz is labeled as a random light game'));
 checks.push(check(!homeWxml.includes('快速发现宝可梦'), 'home removes quick Pokemon discovery'));
+checks.push(check((homeWxml.match(/pocket-panel-section/g) || []).length === 2, 'Pocket home activity and deck sections use readable white panels'));
 checks.push(check(!homeSource.includes('quiz.answerId'), 'daily Pokemon is independent from the quiz answer'));
 checks.push(check(homeSource.includes('getRecentViews(pokemon)') && storageSource.includes('currentById'), 'legacy recent Pokemon images migrate to current OSS URLs'));
 checks.push(check(balancedWxml(path.join(root, 'pages', 'profile', 'index.wxml')), 'profile WXML has balanced tags'));

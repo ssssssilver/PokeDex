@@ -85,6 +85,17 @@
 .pocket-meta { margin-top: 12rpx; color: #475569; font-size: 21rpx; }
 .pocket-arrow { color: #94a3b8; font-size: 42rpx; }
 
+.pocket-panel-section {
+  padding: 20rpx;
+  border: 1rpx solid #dce5eb;
+  border-radius: 8rpx;
+  background: #ffffff;
+  box-shadow: 0 8rpx 20rpx rgba(24, 34, 48, 0.06);
+  box-sizing: border-box;
+}
+
+.pocket-panel-section .section-title { margin-bottom: 12rpx; }
+
 .pocket-event-list,
 .pocket-deck-list { border-top: 1rpx solid #e1e7ec; }
 
@@ -95,6 +106,9 @@
   min-height: 92rpx;
   border-bottom: 1rpx solid #e1e7ec;
 }
+
+.pocket-event-row:last-child,
+.pocket-deck-row:last-child { border-bottom: 0; }
 
 .pocket-event-row > text,
 .pocket-deck-row > text {
