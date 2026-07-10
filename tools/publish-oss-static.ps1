@@ -35,7 +35,7 @@ $RootUri = if ($CleanPrefix) { "oss://$Bucket/$CleanPrefix" } else { "oss://$Buc
 function Copy-OssDirectory([string]$Source, [string]$Destination) {
   if (-not (Test-Path -LiteralPath $Source -PathType Container)) { return }
   $SourceWithSlash = $Source.TrimEnd([char[]]"\/") + [IO.Path]::DirectorySeparatorChar
-  & $Ossutil cp -r -u --disable-dir-object $SourceWithSlash $Destination
+  & $Ossutil cp -r -u -j 10 $SourceWithSlash $Destination
   if ($LASTEXITCODE -ne 0) { throw "ossutil failed while uploading $Source" }
 }
 
@@ -51,7 +51,7 @@ if (-not $SkipAssets) {
 }
 
 Write-Host "Switching manifest last ..."
-& $Ossutil cp -f $ManifestPath "$RootUri/manifest.json" "--meta=Cache-Control:no-cache#Content-Type:application/json"
+& $Ossutil cp -f $ManifestPath "$RootUri/manifest.json" --cache-control "no-cache" --content-type "application/json"
 if ($LASTEXITCODE -ne 0) { throw "ossutil failed while switching manifest.json" }
 
 Write-Host "Published $Version to $RootUri"
