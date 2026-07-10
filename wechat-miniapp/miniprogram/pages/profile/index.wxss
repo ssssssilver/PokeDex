@@ -1,0 +1,181 @@
+.profile-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx;
+}
+
+.profile-card + .profile-card {
+  margin-top: 18rpx;
+}
+
+.profile-title {
+  margin-top: 6rpx;
+  color: #101828;
+  font-size: 44rpx;
+  font-weight: 900;
+}
+
+.data-card {
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.data-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.data-title {
+  margin-top: 6rpx;
+  color: #182230;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.data-pill {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: #f1f5f9;
+  color: #64748b;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.data-pill.ready {
+  background: #e6fffb;
+  color: #0f766e;
+}
+
+.data-pill.local {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.data-pill.stale {
+  background: #fff1f2;
+  color: #be123c;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18rpx;
+  margin-top: 22rpx;
+  color: #182230;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.run-list {
+  margin-top: 24rpx;
+  border-top: 1rpx solid #edf2f7;
+  padding-top: 18rpx;
+}
+
+.run-title {
+  margin-bottom: 12rpx;
+  color: #182230;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.run-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  padding: 12rpx 0;
+}
+
+.run-main {
+  color: #182230;
+  font-size: 25rpx;
+  font-weight: 800;
+}
+
+.run-metrics {
+  flex: 0 0 170rpx;
+  color: #182230;
+  font-size: 24rpx;
+  font-weight: 800;
+  text-align: right;
+}
+
+.check-card {
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.play-entry-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.check-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.check-title {
+  margin-top: 6rpx;
+  color: #182230;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.check-button {
+  min-width: 150rpx;
+  text-align: center;
+}
+
+.check-body {
+  margin-top: 20rpx;
+}
+
+.check-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 18rpx;
+  margin-top: 18rpx;
+  color: #182230;
+  font-size: 26rpx;
+  font-weight: 700;
+}
+
+.mini-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.mini-row {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+}
+
+.mini-row image {
+  width: 86rpx;
+  height: 86rpx;
+  margin-right: 16rpx;
+}
+
+.mini-row image.card-mini-art {
+  width: 76rpx;
+  height: 108rpx;
+  border-radius: 8rpx;
+}
+
+.mini-name {
+  color: #182230;
+  font-size: 30rpx;
+  font-weight: 800;
+}

@@ -1,0 +1,592 @@
+const fs = require('fs');
+const http = require('http');
+const path = require('path');
+const { URL } = require('url');
+const { CacheStore } = require('./cache-store');
+const { PokedexService } = require('./pokedex-service');
+const { syncPokeapi } = require('./pokeapi-sync');
+const { PtcgCacheStore } = require('./ptcg-cache-store');
+const { PtcgService } = require('./ptcg-service');
+const { syncPtcg } = require('./ptcg-sync');
+const { createSyncScheduler } = require('./sync-scheduler');
+const { HotDeckService } = require('./deck-service');
+const { PokemonModel3dService } = require('./projectpokemon-3d-service');
+
+const DEFAULT_PORT = 8787;
+const DEFAULT_HOST = '127.0.0.1';
+
+function sendJson(res, statusCode, payload) {
+  const body = JSON.stringify(payload);
+  res.writeHead(statusCode, {
+    'Content-Type': 'application/json; charset=utf-8',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
+  });
+  res.end(body);
+}
+
+function sendText(res, statusCode, payload) {
+  res.writeHead(statusCode, {
+    'Content-Type': 'text/plain; charset=utf-8',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(payload);
+}
+
+function parseJsonBody(req) {
+  return new Promise((resolve, reject) => {
+    let raw = '';
+    req.setEncoding('utf8');
+    req.on('data', (chunk) => {
+      raw += chunk;
+      if (raw.length > 1024 * 1024) {
+        reject(new Error('Request body is too large'));
+        req.destroy();
+      }
+    });
+    req.on('end', () => {
+      if (!raw.trim()) {
+        resolve({});
+        return;
+      }
+      try {
+        resolve(JSON.parse(raw));
+      } catch (error) {
+        reject(new Error(`Invalid JSON body: ${error.message}`));
+      }
+    });
+    req.on('error', reject);
+  });
+}
+
+function queryObject(searchParams) {
+  const data = {};
+  searchParams.forEach((value, key) => {
+    data[key] = value;
+  });
+  return data;
+}
+
+function idsFromQuery(value) {
+  return String(value || '')
+    .split(',')
+    .map((item) => Number(item.trim()))
+    .filter(Boolean);
+}
+
+function contentTypeFor(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
+  if (ext === '.webp') return 'image/webp';
+  if (ext === '.gif') return 'image/gif';
+  return 'image/png';
+}
+
+function ensureDir(dir) {
+  fs.mkdirSync(dir, { recursive: true });
+}
+
+function serveArtwork(req, res, pathname, dataDir) {
+  const prefix = '/assets/pokemon/artwork/';
+  const fileName = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '';
+  if (!fileName || fileName.includes('/') || fileName.includes('\\')) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  const filePath = path.join(dataDir, 'artwork', fileName);
+  if (!fs.existsSync(filePath)) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  res.writeHead(200, {
+    'Content-Type': contentTypeFor(filePath),
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  fs.createReadStream(filePath).pipe(res);
+}
+
+function serveRepoPokemonAsset(req, res, pathname) {
+  const prefix = '/assets/local-pokemon/';
+  const fileName = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '';
+  if (!fileName || fileName.includes('/') || fileName.includes('\\')) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  const spriteRoot = path.resolve(__dirname, 'assets', 'local-pokemon');
+  const filePath = path.resolve(spriteRoot, fileName);
+  if (!filePath.startsWith(spriteRoot) || !fs.existsSync(filePath)) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  res.writeHead(200, {
+    'Content-Type': contentTypeFor(filePath),
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  fs.createReadStream(filePath).pipe(res);
+}
+
+async function servePtcgCardImage(req, res, pathname, service) {
+  const prefix = '/assets/ptcg/cards/';
+  const rest = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '';
+  const parts = rest.split('/').filter(Boolean);
+  const id = decodeURIComponent(parts[0] || '');
+  const size = parts[1] === 'large' ? 'large' : 'small';
+
+  if (!id || id.includes('/') || id.includes('\\')) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  const info = service.getImageInfo(id, size);
+  if (!info) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  if (fs.existsSync(info.filePath)) {
+    res.writeHead(200, {
+      'Content-Type': contentTypeFor(info.filePath),
+      'Cache-Control': 'public, max-age=86400',
+      'Access-Control-Allow-Origin': '*'
+    });
+    fs.createReadStream(info.filePath).pipe(res);
+    return;
+  }
+
+  const response = await fetch(info.remote, {
+    headers: {
+      'User-Agent': 'PokeChill/1.0'
+    }
+  });
+  if (!response.ok) {
+    sendJson(res, 502, { error: `Unable to fetch card image: ${response.status}` });
+    return;
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  ensureDir(path.dirname(info.filePath));
+  fs.writeFileSync(info.filePath, buffer);
+  res.writeHead(200, {
+    'Content-Type': response.headers.get('content-type') || contentTypeFor(info.filePath),
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(buffer);
+}
+
+async function servePtcgSetImage(req, res, pathname, service) {
+  const prefix = '/assets/ptcg/sets/';
+  const rest = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '';
+  const parts = rest.split('/').filter(Boolean);
+  const id = decodeURIComponent(parts[0] || '');
+  const kind = parts[1] === 'logo' ? 'logo' : 'symbol';
+
+  if (!id || id.includes('/') || id.includes('\\')) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  const info = service.getSetImageInfo(id, kind);
+  if (!info) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  if (fs.existsSync(info.filePath)) {
+    res.writeHead(200, {
+      'Content-Type': contentTypeFor(info.filePath),
+      'Cache-Control': 'public, max-age=86400',
+      'Access-Control-Allow-Origin': '*'
+    });
+    fs.createReadStream(info.filePath).pipe(res);
+    return;
+  }
+
+  const response = await fetch(info.remote, {
+    headers: {
+      'User-Agent': 'PokeChill/1.0'
+    }
+  });
+  if (!response.ok) {
+    sendJson(res, 502, { error: `Unable to fetch set image: ${response.status}` });
+    return;
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  ensureDir(path.dirname(info.filePath));
+  fs.writeFileSync(info.filePath, buffer);
+  res.writeHead(200, {
+    'Content-Type': response.headers.get('content-type') || contentTypeFor(info.filePath),
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(buffer);
+}
+
+async function serveLimitlessPokemonImage(req, res, pathname, service) {
+  const prefix = '/assets/limitless/pokemon/';
+  const assetPath = pathname.startsWith(prefix) ? pathname.slice(prefix.length) : '';
+  const info = service.getPokemonImageInfo(decodeURIComponent(assetPath || ''));
+  if (!info) {
+    sendJson(res, 404, { error: 'Asset not found' });
+    return;
+  }
+
+  if (fs.existsSync(info.filePath)) {
+    res.writeHead(200, {
+      'Content-Type': contentTypeFor(info.filePath),
+      'Cache-Control': 'public, max-age=86400',
+      'Access-Control-Allow-Origin': '*'
+    });
+    fs.createReadStream(info.filePath).pipe(res);
+    return;
+  }
+
+  const response = await fetch(info.remote, {
+    headers: {
+      'User-Agent': 'PokeChill/1.0'
+    }
+  });
+  if (!response.ok) {
+    sendJson(res, 502, { error: `Unable to fetch Limitless image: ${response.status}` });
+    return;
+  }
+
+  const buffer = Buffer.from(await response.arrayBuffer());
+  ensureDir(path.dirname(info.filePath));
+  fs.writeFileSync(info.filePath, buffer);
+  res.writeHead(200, {
+    'Content-Type': response.headers.get('content-type') || contentTypeFor(info.filePath),
+    'Cache-Control': 'public, max-age=86400',
+    'Access-Control-Allow-Origin': '*'
+  });
+  res.end(buffer);
+}
+
+function createApp(options = {}) {
+  const host = options.host || process.env.POKECHILL_HOST || DEFAULT_HOST;
+  const port = Number(options.port || process.env.POKECHILL_PORT || DEFAULT_PORT);
+  const publicBaseUrl = options.publicBaseUrl || process.env.POKECHILL_PUBLIC_BASE_URL || `http://${host}:${port}`;
+  const dataDir = options.dataDir || process.env.POKECHILL_DATA_DIR || path.join(__dirname, '.data');
+  const store = options.store || new CacheStore({
+    filePath: path.join(dataDir, 'pokedex-cache.json')
+  });
+  const ptcgStore = options.ptcgStore || new PtcgCacheStore({
+    filePath: path.join(dataDir, 'ptcg-cache.json')
+  });
+  const service = new PokedexService(store, { publicBaseUrl });
+  const ptcgService = new PtcgService(ptcgStore, {
+    publicBaseUrl,
+    pokemonStore: store,
+    dataDir
+  });
+  const hotDeckService = new HotDeckService({
+    publicBaseUrl,
+    dataDir
+  });
+  const pokemonModel3dService = new PokemonModel3dService({
+    publicBaseUrl,
+    dataDir,
+    pokemonStore: store
+  });
+  const scheduler = createSyncScheduler({
+    store,
+    dataDir,
+    syncFn: syncPokeapi,
+    scheduler: options.scheduler || {}
+  });
+
+  async function handler(req, res) {
+    if (req.method === 'OPTIONS') {
+      sendText(res, 204, '');
+      return;
+    }
+
+    const currentUrl = new URL(req.url, publicBaseUrl);
+    const pathname = currentUrl.pathname.replace(/\/+$/, '') || '/';
+
+    try {
+      if (pathname.startsWith('/assets/pokemon/artwork/')) {
+        serveArtwork(req, res, pathname, dataDir);
+        return;
+      }
+
+      if (pathname.startsWith('/assets/local-pokemon/')) {
+        serveRepoPokemonAsset(req, res, pathname);
+        return;
+      }
+
+      const pokemon3dAssetMatch = pathname.match(/^\/assets\/pokemon\/3d\/(normal|shiny)\/([^/]+\.gif)$/);
+      if (pokemon3dAssetMatch) {
+        const served = await pokemonModel3dService.serveImage(
+          res,
+          pokemon3dAssetMatch[1],
+          decodeURIComponent(pokemon3dAssetMatch[2])
+        );
+        if (!served) {
+          sendJson(res, 404, { error: 'Asset not found' });
+        }
+        return;
+      }
+
+      if (pathname.startsWith('/assets/ptcg/cards/')) {
+        await servePtcgCardImage(req, res, pathname, ptcgService);
+        return;
+      }
+
+      if (pathname.startsWith('/assets/ptcg/sets/')) {
+        await servePtcgSetImage(req, res, pathname, ptcgService);
+        return;
+      }
+
+      if (pathname.startsWith('/assets/limitless/pokemon/')) {
+        await serveLimitlessPokemonImage(req, res, pathname, hotDeckService);
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/health') {
+        sendJson(res, 200, {
+          ok: true,
+          service: 'pokechill-self-hosted-api',
+          publicBaseUrl,
+          cacheFile: store.filePath,
+          scheduler: {
+            enabled: scheduler.status().enabled,
+            started: scheduler.status().state.started,
+            running: scheduler.status().state.running,
+            due: scheduler.status().due
+          }
+        });
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pokemon') {
+        sendJson(res, 200, service.listPokemon(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      const pokemonMatch = pathname.match(/^\/api\/pokemon\/(\d+)$/);
+      if (req.method === 'GET' && pokemonMatch) {
+        const payload = service.getPokemon(Number(pokemonMatch[1]));
+        if (payload.item) {
+          payload.item.model3d = pokemonModel3dService.getModelForPokemon(payload.item);
+        }
+        sendJson(res, 200, payload);
+        return;
+      }
+
+      const pokemon3dMatch = pathname.match(/^\/api\/pokemon\/(\d+)\/3d-model$/);
+      if (req.method === 'GET' && pokemon3dMatch) {
+        const payload = service.getPokemon(Number(pokemon3dMatch[1]));
+        sendJson(res, 200, {
+          item: payload.item ? pokemonModel3dService.getModelForPokemon(payload.item) : null,
+          source: 'projectpokemon'
+        });
+        return;
+      }
+
+      const pokemonCardsMatch = pathname.match(/^\/api\/pokemon\/(\d+)\/cards$/);
+      if (req.method === 'GET' && pokemonCardsMatch) {
+        sendJson(res, 200, ptcgService.getPokemonCards(Number(pokemonCardsMatch[1]), queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/cards') {
+        sendJson(res, 200, ptcgService.listCards(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      const cardMatch = pathname.match(/^\/api\/cards\/([^/]+)$/);
+      if (req.method === 'GET' && cardMatch) {
+        sendJson(res, 200, ptcgService.getCard(decodeURIComponent(cardMatch[1])));
+        return;
+      }
+
+      const cardPokemonMatch = pathname.match(/^\/api\/cards\/([^/]+)\/related-pokemon$/);
+      if (req.method === 'GET' && cardPokemonMatch) {
+        sendJson(res, 200, ptcgService.getRelatedPokemon(decodeURIComponent(cardPokemonMatch[1])));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/card-sets') {
+        sendJson(res, 200, ptcgService.listSets(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      const cardSetMatch = pathname.match(/^\/api\/card-sets\/([^/]+)$/);
+      if (req.method === 'GET' && cardSetMatch) {
+        sendJson(res, 200, ptcgService.getSet(decodeURIComponent(cardSetMatch[1])));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/ptcg/meta') {
+        sendJson(res, 200, ptcgService.getMeta());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/ptcg/sync-status') {
+        sendJson(res, 200, ptcgService.getSyncStatus());
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/ptcg/sync-runs') {
+        sendJson(res, 200, ptcgService.getSyncRuns(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/pokemon-3d/sync-status') {
+        sendJson(res, 200, {
+          item: pokemonModel3dService.getMeta(),
+          source: 'projectpokemon'
+        });
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/decks/hot') {
+        sendJson(res, 200, await hotDeckService.listHotDecks(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/card-quiz/daily') {
+        sendJson(res, 200, ptcgService.getDailyCardQuiz());
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/card-quiz/daily/answer') {
+        sendJson(res, 200, ptcgService.submitDailyCardQuiz(await parseJsonBody(req)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/card-pack/open') {
+        sendJson(res, 200, ptcgService.openCardPack(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/card-pack/open') {
+        sendJson(res, 200, ptcgService.openCardPack(await parseJsonBody(req)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/evolution') {
+        sendJson(res, 200, service.getEvolutionChain(idsFromQuery(currentUrl.searchParams.get('ids'))));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/types') {
+        sendJson(res, 200, service.getTypes());
+        return;
+      }
+
+      const typeMatch = pathname.match(/^\/api\/types\/([^/]+)\/relations$/);
+      if (req.method === 'GET' && typeMatch) {
+        sendJson(res, 200, service.getTypeRelations(decodeURIComponent(typeMatch[1])));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/quiz/daily') {
+        sendJson(res, 200, service.getDailyQuiz());
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/quiz/daily/answer') {
+        sendJson(res, 200, service.submitDailyQuiz(await parseJsonBody(req)));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/team/analyze') {
+        sendJson(res, 200, service.analyzeTeam(await parseJsonBody(req)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/sync/status') {
+        sendJson(res, 200, service.getSyncStatus(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/sync/runs') {
+        sendJson(res, 200, service.getSyncRuns(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/sync/scheduler') {
+        sendJson(res, 200, scheduler.status());
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/sync/scheduler/run') {
+        const body = await parseJsonBody(req);
+        const result = await scheduler.runIfDue(body.reason || 'manual-api', Object.assign({}, body, {
+          forceSchedulerRun: body.forceSchedulerRun === true
+        }));
+        sendJson(res, 200, result);
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/cache/validate') {
+        sendJson(res, 200, service.validateCache(await parseJsonBody(req)));
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/sync/pokeapi') {
+        const result = await syncPokeapi(store, await parseJsonBody(req), { dataDir });
+        sendJson(res, 200, result);
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/sync/ptcg') {
+        const result = await syncPtcg(ptcgStore, await parseJsonBody(req));
+        sendJson(res, 200, result);
+        return;
+      }
+
+      if (req.method === 'POST' && pathname === '/api/sync/projectpokemon-3d') {
+        const result = await pokemonModel3dService.sync(await parseJsonBody(req));
+        sendJson(res, 200, result);
+        return;
+      }
+
+      sendJson(res, 404, { error: 'Not found' });
+    } catch (error) {
+      sendJson(res, 500, {
+        error: error.message || 'Internal server error'
+      });
+    }
+  }
+
+  return {
+    host,
+    port,
+    publicBaseUrl,
+    dataDir,
+    store,
+    ptcgStore,
+    service,
+    ptcgService,
+    hotDeckService,
+    pokemonModel3dService,
+    scheduler,
+    handler,
+    server: http.createServer(handler)
+  };
+}
+
+if (require.main === module) {
+  const app = createApp();
+  app.scheduler.start();
+  app.server.listen(app.port, app.host, () => {
+    console.log(`PokeChill self-hosted API listening on ${app.publicBaseUrl}`);
+    console.log(`Cache file: ${app.store.filePath}`);
+    console.log(`Sync scheduler enabled: ${app.scheduler.status().enabled}`);
+  });
+}
+
+module.exports = {
+  createApp
+};

@@ -1,0 +1,149 @@
+.chip-scroll {
+  white-space: nowrap;
+}
+
+.chip-row {
+  display: inline-flex;
+  gap: 12rpx;
+  padding-bottom: 4rpx;
+}
+
+.type-filter {
+  min-width: 88rpx;
+  padding: 12rpx 18rpx;
+  border: 1rpx solid;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+  font-weight: 900;
+  line-height: 1;
+  text-align: center;
+}
+
+.relation-card {
+  margin-top: 24rpx;
+  padding: 28rpx;
+}
+
+.chart-card {
+  margin-top: 18rpx;
+  padding: 28rpx;
+}
+
+.relation-title {
+  color: #101828;
+  font-size: 42rpx;
+  font-weight: 900;
+}
+
+.relation-section {
+  margin-top: 26rpx;
+}
+
+.section-label {
+  margin-bottom: 12rpx;
+  color: #334155;
+  font-size: 28rpx;
+  font-weight: 800;
+}
+
+.tag-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  min-height: 42rpx;
+}
+
+.relation-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8rpx;
+  min-height: 42rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  color: #fff;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 1;
+  box-shadow: 0 8rpx 18rpx rgba(15, 23, 42, 0.08);
+}
+
+.relation-chip text:last-child {
+  opacity: 0.9;
+}
+
+.chart-hint {
+  margin-top: -8rpx;
+  margin-bottom: 16rpx;
+}
+
+.type-table-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.matchup-table {
+  display: inline-flex;
+  flex-direction: column;
+  min-width: 1492rpx;
+  border: 1rpx solid #e2e8f0;
+  border-radius: 8rpx;
+  overflow: hidden;
+}
+
+.table-row {
+  display: flex;
+}
+
+.corner-cell,
+.row-type,
+.type-head,
+.matchup-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 78rpx;
+  min-height: 56rpx;
+  border-right: 1rpx solid #e2e8f0;
+  border-bottom: 1rpx solid #e2e8f0;
+  font-size: 20rpx;
+  font-weight: 900;
+}
+
+.corner-cell,
+.row-type {
+  width: 88rpx;
+}
+
+.corner-cell {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.row-type,
+.type-head {
+  color: #fff;
+}
+
+.header-row .type-head {
+  min-height: 64rpx;
+}
+
+.matchup-cell {
+  background: #fff;
+  color: #475569;
+}
+
+.matchup-cell.super {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.matchup-cell.resist {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.matchup-cell.zero {
+  background: #e2e8f0;
+  color: #475569;
+}

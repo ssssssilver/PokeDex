@@ -1,0 +1,51 @@
+<view class="page play-page">
+  <view class="play-header">
+    <view class="title">轻玩法</view>
+    <view class="muted">用图鉴数据做一点小挑战。</view>
+  </view>
+
+  <view class="play-list">
+    <view class="card play-card" bindtap="openQuiz">
+      <view class="play-icon">猜</view>
+      <view class="play-copy">
+        <view class="play-title">每日猜宝可梦</view>
+        <view class="muted">根据属性、世代和剪影来猜。</view>
+      </view>
+    </view>
+    <view class="card play-card" bindtap="openTeam">
+      <view class="play-icon">队</view>
+      <view class="play-copy">
+        <view class="play-title">队伍属性分析</view>
+        <view class="muted">选择最多 6 只，查看共同弱点。</view>
+      </view>
+    </view>
+    <view class="card play-card" bindtap="openTypes">
+      <view class="play-icon">属</view>
+      <view class="play-copy">
+        <view class="play-title">属性克制速查</view>
+        <view class="muted">快速看弱点、抗性和免疫。</view>
+      </view>
+    </view>
+    <view class="card play-card" bindtap="openCardQuiz">
+      <view class="play-icon">卡</view>
+      <view class="play-copy">
+        <view class="play-title">今日猜卡牌</view>
+        <view class="muted">根据卡图、系列和稀有度提示来猜。</view>
+      </view>
+    </view>
+    <view class="card play-card" bindtap="openCardPack">
+      <view class="play-icon">包</view>
+      <view class="play-copy">
+        <view class="play-title">每日开包</view>
+        <view class="muted">选择系列，开一包 10 张卡。</view>
+      </view>
+    </view>
+    <view class="card play-card disabled" bindtap="showChallenge">
+      <view class="play-icon">限</view>
+      <view class="play-copy">
+        <view class="play-title">随机挑战生成器</view>
+        <view class="muted">下一版：生成限定属性/世代挑战。</view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,51 @@
+.play-header {
+  margin: 8rpx 0 24rpx;
+}
+
+.title {
+  color: #101828;
+  font-size: 44rpx;
+  font-weight: 900;
+}
+
+.play-list {
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+}
+
+.play-card {
+  display: flex;
+  align-items: center;
+  min-height: 140rpx;
+  padding: 24rpx;
+}
+
+.play-card.disabled {
+  opacity: 0.7;
+}
+
+.play-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72rpx;
+  height: 72rpx;
+  margin-right: 20rpx;
+  border-radius: 18rpx;
+  background: #e6fffb;
+  color: #0f766e;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.play-copy {
+  flex: 1;
+}
+
+.play-title {
+  color: #182230;
+  font-size: 32rpx;
+  font-weight: 800;
+}
+

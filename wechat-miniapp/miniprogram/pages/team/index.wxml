@@ -1,0 +1,45 @@
+<view class="page team-page">
+  <view class="card team-summary">
+    <view>
+      <view class="muted">当前队伍</view>
+      <view class="team-count">{{selectedIds.length}} / 6</view>
+    </view>
+    <view wx:if="{{analysis}}" class="score">{{analysis.score}}</view>
+  </view>
+
+  <view wx:if="{{analysis}}" class="card analysis-card">
+    <view class="analysis-text">{{analysis.summary}}</view>
+    <view class="analysis-section">
+      <view class="analysis-title">主要弱点</view>
+      <view class="tag-line">
+        <view wx:for="{{analysis.weaknesses}}" wx:key="id" class="soft-tag">{{item.name}} × {{item.count}}</view>
+      </view>
+    </view>
+    <view class="analysis-section">
+      <view class="analysis-title">抗性覆盖</view>
+      <view class="tag-line">
+        <view wx:for="{{analysis.resistances}}" wx:key="id" class="soft-tag">{{item.name}} × {{item.count}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="section-title">
+      <text>选择成员</text>
+      <text class="muted">点击卡片加入/移除</text>
+    </view>
+    <view class="team-list">
+      <view wx:for="{{pokemon}}" wx:key="id" class="member-card card {{item.selected ? 'active' : ''}}" data-id="{{item.id}}" bindtap="toggleMember">
+        <image src="{{item.image}}" mode="aspectFit" />
+        <view class="member-main">
+          <view class="member-name">{{item.name_zh}}</view>
+          <view class="muted">#{{item.id}} {{item.name_en}}</view>
+          <view class="member-types">
+            <view wx:for="{{item.types}}" wx:for-item="type" wx:for-index="typeIndex" wx:key="*this" class="type-badge type-{{type}}">{{item.typeNames[typeIndex]}}</view>
+          </view>
+        </view>
+        <view class="member-mark">{{item.selected ? '✓' : '+'}}</view>
+      </view>
+    </view>
+  </view>
+</view>

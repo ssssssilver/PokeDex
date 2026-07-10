@@ -1,0 +1,110 @@
+<view class="page carddex-page">
+  <view class="search-row">
+    <view class="search-box search-inline">
+      <input value="{{keyword}}" bindinput="onKeywordInput" bindconfirm="submitSearch" confirm-type="search" placeholder="搜索卡牌、宝可梦、系列、编号或画师" />
+    </view>
+    <view class="filter-trigger {{activeFilterCount ? 'active' : ''}}" bindtap="openFilter">
+      <text>筛选</text>
+      <text wx:if="{{activeFilterCount}}" class="filter-count">{{activeFilterCount}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{activeFilterCount}}" class="applied-row">
+    <view wx:if="{{activePokemonId}}" class="applied-chip">关联 #{{activePokemonId}}</view>
+    <view wx:if="{{activeSupertype}}" class="applied-chip">{{activeSupertype}}</view>
+    <view wx:if="{{activeType}}" class="applied-chip">{{activeType}}</view>
+    <view wx:if="{{activeSetId}}" class="applied-chip">{{activeSetId}}</view>
+    <view wx:if="{{activeRarity}}" class="applied-chip">{{activeRarity}}</view>
+    <view wx:if="{{activeSort !== 'releaseDate'}}" class="applied-chip">已排序</view>
+    <view class="applied-reset" bindtap="resetFilters">重置</view>
+  </view>
+
+  <view class="result-meta">
+    <text>{{resultCountText}}</text>
+    <text class="muted">{{sourceText}}</text>
+  </view>
+
+  <view wx:if="{{loading && !cards.length}}" class="card loading-state">卡牌图鉴加载中</view>
+
+  <view wx:elif="{{cards.length}}" class="card-list">
+    <view wx:for="{{cards}}" wx:key="id" class="card-row card">
+      <view class="row-main" data-id="{{item.id}}" bindtap="openCard">
+        <view class="card-art-wrap">
+          <image wx:if="{{item.image}}" src="{{item.image}}" mode="aspectFit" lazy-load="true" />
+          <view wx:else class="card-art-empty">CARD</view>
+        </view>
+        <view class="row-copy">
+          <view class="row-topline">
+            <text class="set-number">{{item.set_id}} #{{item.number}}</text>
+            <text wx:if="{{item.regulation_mark}}" class="regulation-pill">{{item.regulation_mark}}</text>
+          </view>
+          <view class="row-name">{{item.title}}</view>
+          <view wx:if="{{item.subtitle}}" class="row-subtitle">{{item.subtitle}}</view>
+          <view class="row-facts">
+            <text>{{item.setText}}</text>
+            <text wx:if="{{item.metaText}}">{{item.metaText}}</text>
+          </view>
+          <view wx:if="{{item.type_energy.length}}" class="energy-row">
+            <view wx:for="{{item.type_energy}}" wx:key="id" class="energy-badge" style="background: {{item.color}}">{{item.name}}</view>
+          </view>
+        </view>
+      </view>
+      <view class="row-actions">
+        <view class="mini-action {{item.favorite ? 'active' : ''}}" data-id="{{item.id}}" catchtap="toggleFavorite">{{item.favorite ? '★' : '☆'}}</view>
+        <view class="mini-owned {{item.owned ? 'active' : ''}}" data-id="{{item.id}}" catchtap="toggleOwned">{{item.owned ? '有' : '收'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:else class="card empty-state">
+    <view class="title">没有找到卡牌</view>
+    <view class="hint">换个名称、系列、属性或稀有度试试。</view>
+  </view>
+
+  <view wx:if="{{loadingMore}}" class="load-more-state">继续加载中</view>
+  <view wx:elif="{{cards.length && !hasMore}}" class="load-more-state">已加载全部</view>
+
+  <view wx:if="{{filterVisible}}" class="filter-mask" catchtap="closeFilter"></view>
+  <view wx:if="{{filterVisible}}" class="filter-panel" catchtap="stopTap">
+    <view class="filter-panel-head">
+      <view class="filter-panel-title">卡牌筛选</view>
+      <view class="filter-close" bindtap="closeFilter">关闭</view>
+    </view>
+
+    <scroll-view scroll-y class="filter-panel-body">
+      <view class="filter-section-title">卡牌大类</view>
+      <view class="filter-grid three-grid">
+        <view wx:for="{{filterSupertypes}}" wx:key="id" class="filter-option {{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectDraftSupertype">{{item.name}}</view>
+      </view>
+
+      <view class="filter-section-title">属性</view>
+      <view class="filter-grid five-grid">
+        <view wx:for="{{filterTypes}}" wx:key="id" class="filter-option {{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectDraftType">{{item.name}}</view>
+      </view>
+
+      <view class="filter-section-title">系列</view>
+      <view class="filter-grid set-filter-grid">
+        <view wx:for="{{filterSets}}" wx:key="id" hover-class="set-filter-hover" class="filter-option set-filter-option {{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectDraftSet">
+          <image wx:if="{{item.logo || item.symbol}}" src="{{item.logo || item.symbol}}" mode="aspectFit" />
+          <text wx:else>{{item.name}}</text>
+          <view wx:if="{{item.logo || item.symbol}}" class="set-option-tooltip">{{item.name}}</view>
+        </view>
+      </view>
+
+      <view class="filter-section-title">稀有度</view>
+      <view class="filter-grid two-grid">
+        <view wx:for="{{filterRarities}}" wx:key="id" class="filter-option {{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectDraftRarity">{{item.name}}</view>
+      </view>
+
+      <view class="filter-section-title">排序</view>
+      <view class="filter-grid sort-grid">
+        <view wx:for="{{filterSorts}}" wx:key="id" class="filter-option {{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectDraftSort">{{item.name}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="filter-actions">
+      <view class="filter-clear" bindtap="clearDraftFilters">清空</view>
+      <view class="filter-confirm" bindtap="confirmFilters">确定</view>
+    </view>
+  </view>
+</view>

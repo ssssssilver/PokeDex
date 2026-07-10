@@ -1,0 +1,56 @@
+<view class="page type-page">
+  <scroll-view scroll-x class="chip-scroll">
+    <view class="chip-row">
+      <view wx:for="{{types}}" wx:key="id" class="type-filter {{activeType === item.id ? 'active' : ''}}" style="border-color: {{item.color}}; color: {{activeType === item.id ? '#fff' : item.color}}; background: {{activeType === item.id ? item.color : '#fff'}};" data-type="{{item.id}}" bindtap="selectType">{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <view wx:if="{{relation}}" class="card relation-card">
+    <view class="relation-title">{{relation.name}}属性防守</view>
+    <view class="relation-section">
+      <view class="section-label">弱点</view>
+      <view class="tag-line">
+        <view wx:for="{{relation.weakTo}}" wx:key="id" class="relation-chip" style="background: {{item.color}};">
+          <text>{{item.name}}</text>
+          <text>{{item.multiplierText}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="relation-section">
+      <view class="section-label">抗性</view>
+      <view class="tag-line">
+        <view wx:for="{{relation.resists}}" wx:key="id" class="relation-chip" style="background: {{item.color}};">
+          <text>{{item.name}}</text>
+          <text>{{item.multiplierText}}</text>
+        </view>
+      </view>
+    </view>
+    <view class="relation-section">
+      <view class="section-label">免疫</view>
+      <view class="tag-line">
+        <view wx:for="{{relation.immuneTo}}" wx:key="id" class="relation-chip" style="background: {{item.color}};">
+          <text>{{item.name}}</text>
+          <text>{{item.multiplierText}}</text>
+        </view>
+        <view wx:if="{{!relation.immuneTo.length}}" class="muted">暂无</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card chart-card">
+    <view class="relation-title">属性相克表</view>
+    <view class="muted chart-hint">纵轴攻击方，横轴防守方</view>
+    <scroll-view scroll-x class="type-table-scroll">
+      <view class="matchup-table">
+        <view class="table-row header-row">
+          <view class="corner-cell">攻\防</view>
+          <view wx:for="{{typeColumns}}" wx:key="id" class="type-head" style="background: {{item.color}};">{{item.name}}</view>
+        </view>
+        <view wx:for="{{typeRows}}" wx:key="id" wx:for-item="row" class="table-row">
+          <view class="row-type" style="background: {{row.color}};">{{row.name}}</view>
+          <view wx:for="{{row.cells}}" wx:key="key" wx:for-item="cell" class="matchup-cell {{cell.tone}}">{{cell.text}}</view>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

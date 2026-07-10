@@ -1,0 +1,121 @@
+<view wx:if="{{card}}" class="page card-detail-page">
+  <view class="detail-hero card">
+    <view class="card-art-large" bindtap="previewImage">
+      <image wx:if="{{card.image_large || card.image}}" src="{{card.image_large || card.image}}" mode="aspectFit" />
+      <view wx:else class="card-art-empty">CARD</view>
+    </view>
+    <view class="hero-copy">
+      <view class="hero-meta">
+        <text>{{card.set_id}} #{{card.number}}</text>
+        <text wx:if="{{card.regulation_mark}}">{{card.regulation_mark}}</text>
+      </view>
+      <view class="hero-name">{{card.title}}</view>
+      <view wx:if="{{card.subtitle}}" class="hero-subtitle">{{card.subtitle}}</view>
+      <view class="hero-tags">
+        <view wx:for="{{card.type_energy}}" wx:key="id" class="energy-badge" style="background: {{item.color}}">{{item.name}}</view>
+        <view wx:if="{{card.rarity_name}}" class="plain-badge">{{card.rarity_name}}</view>
+      </view>
+      <view class="hero-actions">
+        <view class="action {{favorite ? 'active' : ''}}" bindtap="toggleFavorite">{{favorite ? '已收藏' : '收藏'}}</view>
+        <view class="action {{owned ? 'active' : ''}}" bindtap="toggleOwned">{{owned ? '已拥有' : '标拥有'}}</view>
+        <view class="action {{wishlisted ? 'active' : ''}}" bindtap="toggleWishlist">{{wishlisted ? '愿望中' : '愿望单'}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="section-title compact">基础资料</view>
+    <view class="info-grid">
+      <view wx:for="{{infoRows}}" wx:key="label" class="info-row">
+        <view class="muted">{{item.label}}</view>
+        <view>{{item.value}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{card.descriptionText}}" class="card info-card">
+    <view class="section-title compact">中文描述</view>
+    <view class="block-copy">{{card.descriptionText}}</view>
+    <view wx:if="{{card.descriptionSource}}" class="description-source">{{card.descriptionSource}}</view>
+  </view>
+
+  <view wx:if="{{card.abilities.length}}" class="card info-card">
+    <view class="section-title compact">特性</view>
+    <view wx:for="{{card.abilities}}" wx:key="name" class="text-block">
+      <view class="block-title">{{item.name}}<text wx:if="{{item.type_name}}"> · {{item.type_name}}</text></view>
+      <view class="block-copy">{{item.text_zh || item.text}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{card.attacks.length}}" class="card info-card">
+    <view class="section-title compact">招式</view>
+    <view wx:for="{{card.attacks}}" wx:key="name" class="attack-row">
+      <view class="attack-head">
+        <view class="block-title">{{item.name}}</view>
+        <view class="damage">{{item.damage || '-'}}</view>
+      </view>
+      <view class="cost-line">
+        <text class="cost-label">费用</text>
+        <view class="energy-icon-row">
+          <view wx:for="{{item.cost_energy}}" wx:key="id" class="energy-icon" style="background: {{item.color}}">{{item.symbol}}</view>
+          <text wx:if="{{!item.cost_energy.length}}" class="muted">-</text>
+        </view>
+        <text class="cost-total">总能量 {{item.converted_energy_cost}}</text>
+      </view>
+      <view wx:if="{{item.text_zh || item.text}}" class="block-copy">{{item.text_zh || item.text}}</view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="section-title compact">对战资料</view>
+    <view class="info-grid">
+      <view wx:for="{{battleRows}}" wx:key="label" class="info-row">
+        <view class="muted">{{item.label}}</view>
+        <view>{{item.value}}</view>
+      </view>
+    </view>
+    <view class="retreat-cost-row">
+      <view class="muted">撤退费用</view>
+      <view class="energy-icon-row">
+        <view wx:for="{{card.retreat_cost_energy}}" wx:key="id" class="energy-icon" style="background: {{item.color}}">{{item.symbol}}</view>
+        <text wx:if="{{!card.retreat_cost_energy.length}}" class="muted">无</text>
+      </view>
+      <view class="cost-total">{{card.converted_retreat_cost || 0}} 能量</view>
+    </view>
+    <view wx:if="{{card.weaknesses.length}}" class="relation-group">
+      <view class="muted">弱点</view>
+      <view class="relation-row">
+        <view wx:for="{{card.weaknesses}}" wx:key="type" class="relation-chip" style="background: {{item.type_color}}">{{item.type_name}} {{item.value}}</view>
+      </view>
+    </view>
+    <view wx:if="{{card.resistances.length}}" class="relation-group">
+      <view class="muted">抵抗</view>
+      <view class="relation-row">
+        <view wx:for="{{card.resistances}}" wx:key="type" class="relation-chip" style="background: {{item.type_color}}">{{item.type_name}} {{item.value}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{card.rules.length || card.legalitiesText}}" class="card info-card">
+    <view class="section-title compact">规则</view>
+    <view wx:if="{{card.legalitiesText}}" class="block-copy">{{card.legalitiesText}}</view>
+    <view wx:for="{{card.rules}}" wx:key="*this" class="rule-row">{{item}}</view>
+  </view>
+
+  <view wx:if="{{card.pokemon_refs.length}}" class="card info-card">
+    <view class="section-title compact">关联宝可梦</view>
+    <view class="pokemon-ref-row">
+      <view wx:for="{{card.pokemon_refs}}" wx:key="id" class="pokemon-ref" data-id="{{item.id}}" bindtap="openPokemon">
+        <view class="ref-number">#{{item.id}}</view>
+        <view>{{item.name_zh || item.name_en}}</view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<view wx:else class="page">
+  <view class="card empty-state">
+    <view class="title">卡牌加载中</view>
+    <view class="hint">正在读取卡牌详情。</view>
+  </view>
+</view>

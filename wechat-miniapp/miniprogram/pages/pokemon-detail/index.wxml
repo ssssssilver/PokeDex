@@ -1,0 +1,260 @@
+<view wx:if="{{pokemon}}" class="page detail-page">
+  <view class="card detail-hero">
+    <view class="detail-copy">
+      <view class="hero-meta">
+        <text>{{pokemon.idText}}</text>
+        <text>{{pokemon.generationText}}</text>
+      </view>
+      <view class="detail-name">{{pokemon.name_zh}}</view>
+      <view class="detail-subtitle">
+        <text>{{pokemon.name_en}}</text>
+        <text wx:if="{{pokemon.name_ja}}"> / {{pokemon.name_ja}}</text>
+      </view>
+      <view class="type-line">
+        <view wx:for="{{pokemon.types}}" wx:key="*this" class="type-badge type-{{item}}">{{pokemon.typeNames[index]}}</view>
+      </view>
+    </view>
+    <view class="detail-image-wrap" bindtap="previewModel3d">
+      <image class="detail-image {{activeModelImage ? 'is-model' : ''}}" src="{{activeModelImage || pokemon.image}}" mode="aspectFit" />
+      <view wx:if="{{activeModel}}" class="hero-model-pill">{{activeModel.label}} · {{activeModelVariantText}}</view>
+    </view>
+  </view>
+
+  <view class="action-row">
+    <view class="button-primary" bindtap="toggleFavorite">{{favorite ? '取消收藏' : '收藏'}}</view>
+    <view class="button-secondary" bindtap="addToTeam">加入队伍</view>
+    <view class="button-secondary" bindtap="openTeam">看队伍</view>
+  </view>
+
+  <view wx:if="{{modelForms.length}}" class="card info-card model-card">
+    <view class="relation-head">
+      <view>
+        <view class="info-title">3D 动态图</view>
+        <view class="muted">{{activeModel.label}} · {{activeModelVariantText}}</view>
+      </view>
+      <view class="model-source">{{modelForms.length}} 形态</view>
+    </view>
+
+    <scroll-view wx:if="{{modelForms.length > 1}}" scroll-x class="model-form-scroll">
+      <view class="model-form-row">
+        <view wx:for="{{modelForms}}" wx:key="slug" class="model-form-chip {{item.selected ? 'active' : ''}}" data-index="{{index}}" bindtap="selectModelForm">{{item.label}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="model-variant-row">
+      <view wx:for="{{modelVariantOptions}}" wx:key="id" class="model-variant-button {{activeModelVariant === item.id ? 'active' : ''}}" data-variant="{{item.id}}" bindtap="selectModelVariant">{{item.name}}</view>
+      <view class="model-preview-button" bindtap="previewModel3d">预览</view>
+    </view>
+
+    <view class="model-credit">{{activeModel.sourceName}} · {{activeModel.credit}}</view>
+  </view>
+
+  <view wx:if="{{relatedCards.length}}" class="card info-card">
+    <view class="relation-head">
+      <view>
+        <view class="info-title">相关卡牌</view>
+        <view class="muted">已找到 {{relatedCardTotal}} 张</view>
+      </view>
+      <view class="chart-link" bindtap="openRelatedCards">全部</view>
+    </view>
+    <scroll-view scroll-x class="related-card-scroll">
+      <view wx:for="{{relatedCards}}" wx:key="id" class="related-card" data-id="{{item.id}}" bindtap="openCard">
+        <image src="{{item.image}}" mode="aspectFit" />
+        <view class="related-card-name">{{item.display_name || item.name_zh || item.name}}</view>
+      </view>
+    </scroll-view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-title">基础资料</view>
+    <view class="info-grid">
+      <view wx:for="{{infoRows}}" wx:key="label" class="info-cell">
+        <view class="muted">{{item.label}}</view>
+        <view>{{item.value}}</view>
+      </view>
+    </view>
+    <view wx:if="{{regionalDexes.length}}" class="tag-line regional-line">
+      <view wx:for="{{regionalDexes}}" wx:key="key" class="soft-tag dex-tag {{item.selected ? 'selected' : ''}}" data-key="{{item.key}}" bindtap="selectRegionalDex">{{item.label}}</view>
+    </view>
+    <view wx:if="{{selectedFlavor}}" class="flavor selected-flavor">
+      <view class="flavor-title">{{selectedFlavor.title}}</view>
+      <view wx:if="{{selectedFlavor.version}}" class="muted">{{selectedFlavor.version}}</view>
+      <view>{{selectedFlavor.text}}</view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-title">能力值与努力值</view>
+    <view class="ev-summary">击败获得：{{pokemon.evYieldText}}</view>
+    <view wx:for="{{stats}}" wx:key="key" class="stat-row">
+      <view class="stat-name">{{item.name}}</view>
+      <view class="stat-track">
+        <view class="stat-fill" style="width: {{item.percent}}%;"></view>
+      </view>
+      <view class="stat-value">{{item.value}}</view>
+      <view class="ev-chip {{item.evText ? 'active' : ''}}">{{item.evText || '-'}}</view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-title">特性</view>
+    <view wx:for="{{abilities}}" wx:key="key" class="ability-row">
+      <view class="ability-head">
+        <view>
+          <text class="ability-name">{{item.name}}</text>
+          <text wx:if="{{item.name_en}}" class="ability-en"> {{item.name_en}}</text>
+        </view>
+        <view wx:if="{{item.is_hidden}}" class="hidden-pill">隐藏</view>
+      </view>
+      <view wx:if="{{item.name_ja}}" class="muted">{{item.name_ja}}</view>
+      <view wx:if="{{item.description}}" class="ability-text">{{item.description}}</view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-title">孵蛋与培育</view>
+    <view class="info-grid breeding-grid">
+      <view wx:for="{{breedingRows}}" wx:key="label" class="info-cell">
+        <view class="muted">{{item.label}}</view>
+        <view>{{item.value}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-title">招式列表</view>
+    <view class="move-meta">{{filteredMoveTotal}} / {{moveTotal}} 招式</view>
+    <scroll-view scroll-x class="chip-scroll move-filter">
+      <view class="chip-row">
+        <view wx:for="{{moveMethodOptions}}" wx:key="id" class="chip {{activeMoveMethod === item.id ? 'active' : ''}}" data-method="{{item.id}}" bindtap="selectMoveMethod">{{item.name}}</view>
+      </view>
+    </scroll-view>
+    <view wx:if="{{moves.length}}" class="move-list">
+      <view wx:for="{{moves}}" wx:key="key" class="move-row" data-index="{{index}}" bindtap="openMoveDetail">
+        <view class="move-main">
+          <view class="move-name">{{item.name}}</view>
+          <view class="move-bits">
+            <text class="move-type-mini" style="background: {{item.type_color}};">{{item.type_name}}</text>
+            <text class="move-class-mini">{{item.damage_class_name}}</text>
+            <text class="move-power-mini">威力 {{item.powerText}}</text>
+          </view>
+        </view>
+        <view class="move-method">{{item.method_name}}</view>
+      </view>
+    </view>
+    <view wx:else class="section-empty">暂无招式数据</view>
+    <view wx:if="{{canShowMoreMoves}}" class="load-more" bindtap="showMoreMoves">加载更多</view>
+  </view>
+
+  <view wx:if="{{activeMoveDetail}}" class="modal-mask" bindtap="closeMoveDetail">
+    <view class="move-modal" catchtap="noop">
+      <view class="modal-head">
+        <view>
+          <view class="modal-title">{{activeMoveDetail.name}}</view>
+          <view class="modal-subtitle">
+            <text wx:if="{{activeMoveDetail.name_en}}">{{activeMoveDetail.name_en}}</text>
+            <text wx:if="{{activeMoveDetail.name_ja}}"> / {{activeMoveDetail.name_ja}}</text>
+          </view>
+        </view>
+        <view class="modal-close" bindtap="closeMoveDetail">×</view>
+      </view>
+      <view class="move-badge-line">
+        <view class="move-type-pill" style="background: {{activeMoveDetail.type_color}};">{{activeMoveDetail.type_name}}</view>
+        <view class="move-class-pill">{{activeMoveDetail.damage_class_name}}</view>
+      </view>
+      <view class="move-description">{{activeMoveDetail.descriptionText}}</view>
+      <view wx:if="{{activeMoveDetail.effectText}}" class="move-effect">{{activeMoveDetail.effectText}}</view>
+      <view class="move-detail-grid">
+        <view wx:for="{{activeMoveDetail.mainRows}}" wx:key="label" class="move-detail-cell">
+          <view class="muted">{{item.label}}</view>
+          <view>{{item.value}}</view>
+        </view>
+      </view>
+      <view wx:if="{{activeMoveDetail.hasExtra}}" class="move-extra">
+        <view class="move-extra-title">附加信息</view>
+        <view wx:for="{{activeMoveDetail.extraRows}}" wx:key="label" class="move-extra-row">
+          <text class="muted">{{item.label}}</text>
+          <text>{{item.value}}</text>
+        </view>
+        <view wx:for="{{activeMoveDetail.statChanges}}" wx:key="stat" class="move-extra-row">
+          <text class="muted">{{item.name}}</text>
+          <text>{{item.change_text}}</text>
+        </view>
+      </view>
+      <view wx:if="{{activeMoveDetail.fullEffectText && activeMoveDetail.fullEffectText !== activeMoveDetail.effectText}}" class="move-effect-original">{{activeMoveDetail.fullEffectText}}</view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-title">获得方式</view>
+    <view wx:if="{{encounterCount}}">
+      <view class="tag-line">
+        <view wx:for="{{encounterMethods}}" wx:key="*this" class="soft-tag">{{item}}</view>
+      </view>
+      <view class="encounter-list">
+        <view wx:for="{{encounterRows}}" wx:key="key" class="encounter-row">
+          <view>
+            <view class="encounter-location">{{item.location}}</view>
+            <view class="muted">{{item.version_name}} {{item.method_name}}</view>
+          </view>
+          <view class="encounter-meta">
+            <text>{{item.levelText}}</text>
+            <text wx:if="{{item.chanceText}}">{{item.chanceText}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view wx:else class="section-empty">暂无野外遭遇数据</view>
+  </view>
+
+  <view class="card info-card">
+    <view class="info-title">进化链</view>
+    <view class="evolution-row">
+      <view wx:for="{{evolution}}" wx:key="id" class="evolution-item" data-id="{{item.id}}" bindtap="openPokemon">
+        <image src="{{item.image}}" mode="aspectFit" />
+        <view class="evolution-name">{{item.name_zh}}</view>
+        <view class="evolution-condition {{item.active ? 'active' : ''}}">{{item.active ? '当前形态' : item.conditionText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view class="card info-card">
+    <view class="relation-head">
+      <view>
+        <view class="info-title">属性关系</view>
+        <view class="muted">{{relations.title}}</view>
+      </view>
+      <view class="chart-link" bindtap="openTypeChart">相克表</view>
+    </view>
+    <view class="relation-block">
+      <view class="relation-title">弱点</view>
+      <view class="type-chip-line">
+        <view wx:for="{{relations.weaknesses}}" wx:key="id" class="relation-chip" style="background: {{item.color}};" data-type="{{item.id}}" bindtap="openTypeChart">
+          <text>{{item.name}}</text>
+          <text>{{item.multiplierText}}</text>
+        </view>
+        <view wx:if="{{!relations.weaknesses.length}}" class="section-empty">暂无</view>
+      </view>
+    </view>
+    <view class="relation-block">
+      <view class="relation-title">抵抗</view>
+      <view class="type-chip-line">
+        <view wx:for="{{relations.resistances}}" wx:key="id" class="relation-chip" style="background: {{item.color}};" data-type="{{item.id}}" bindtap="openTypeChart">
+          <text>{{item.name}}</text>
+          <text>{{item.multiplierText}}</text>
+        </view>
+        <view wx:if="{{!relations.resistances.length}}" class="section-empty">暂无</view>
+      </view>
+    </view>
+    <view class="relation-block">
+      <view class="relation-title">免疫</view>
+      <view class="type-chip-line">
+        <view wx:for="{{relations.immunities}}" wx:key="id" class="relation-chip" style="background: {{item.color}};" data-type="{{item.id}}" bindtap="openTypeChart">
+          <text>{{item.name}}</text>
+          <text>{{item.multiplierText}}</text>
+        </view>
+        <view wx:if="{{!relations.immunities.length}}" class="section-empty">暂无</view>
+      </view>
+    </view>
+  </view>
+</view>

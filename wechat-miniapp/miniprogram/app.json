@@ -1,0 +1,49 @@
+{
+  "pages": [
+    "pages/home/index",
+    "pages/pokedex/index",
+    "pages/carddex/index",
+    "pages/profile/index",
+    "pages/play/index",
+    "pages/pokemon-detail/index",
+    "pages/card-detail/index",
+    "pages/card-pack/index",
+    "pages/card-quiz/index",
+    "pages/quiz/index",
+    "pages/team/index",
+    "pages/type-chart/index"
+  ],
+  "window": {
+    "navigationBarTitleText": "PokeChill",
+    "navigationBarBackgroundColor": "#f8fafc",
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#f5f7fb",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#7b8794",
+    "selectedColor": "#0f766e",
+    "backgroundColor": "#ffffff",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/home/index",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/pokedex/index",
+        "text": "宝可梦图鉴"
+      },
+      {
+        "pagePath": "pages/carddex/index",
+        "text": "卡牌图鉴"
+      },
+      {
+        "pagePath": "pages/profile/index",
+        "text": "我的"
+      }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

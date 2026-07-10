@@ -1,0 +1,165 @@
+<view class="page home-page">
+  <view class="home-header">
+    <view>
+      <view class="eyebrow">今日图鉴</view>
+      <view class="title">宝可梦和卡牌一起慢慢收集</view>
+    </view>
+    <view class="source-pill">V2</view>
+  </view>
+
+  <view class="search-tabs">
+    <view class="search-tab {{homeMode === 'pokemon' ? 'active' : ''}}" data-target="pokemon" bindtap="switchHomeMode">宝可梦</view>
+    <view class="search-tab {{homeMode === 'card' ? 'active' : ''}}" data-target="card" bindtap="switchHomeMode">卡牌</view>
+  </view>
+  <view class="search-box home-search">
+    <input value="{{keyword}}" bindinput="onKeywordInput" bindconfirm="submitSearch" confirm-type="search" placeholder="{{homeMode === 'pokemon' ? '搜索宝可梦名称、英文名或编号' : '搜索卡牌、系列、编号或画师'}}" />
+    <view class="search-action" bindtap="submitSearch">搜索</view>
+  </view>
+
+  <block wx:if="{{homeMode === 'pokemon'}}">
+    <view wx:if="{{dailyPokemon}}" class="card hero-card" bindtap="openPokemon" data-id="{{dailyPokemon.id}}">
+      <view class="hero-copy">
+        <view class="muted">今日宝可梦</view>
+        <view class="hero-name">{{dailyPokemon.name_zh}}</view>
+        <view class="hero-en">#{{dailyPokemon.id}} {{dailyPokemon.name_en}}</view>
+        <view class="type-line">
+          <view wx:for="{{dailyPokemon.types}}" wx:key="*this" class="type-badge type-{{item}}">{{dailyPokemon.typeNames[index]}}</view>
+        </view>
+      </view>
+      <image class="hero-image" src="{{dailyPokemon.image}}" mode="aspectFit" />
+    </view>
+
+    <view class="section">
+      <view class="section-title">
+        <text>最近查看</text>
+        <text class="muted" bindtap="openPokedex">去宝可梦图鉴</text>
+      </view>
+      <scroll-view wx:if="{{recent.length}}" scroll-x class="recent-row">
+        <view wx:for="{{recent}}" wx:key="id" class="recent-card" bindtap="openPokemon" data-id="{{item.id}}">
+          <image src="{{item.image}}" mode="aspectFit" />
+          <view>{{item.name_zh}}</view>
+        </view>
+      </scroll-view>
+      <view wx:else class="card empty-state">
+        <view class="title">还没有浏览记录</view>
+        <view class="hint">从今日宝可梦或图鉴开始探索。</view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">
+        <text>快速发现宝可梦</text>
+      </view>
+      <view class="featured-list">
+        <view wx:for="{{featured}}" wx:key="id" class="featured-item card" bindtap="openPokemon" data-id="{{item.id}}">
+          <image src="{{item.image}}" mode="aspectFit" />
+          <view class="featured-copy">
+            <view class="featured-name">{{item.name_zh}}</view>
+            <view class="muted">#{{item.id}} {{item.name_en}}</view>
+          </view>
+          <view class="featured-types">
+            <view wx:for="{{item.types}}" wx:for-item="type" wx:for-index="typeIndex" wx:key="*this" class="type-badge type-{{type}}">{{item.typeNames[typeIndex]}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </block>
+
+  <block wx:else>
+    <view wx:if="{{dailyCard}}" class="card card-hero" bindtap="openCard" data-id="{{dailyCard.id}}">
+      <view class="card-hero-art">
+        <image src="{{dailyCard.image}}" mode="aspectFit" />
+      </view>
+      <view class="card-hero-copy">
+        <view class="muted">今日卡牌</view>
+        <view class="card-hero-name">{{dailyCard.display_name || dailyCard.name_zh || dailyCard.name}}</view>
+        <view class="card-hero-sub">#{{dailyCard.number}}</view>
+        <view class="card-hero-meta">{{dailyCard.rarity_name || dailyCard.rarity}}</view>
+      </view>
+    </view>
+
+    <view class="card pack-home-card" bindtap="openCardPack">
+      <view class="pack-home-copy">
+        <view class="muted">每日开包</view>
+        <view class="pack-home-title">选一个系列，手动开一包</view>
+        <view class="pack-home-sub">不会自动抽，点进去后由你决定。</view>
+      </view>
+      <image wx:if="{{dailyCard && (dailyCard.set_logo || dailyCard.set_symbol)}}" class="pack-home-logo" src="{{dailyCard.set_logo || dailyCard.set_symbol}}" mode="aspectFit" />
+      <view wx:else class="pack-home-icon">包</view>
+    </view>
+
+    <view wx:if="{{hotDecks.length}}" class="section">
+      <view class="section-title">
+        <text>热门卡组</text>
+        <text class="muted">Limitless</text>
+      </view>
+      <view class="deck-list">
+        <view wx:for="{{hotDecks}}" wx:key="rank" class="deck-row card">
+          <view class="deck-rank">#{{item.rank}}</view>
+          <view class="deck-icons">
+            <image wx:for="{{item.images}}" wx:for-item="icon" wx:key="src" src="{{icon.src}}" mode="aspectFit" />
+          </view>
+          <view class="deck-copy">
+            <view class="deck-name">{{item.name}}</view>
+            <view class="muted">{{item.points}} 分 · {{item.share}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <view class="section">
+      <view class="section-title">
+        <text>最近看卡</text>
+        <text class="muted" bindtap="openCarddex">去卡牌图鉴</text>
+      </view>
+      <scroll-view wx:if="{{recentCards.length}}" scroll-x class="recent-card-row">
+        <view wx:for="{{recentCards}}" wx:key="id" class="recent-tcg-card" bindtap="openCard" data-id="{{item.id}}">
+          <image src="{{item.image}}" mode="aspectFit" />
+          <view>{{item.display_name}}</view>
+        </view>
+      </scroll-view>
+      <view wx:else class="card empty-state">
+        <view class="title">还没有看过卡牌</view>
+        <view class="hint">从今日卡牌或卡牌图鉴开始。</view>
+      </view>
+    </view>
+  </block>
+
+  <view class="section">
+    <view class="section-title">
+      <text>常用玩法</text>
+    </view>
+    <view class="quick-grid">
+      <view class="quick-card" bindtap="openQuiz">
+        <view class="quick-icon">猜</view>
+        <view class="quick-title">每日猜谜</view>
+        <view class="quick-sub">4 选 1</view>
+      </view>
+      <view class="quick-card" bindtap="openCardQuiz">
+        <view class="quick-icon">卡</view>
+        <view class="quick-title">猜卡牌</view>
+        <view class="quick-sub">今日挑战</view>
+      </view>
+      <view class="quick-card" bindtap="openCardPack">
+        <view class="quick-icon">包</view>
+        <view class="quick-title">每日开包</view>
+        <view class="quick-sub">10 张一包</view>
+      </view>
+      <view class="quick-card" bindtap="openTeam">
+        <view class="quick-icon">队</view>
+        <view class="quick-title">队伍分析</view>
+        <view class="quick-sub">最多 6 只</view>
+      </view>
+      <view class="quick-card" bindtap="openTypes">
+        <view class="quick-icon">属</view>
+        <view class="quick-title">属性速查</view>
+        <view class="quick-sub">弱点抗性</view>
+      </view>
+      <view class="quick-card" bindtap="openPlay">
+        <view class="quick-icon">玩</view>
+        <view class="quick-title">玩法盒子</view>
+        <view class="quick-sub">更多轻玩法</view>
+      </view>
+    </view>
+  </view>
+</view>

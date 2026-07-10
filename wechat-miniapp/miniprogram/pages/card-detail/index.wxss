@@ -1,0 +1,278 @@
+.card-detail-page {
+  padding-bottom: 48rpx;
+}
+
+.detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 24rpx;
+}
+
+.card-art-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 226rpx;
+  height: 316rpx;
+  border-radius: 14rpx;
+  background: #f8fafc;
+}
+
+.card-art-large image {
+  width: 212rpx;
+  height: 300rpx;
+  border-radius: 12rpx;
+}
+
+.card-art-empty {
+  color: #94a3b8;
+  font-size: 24rpx;
+  font-weight: 900;
+}
+
+.hero-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  color: #0f766e;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.hero-meta text {
+  padding: 4rpx 10rpx;
+  border-radius: 999rpx;
+  background: #e6fffb;
+}
+
+.hero-name {
+  margin-top: 12rpx;
+  color: #101828;
+  font-size: 42rpx;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.hero-subtitle {
+  margin-top: 6rpx;
+  color: #697586;
+  font-size: 24rpx;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-top: 16rpx;
+}
+
+.energy-badge,
+.plain-badge {
+  min-width: 58rpx;
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  color: #ffffff;
+  font-size: 22rpx;
+  font-weight: 800;
+  text-align: center;
+}
+
+.plain-badge {
+  background: #475467;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.action {
+  min-height: 52rpx;
+  padding: 0 14rpx;
+  border: 1rpx solid #d9e2ec;
+  border-radius: 999rpx;
+  color: #334155;
+  font-size: 22rpx;
+  font-weight: 900;
+  line-height: 52rpx;
+}
+
+.action.active {
+  border-color: #0f766e;
+  background: #e6fffb;
+  color: #0f766e;
+}
+
+.info-card {
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.section-title.compact {
+  margin-bottom: 16rpx;
+  font-size: 30rpx;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18rpx;
+}
+
+.info-row {
+  min-width: 0;
+  color: #182230;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.text-block,
+.attack-row {
+  padding: 16rpx 0;
+  border-top: 1rpx solid #edf2f7;
+}
+
+.text-block:first-of-type,
+.attack-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.block-title {
+  color: #182230;
+  font-size: 28rpx;
+  font-weight: 900;
+}
+
+.block-copy {
+  margin-top: 8rpx;
+  color: #465467;
+  font-size: 24rpx;
+  line-height: 1.55;
+}
+
+.description-source {
+  margin-top: 12rpx;
+  color: #94a3b8;
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.attack-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.damage {
+  flex: 0 0 auto;
+  min-width: 74rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 999rpx;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 24rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
+.cost-line,
+.retreat-cost-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10rpx;
+  margin-top: 12rpx;
+}
+
+.retreat-cost-row {
+  padding-top: 18rpx;
+}
+
+.cost-label,
+.cost-total {
+  color: #697586;
+  font-size: 22rpx;
+  font-weight: 800;
+}
+
+.energy-icon-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6rpx;
+}
+
+.energy-icon {
+  width: 38rpx;
+  height: 38rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.84);
+  border-radius: 999rpx;
+  box-shadow: 0 2rpx 6rpx rgba(15, 23, 42, 0.18);
+  color: #ffffff;
+  font-size: 20rpx;
+  font-weight: 900;
+  line-height: 38rpx;
+  text-align: center;
+}
+
+.relation-group {
+  margin-top: 20rpx;
+}
+
+.relation-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 10rpx;
+}
+
+.relation-chip {
+  padding: 6rpx 14rpx;
+  border-radius: 999rpx;
+  color: #ffffff;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.rule-row {
+  margin-top: 10rpx;
+  padding: 14rpx;
+  border-radius: 10rpx;
+  background: #f8fafc;
+  color: #465467;
+  font-size: 24rpx;
+  line-height: 1.55;
+}
+
+.pokemon-ref-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+
+.pokemon-ref {
+  min-width: 150rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 10rpx;
+  background: #f8fafc;
+  color: #182230;
+  font-size: 24rpx;
+  font-weight: 800;
+}
+
+.ref-number {
+  color: #0f766e;
+  font-size: 22rpx;
+  font-weight: 900;
+}

@@ -1,0 +1,107 @@
+.card-quiz-page {
+  padding-bottom: 48rpx;
+}
+
+.quiz-card {
+  padding: 24rpx;
+}
+
+.quiz-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.quiz-title {
+  margin-top: 6rpx;
+  color: #101828;
+  font-size: 40rpx;
+  font-weight: 900;
+}
+
+.quiz-pill {
+  padding: 8rpx 16rpx;
+  border-radius: 999rpx;
+  background: #e6fffb;
+  color: #0f766e;
+  font-size: 22rpx;
+  font-weight: 900;
+}
+
+.quiz-art-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 24rpx;
+  min-height: 430rpx;
+  border-radius: 14rpx;
+  background: #f8fafc;
+}
+
+.quiz-art {
+  width: 280rpx;
+  height: 390rpx;
+  border-radius: 12rpx;
+}
+
+.quiz-art.hidden {
+  filter: blur(12rpx);
+  opacity: 0.68;
+}
+
+.hint-card,
+.result-card {
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.hint-title,
+.result-title {
+  color: #182230;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.hint-row {
+  margin-top: 12rpx;
+  padding: 14rpx;
+  border-radius: 10rpx;
+  background: #f8fafc;
+  color: #465467;
+  font-size: 24rpx;
+}
+
+.option-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+  margin-top: 18rpx;
+}
+
+.option-card {
+  padding: 20rpx 22rpx;
+}
+
+.option-card.active {
+  border-color: #0f766e;
+  background: #ecfdf5;
+}
+
+.option-name {
+  color: #182230;
+  font-size: 30rpx;
+  font-weight: 900;
+}
+
+.submit-button {
+  margin-top: 20rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.result-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14rpx;
+  margin-top: 20rpx;
+}

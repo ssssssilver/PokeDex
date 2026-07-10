@@ -1,0 +1,17 @@
+const defaults = {
+  cloudEnv: '',
+  useCloudApi: false,
+  useRemoteApi: false,
+  apiBaseUrl: '',
+  requestTimeoutMs: 10000,
+  pageSize: 30
+};
+
+let local = {};
+try {
+  local = require('./config.local');
+} catch (error) {
+  local = {};
+}
+
+module.exports = Object.assign({}, defaults, local);

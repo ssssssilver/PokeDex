@@ -1,0 +1,4 @@
+tmp/
+server/.data/
+wechat-miniapp/miniprogram/config.local.js
+**/project.private.config.json

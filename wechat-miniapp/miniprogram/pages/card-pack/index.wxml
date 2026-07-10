@@ -1,0 +1,38 @@
+<view class="page pack-page">
+  <view class="pack-header card">
+    <view class="pack-copy">
+      <view class="muted">每日开包</view>
+      <view class="pack-title">{{selectedSet ? selectedSet.name : '卡牌补充包'}}</view>
+      <view class="pack-sub">{{selectedSet ? selectedSet.series : sourceText}}</view>
+    </view>
+    <image wx:if="{{selectedSet && (selectedSet.logo || selectedSet.symbol)}}" class="pack-logo" src="{{selectedSet.logo || selectedSet.symbol}}" mode="aspectFit" />
+  </view>
+
+  <scroll-view wx:if="{{setOptions.length}}" scroll-x class="set-row">
+    <view wx:for="{{setOptions}}" wx:key="id" class="set-chip {{item.selected ? 'selected' : ''}}" data-id="{{item.id}}" bindtap="selectSet">
+      <image wx:if="{{item.symbol || item.logo}}" src="{{item.symbol || item.logo}}" mode="aspectFit" />
+      <view>{{item.name}}</view>
+    </view>
+  </scroll-view>
+
+  <view class="open-button {{opening ? 'disabled' : ''}}" bindtap="openPack">{{opening ? '开包中' : '开一包'}}</view>
+
+  <view wx:if="{{cards.length}}" class="pack-result">
+    <view class="section-title">
+      <text>本包结果</text>
+      <text class="muted">{{cards.length}} 张</text>
+    </view>
+    <view class="pull-grid">
+      <view wx:for="{{cards}}" wx:key="id" class="pull-card card" data-id="{{item.id}}" bindtap="openCard">
+        <image src="{{item.image}}" mode="aspectFit" lazy-load="true" />
+        <view class="pull-name">{{item.title}}</view>
+        <view class="pull-meta">{{item.rarityText}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:elif="{{!opening && !loading}}" class="card empty-state">
+    <view class="title">还没有抽包结果</view>
+    <view class="hint">选择一个系列后开一包。</view>
+  </view>
+</view>

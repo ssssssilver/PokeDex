@@ -1,0 +1,99 @@
+<view class="page pokedex-page">
+  <view class="search-row">
+    <view class="search-box search-inline">
+      <input value="{{keyword}}" bindinput="onKeywordInput" bindconfirm="submitSearch" confirm-type="search" placeholder="搜索中文名、英文名、日文名或编号" />
+    </view>
+    <view class="filter-trigger {{activeFilterCount ? 'active' : ''}}" bindtap="openFilter">
+      <text>筛选</text>
+      <text wx:if="{{activeFilterCount}}" class="filter-count">{{activeFilterCount}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{activeFilterCount}}" class="applied-row">
+    <view wx:if="{{activeTypeText}}" class="applied-chip">{{activeTypeText}}</view>
+    <view wx:if="{{activeGeneration}}" class="applied-chip">第 {{activeGeneration}} 世代</view>
+    <view wx:if="{{activePokedex !== 'national'}}" class="applied-chip">地区图鉴</view>
+    <view wx:if="{{activeSort !== 'id'}}" class="applied-chip">已排序</view>
+    <view class="applied-reset" bindtap="resetFilters">重置</view>
+  </view>
+
+  <view class="result-meta">
+    <text>{{resultCountText}}</text>
+    <text class="muted">{{sourceText}}</text>
+  </view>
+
+  <view wx:if="{{loading && !pokemon.length}}" class="card loading-state">图鉴加载中</view>
+
+  <view wx:elif="{{pokemon.length}}" class="pokemon-list">
+    <view wx:for="{{pokemon}}" wx:key="id" class="pokemon-row card">
+      <view class="row-main" data-id="{{item.id}}" bindtap="openPokemon">
+        <view class="sprite-wrap">
+          <image src="{{item.image}}" mode="aspectFit" lazy-load="true" />
+        </view>
+        <view class="row-copy">
+          <view class="row-topline">
+            <text class="dex-number">{{item.idText}}</text>
+            <text class="generation-pill">{{item.generationText}}</text>
+          </view>
+          <view class="row-name">{{item.name_zh}}</view>
+          <view class="row-subtitle">
+            <text>{{item.name_en}}</text>
+            <text wx:if="{{item.name_ja}}"> / {{item.name_ja}}</text>
+          </view>
+          <view class="row-types">
+            <view wx:for="{{item.types}}" wx:for-item="type" wx:for-index="typeIndex" wx:key="*this" class="type-badge type-{{type}}">{{item.typeNames[typeIndex]}}</view>
+          </view>
+          <view class="row-facts">
+            <text>{{item.regionalDexText}}</text>
+            <text wx:if="{{item.statText}}">{{item.statText}}</text>
+            <text wx:if="{{item.moveText}}">{{item.moveText}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="favorite {{item.liked ? 'liked' : ''}}" data-id="{{item.id}}" catchtap="toggleFavorite">{{item.liked ? '★' : '☆'}}</view>
+    </view>
+  </view>
+
+  <view wx:else class="card empty-state">
+    <view class="title">没有找到结果</view>
+    <view class="hint">换个名称、编号、属性或地区图鉴试试。</view>
+  </view>
+
+  <view wx:if="{{loadingMore}}" class="load-more-state">继续加载中</view>
+  <view wx:elif="{{pokemon.length && !hasMore}}" class="load-more-state">已加载全部</view>
+
+  <view wx:if="{{filterVisible}}" class="filter-mask" catchtap="closeFilter"></view>
+  <view wx:if="{{filterVisible}}" class="filter-panel" catchtap="stopTap">
+    <view class="filter-panel-head">
+      <view class="filter-panel-title">筛选</view>
+      <view class="filter-close" bindtap="closeFilter">关闭</view>
+    </view>
+
+    <scroll-view scroll-y class="filter-panel-body">
+      <view class="filter-section-title">属性（最多选择两项）</view>
+      <view class="filter-grid type-grid">
+        <view wx:for="{{filterTypes}}" wx:key="id" class="filter-option {{item.selected ? 'selected' : ''}}" data-type="{{item.id}}" bindtap="toggleDraftType">{{item.name}}</view>
+      </view>
+
+      <view class="filter-section-title">世代（最多选择一项）</view>
+      <view class="filter-grid generation-grid">
+        <view wx:for="{{generationOptions}}" wx:key="id" class="filter-option {{draftGeneration === item.id ? 'selected' : ''}}" data-generation="{{item.id}}" bindtap="selectDraftGeneration">{{item.name}}</view>
+      </view>
+
+      <view class="filter-section-title">地区图鉴</view>
+      <view class="filter-grid region-grid">
+        <view wx:for="{{pokedexOptions}}" wx:key="id" class="filter-option {{draftPokedex === item.id ? 'selected' : ''}}" data-pokedex="{{item.id}}" bindtap="selectDraftPokedex">{{item.name}}</view>
+      </view>
+
+      <view class="filter-section-title">排序</view>
+      <view class="filter-grid sort-grid">
+        <view wx:for="{{sortOptions}}" wx:key="id" class="filter-option {{draftSort === item.id ? 'selected' : ''}}" data-sort="{{item.id}}" bindtap="selectDraftSort">{{item.name}}</view>
+      </view>
+    </scroll-view>
+
+    <view class="filter-actions">
+      <view class="filter-clear" bindtap="clearDraftFilters">清空</view>
+      <view class="filter-confirm" bindtap="confirmFilters">确定</view>
+    </view>
+  </view>
+</view>

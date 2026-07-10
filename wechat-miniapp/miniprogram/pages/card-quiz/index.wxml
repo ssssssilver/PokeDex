@@ -1,0 +1,44 @@
+<view class="page card-quiz-page">
+  <view wx:if="{{quiz}}" class="card quiz-card">
+    <view class="quiz-head">
+      <view>
+        <view class="muted">今日卡牌挑战</view>
+        <view class="quiz-title">猜出这张卡牌</view>
+      </view>
+      <view class="quiz-pill">4 选 1</view>
+    </view>
+    <view class="quiz-art-wrap">
+      <image class="quiz-art {{revealed ? 'revealed' : 'hidden'}}" src="{{quiz.image}}" mode="aspectFit" />
+    </view>
+  </view>
+
+  <view wx:if="{{quiz}}" class="card hint-card">
+    <view class="hint-title">提示</view>
+    <view wx:for="{{quiz.hints}}" wx:key="*this" class="hint-row">{{item}}</view>
+  </view>
+
+  <view wx:if="{{quiz}}" class="option-list">
+    <view wx:for="{{quiz.options}}" wx:key="id" class="option-card card {{selectedId === item.id ? 'active' : ''}}" data-id="{{item.id}}" bindtap="chooseOption">
+      <view>
+        <view class="option-name">{{item.display_name || item.name_zh || item.name}}</view>
+        <view class="muted">{{item.set_name}} #{{item.number}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{quiz && !result}}" class="button-primary submit-button" bindtap="submitAnswer">确认答案</view>
+
+  <view wx:if="{{result}}" class="card result-card">
+    <view class="result-title">{{result.correct ? '猜对了' : '差一点'}}</view>
+    <view class="muted">{{result.message}}</view>
+    <view class="result-actions">
+      <view class="button-primary" bindtap="openAnswer">查看卡牌</view>
+      <view class="button-secondary" bindtap="reloadQuiz">再看一次</view>
+    </view>
+  </view>
+
+  <view wx:if="{{!quiz}}" class="card empty-state">
+    <view class="title">卡牌题目未准备好</view>
+    <view class="hint">先同步 PTCG 卡牌数据，再回来挑战。</view>
+  </view>
+</view>

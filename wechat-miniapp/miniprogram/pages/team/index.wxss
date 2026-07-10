@@ -1,0 +1,109 @@
+.team-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28rpx;
+}
+
+.team-count {
+  color: #101828;
+  font-size: 44rpx;
+  font-weight: 900;
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: #e6fffb;
+  color: #0f766e;
+  font-size: 34rpx;
+  font-weight: 900;
+}
+
+.analysis-card {
+  margin-top: 18rpx;
+  padding: 24rpx;
+}
+
+.analysis-text {
+  color: #334155;
+  font-size: 28rpx;
+  line-height: 1.55;
+}
+
+.analysis-section {
+  margin-top: 18rpx;
+}
+
+.analysis-title {
+  margin-bottom: 10rpx;
+  color: #182230;
+  font-size: 26rpx;
+  font-weight: 800;
+}
+
+.tag-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+}
+
+.soft-tag {
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 24rpx;
+}
+
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14rpx;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  padding: 16rpx;
+}
+
+.member-card.active {
+  border-color: #0f766e;
+  background: #e6fffb;
+}
+
+.member-card image {
+  width: 92rpx;
+  height: 92rpx;
+  margin-right: 16rpx;
+}
+
+.member-main {
+  flex: 1;
+}
+
+.member-name {
+  color: #182230;
+  font-size: 30rpx;
+  font-weight: 800;
+}
+
+.member-types {
+  display: flex;
+  gap: 8rpx;
+  margin-top: 8rpx;
+}
+
+.member-mark {
+  width: 48rpx;
+  color: #0f766e;
+  font-size: 34rpx;
+  font-weight: 900;
+  text-align: center;
+}
+
