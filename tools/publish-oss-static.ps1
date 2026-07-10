@@ -34,8 +34,7 @@ $RootUri = if ($CleanPrefix) { "oss://$Bucket/$CleanPrefix" } else { "oss://$Buc
 
 function Copy-OssDirectory([string]$Source, [string]$Destination) {
   if (-not (Test-Path -LiteralPath $Source -PathType Container)) { return }
-  $SourceWithSlash = $Source.TrimEnd([char[]]"\/") + [IO.Path]::DirectorySeparatorChar
-  & $Ossutil cp -r -u -j 10 $SourceWithSlash $Destination
+  & $Ossutil cp -r -u -j 10 $Source $Destination
   if ($LASTEXITCODE -ne 0) { throw "ossutil failed while uploading $Source" }
 }
 
