@@ -4,6 +4,8 @@ const path = require('path');
 
 const root = path.resolve(process.argv[2] || path.join(__dirname, '..', 'dist', 'oss'));
 const config = require('../wechat-miniapp/miniprogram/config');
+const apiSource = fs.readFileSync(path.join(__dirname, '..', 'wechat-miniapp', 'miniprogram', 'services', 'api.js'), 'utf8');
+assert(!/^(?:const|let|var)\s+staticApi\s*=\s*require\(['"]\.\/static-api['"]\)/m.test(apiSource), 'static API must not be eagerly required');
 config.useStaticApi = true;
 config.useRemoteApi = false;
 config.useCloudApi = false;
