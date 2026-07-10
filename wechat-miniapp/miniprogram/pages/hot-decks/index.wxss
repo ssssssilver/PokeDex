@@ -1,0 +1,21 @@
+.hot-decks-page { padding-bottom: 44rpx; }
+.deck-summary { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18rpx; padding: 18rpx 20rpx; border-left: 8rpx solid #315ea8; background: #182230; color: #fff; }
+.deck-summary text { font-size: 34rpx; font-weight: 900; }
+.deck-summary view view { margin-top: 2rpx; color: #cbd5e1; font-size: 21rpx; }
+.summary-source { color: #8db8ff; font-size: 19rpx; font-weight: 900; }
+.ranking-panel { padding: 0 18rpx; border: 1rpx solid #dce5eb; border-radius: 8rpx; background: #fff; box-shadow: 0 8rpx 20rpx rgba(24, 34, 48, 0.06); }
+.ranking-list { border-top: 1rpx solid #e1e7ec; }
+.ranking-row { display: flex; align-items: center; min-height: 112rpx; padding: 12rpx 4rpx; border-bottom: 1rpx solid #e1e7ec; }
+.ranking-row:last-child { border-bottom: 0; }
+.ranking-number { display: flex; align-items: center; justify-content: center; flex: 0 0 46rpx; height: 46rpx; border-radius: 50%; background: #315ea8; color: #fff; font-size: 21rpx; font-weight: 900; }
+.ranking-icons { display: flex; flex: 0 0 96rpx; margin-left: 12rpx; }
+.ranking-icons image { width: 56rpx; height: 56rpx; margin-right: -16rpx; }
+.ranking-copy { flex: 1; min-width: 0; margin-left: 10rpx; }
+.ranking-name { overflow: hidden; color: #182230; font-size: 26rpx; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+.ranking-points { margin-top: 5rpx; color: #718096; font-size: 19rpx; }
+.ranking-share { flex: 0 0 94rpx; text-align: right; }
+.ranking-share view { color: #315ea8; font-size: 22rpx; font-weight: 900; }
+.ranking-share text { color: #94a3b8; font-size: 17rpx; }
+.ranking-arrow { margin-left: 8rpx; color: #94a3b8; font-size: 34rpx; }
+.deck-state { padding: 54rpx 20rpx; color: #64748b; text-align: center; }
+.deck-state.error { color: #b42318; }

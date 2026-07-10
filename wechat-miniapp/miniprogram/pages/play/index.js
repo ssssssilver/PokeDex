@@ -19,6 +19,7 @@ Page({
   openTypes() { wx.navigateTo({ url: '/pages/type-chart/index' }); },
   openCardQuiz() { wx.navigateTo({ url: '/pages/card-quiz/index' }); },
   openCardPack() { wx.navigateTo({ url: '/pages/card-pack/index' }); },
+  openHotDecks() { wx.navigateTo({ url: '/pages/hot-decks/index' }); },
   openPocketPack() { wx.navigateTo({ url: '/pages/pocket-pack/index' }); },
   openPocketEvents(event) { wx.navigateTo({ url: `/pages/pocket-events/index?tab=${event.currentTarget.dataset.tab || 'events'}` }); },
   openPocketDecks() { wx.navigateTo({ url: '/pages/pocket-hot-decks/index' }); }

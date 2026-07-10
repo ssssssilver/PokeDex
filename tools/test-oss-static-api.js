@@ -96,6 +96,8 @@ async function main() {
   assert(events.items.length > 0);
   assert.strictEqual(decks.items.length, 4);
   assert(pocketDecks.total >= 300);
+  const physicalDeckRanking = await staticApi.call('getHotDecks', { limit: 100 });
+  assert(physicalDeckRanking.items.length >= 20, 'physical-card hot deck ranking is incomplete');
 
   const quiz = await staticApi.call('getDailyQuiz', { seed: 'pokemon-random-a' });
   const nextQuiz = await staticApi.call('getDailyQuiz', { seed: 'pokemon-random-b' });

@@ -1,0 +1,17 @@
+<view class="page hot-decks-page">
+  <view class="deck-summary"><view><text>{{total}}</text><view>当前环境卡组原型</view></view><view class="summary-source">LIMITLESS TCG</view></view>
+  <view class="ranking-panel">
+    <view wx:if="{{loading}}" class="deck-state">排行榜加载中</view>
+    <view wx:elif="{{error}}" class="deck-state error" bindtap="retry">{{error}}</view>
+    <view wx:elif="{{decks.length}}" class="ranking-list">
+      <view wx:for="{{decks}}" wx:key="rank" class="ranking-row" data-url="{{item.url}}" data-name="{{item.name}}" data-rank="{{item.rank}}" data-points="{{item.points}}" data-share="{{item.share}}" bindtap="openDeck">
+        <view class="ranking-number">{{item.rank}}</view>
+        <view class="ranking-icons"><image wx:for="{{item.images}}" wx:for-item="icon" wx:key="src" src="{{icon.src}}" mode="aspectFit" /></view>
+        <view class="ranking-copy"><view class="ranking-name">{{item.name}}</view><view class="ranking-points">{{item.pointsText}}</view></view>
+        <view class="ranking-share"><view>{{item.shareText}}</view><text>环境占比</text></view>
+        <view class="ranking-arrow">›</view>
+      </view>
+    </view>
+    <view wx:else class="deck-state">暂无热门卡组</view>
+  </view>
+</view>

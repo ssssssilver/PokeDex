@@ -13,6 +13,7 @@
     <view class="category-heading"><text>实体卡牌玩法</text><small>PTCG 数据</small></view>
     <view class="card play-card" bindtap="openCardQuiz"><view class="play-icon coral">猜</view><view class="play-copy"><view class="play-title">今日猜卡牌</view><view class="muted">根据卡图、系列和稀有度提示作答。</view></view></view>
     <view class="card play-card" bindtap="openCardPack"><view class="play-icon blue">包</view><view class="play-copy"><view class="play-title">模拟开包</view><view class="muted">选择实体卡系列并手动开包。</view></view></view>
+    <view class="card play-card" bindtap="openHotDecks"><view class="play-icon coral">组</view><view class="play-copy"><view class="play-title">热门卡组</view><view class="muted">查看当前环境排行榜与完整牌表。</view></view></view>
   </view>
 
   <view wx:else class="play-list">

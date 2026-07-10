@@ -96,7 +96,7 @@ Page({
     wx.navigateTo({ url: this.data.homeMode === 'pocket' ? '/pages/pocket-pack/index' : '/pages/card-pack/index' });
   },
   openPlay() { wx.navigateTo({ url: `/pages/play/index?category=${this.data.homeMode}` }); },
-  scrollToHotDecks() { wx.pageScrollTo({ selector: '#physical-hot-decks', duration: 260 }); },
+  openHotDecks() { wx.navigateTo({ url: '/pages/hot-decks/index' }); },
   openDeck(event) {
     const deck = event.currentTarget.dataset || {};
     wx.navigateTo({ url: `/pages/deck-detail/index?url=${encodeURIComponent(deck.url || '')}&name=${encodeURIComponent(deck.name || '')}&rank=${deck.rank || ''}&points=${deck.points || ''}&share=${encodeURIComponent(deck.share || '')}` });

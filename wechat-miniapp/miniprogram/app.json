@@ -10,6 +10,7 @@
     "pages/card-detail/index",
     "pages/card-pack/index",
     "pages/card-quiz/index",
+    "pages/hot-decks/index",
     "pages/deck-detail/index",
     "pages/quiz/index",
     "pages/team/index",

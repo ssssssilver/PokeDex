@@ -71,6 +71,10 @@ const homeSource = fs.readFileSync(path.join(root, 'pages', 'home', 'index.js'),
 const storageSource = fs.readFileSync(path.join(root, 'utils', 'storage.js'), 'utf8');
 const profileWxml = fs.readFileSync(path.join(root, 'pages', 'profile', 'index.wxml'), 'utf8');
 const quizWxml = fs.readFileSync(path.join(root, 'pages', 'quiz', 'index.wxml'), 'utf8');
+const playSource = fs.readFileSync(path.join(root, 'pages', 'play', 'index.js'), 'utf8');
+const playWxml = fs.readFileSync(path.join(root, 'pages', 'play', 'index.wxml'), 'utf8');
+const physicalHotDeckPage = 'pages/hot-decks/index';
+const pocketHotDeckWxml = fs.readFileSync(path.join(root, 'pages', 'pocket-hot-decks', 'index.wxml'), 'utf8');
 checks.push(check(!pocketSources.includes('/pages/card-detail/index'), 'Pocket pages do not open physical-card detail'));
 checks.push(check(!pocketSources.includes('/pages/card-pack/index'), 'Pocket pages do not open physical-card pack simulator'));
 checks.push(check(pocketTabWxml.includes('card-list') && pocketTabWxml.includes('card-row'), 'Pocket tab uses the physical-card dex list pattern'));
@@ -89,6 +93,15 @@ checks.push(check(['宝可梦', '实体卡牌', 'Pocket'].every((label) => profi
 checks.push(check(!profileWxml.includes('最近查看') && !profileWxml.includes('数据源') && !profileWxml.includes('同步'), 'profile removes recent and sync diagnostics'));
 checks.push(check(profileWxml.includes('open-type="feedback"') && !profileWxml.includes('联系邮箱'), 'profile keeps native feedback without a duplicate contact email'));
 checks.push(check(quizWxml.includes('随机挑战') && quizWxml.includes('再猜一题'), 'Pokemon quiz supports repeated random rounds'));
+checks.push(check(app.pages.includes(physicalHotDeckPage), 'physical-card hot deck ranking page is registered'));
+['js', 'json', 'wxml', 'wxss'].forEach((extension) => {
+  const filePath = path.join(root, `${physicalHotDeckPage}.${extension}`);
+  checks.push(check(fs.existsSync(filePath), `${physicalHotDeckPage}.${extension} exists`));
+  if (extension === 'wxml' && fs.existsSync(filePath)) checks.push(check(balancedWxml(filePath), `${physicalHotDeckPage}.wxml has balanced tags`));
+});
+checks.push(check(homeSource.includes("/pages/hot-decks/index") && homeWxml.includes('bindtap="openHotDecks"'), 'home physical-card deck ranking entry is wired'));
+checks.push(check(playSource.includes("/pages/hot-decks/index") && playWxml.includes('bindtap="openHotDecks"'), 'play box physical-card hot decks open the ranking page'));
+checks.push(check(pocketHotDeckWxml.includes('ranking-panel'), 'Pocket hot deck ranking uses a readable white panel'));
 
 const originalWx = global.wx;
 const storedValues = new Map([['pokechill:recent', [{ id: 11, name_zh: '铁甲蛹', image: 'http://127.0.0.1:8787/assets/local-pokemon/metapod.png' }]]]);
