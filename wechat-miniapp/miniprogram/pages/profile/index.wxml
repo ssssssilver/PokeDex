@@ -56,12 +56,12 @@
       <view class="settings-row" bindtap="openPlay">
         <view class="settings-icon">玩</view><view class="settings-copy"><view class="settings-title">玩法盒子</view><text>查看全部轻玩法</text></view><view class="row-arrow">›</view>
       </view>
-      <button class="settings-row feedback-button" open-type="feedback">
-        <view class="settings-icon support">意</view><view class="settings-copy"><view class="settings-title">用户意见反馈</view><text>通过微信反馈问题或建议</text></view><view class="row-arrow">›</view>
-      </button>
       <view class="settings-row version-row">
         <view class="settings-icon version">版</view><view class="settings-copy"><view class="settings-title">版本号</view><text>宝批小站</text></view><view class="version-value">v{{version}}</view>
       </view>
+      <button class="settings-row feedback-button" open-type="feedback">
+        <view class="settings-icon support">意</view><view class="settings-copy"><view class="settings-title">用户意见反馈</view><text>通过微信反馈问题或建议</text></view><view class="row-arrow">›</view>
+      </button>
     </view>
   </view>
 </view>

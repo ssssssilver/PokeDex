@@ -92,6 +92,7 @@ checks.push(check(balancedWxml(path.join(root, 'pages', 'profile', 'index.wxml')
 checks.push(check(['宝可梦', '实体卡牌', 'Pocket'].every((label) => profileWxml.includes(label)), 'profile groups saved data by product domain'));
 checks.push(check(!profileWxml.includes('最近查看') && !profileWxml.includes('数据源') && !profileWxml.includes('同步'), 'profile removes recent and sync diagnostics'));
 checks.push(check(profileWxml.includes('open-type="feedback"') && !profileWxml.includes('联系邮箱'), 'profile keeps native feedback without a duplicate contact email'));
+checks.push(check(profileWxml.lastIndexOf('用户意见反馈') > profileWxml.lastIndexOf('版本号'), 'profile feedback is the final settings entry'));
 checks.push(check(quizWxml.includes('随机挑战') && quizWxml.includes('再猜一题'), 'Pokemon quiz supports repeated random rounds'));
 checks.push(check(app.pages.includes(physicalHotDeckPage), 'physical-card hot deck ranking page is registered'));
 ['js', 'json', 'wxml', 'wxss'].forEach((extension) => {

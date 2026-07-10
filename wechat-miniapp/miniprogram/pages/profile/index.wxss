@@ -34,6 +34,7 @@
 .settings-list { border: 1rpx solid #dfe6ec; border-radius: 8rpx; background: #fff; overflow: hidden; }
 .settings-row { display: flex; align-items: center; width: 100%; min-height: 94rpx; padding: 16rpx 20rpx; border: 0; border-bottom: 1rpx solid #edf1f4; border-radius: 0; background: #fff; text-align: left; box-sizing: border-box; }
 .settings-row:last-child { border-bottom: 0; }
+.feedback-button { justify-content: flex-start; margin: 0; font-size: inherit; line-height: normal; }
 .feedback-button::after { border: 0; }
 .settings-icon { display: flex; align-items: center; justify-content: center; flex: 0 0 48rpx; height: 48rpx; border-radius: 8rpx; background: #edf6f4; color: #0f766e; font-size: 20rpx; font-weight: 900; }
 .settings-icon.support { background: #fff1ee; color: #c94e42; }
