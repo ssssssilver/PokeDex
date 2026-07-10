@@ -292,9 +292,10 @@ function dailyKey() {
   return `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}`;
 }
 
-function dailyQuiz(manifest, name) {
+function dailyQuiz(manifest, name, seed) {
   const dataset = manifest.datasets[name];
-  const random = seededRandom(`${name}-${dailyKey()}`);
+  const quizKey = seed || dailyKey();
+  const random = seededRandom(`${name}-${quizKey}`);
   const indices = [];
   while (indices.length < 4 && indices.length < dataset.count) {
     const index = Math.floor(random() * dataset.count);
@@ -316,16 +317,16 @@ function dailyQuiz(manifest, name) {
       });
     });
     const items = indices.map((index) => lookup[index]).filter(Boolean);
-    const random = seededRandom(`${name}-${dailyKey()}`);
+    const random = seededRandom(`${name}-${quizKey}`);
     const answer = items[0];
     const choices = items.slice();
     choices.sort(() => random() - 0.5);
     if (name === 'pokemon') {
       return { item: {
-        quizId: `pokemon-daily-${dailyKey()}-${answer.id}`,
+        quizId: `pokemon-random-${quizKey}-${answer.id}`,
         answerId: answer.id,
         silhouette: answer.image,
-        hints: [`Type: ${(answer.typeNames || answer.types || []).join(' / ')}`, `Generation: ${answer.generation}`, `Stats: ${answer.stat_total || '-'}`, `Category: ${answer.category || '-'}`],
+        hints: [`属性：${(answer.typeNames || answer.types || []).join(' / ')}`, `世代：第 ${answer.generation || 1} 世代`, `种族值总和：${answer.stat_total || '-'}`, `分类：${answer.category || '未知'}`],
         options: choices.map((item) => ({ id: item.id, name_zh: item.name_zh, name_en: item.name_en }))
       }, source: 'oss-static' };
     }
@@ -458,7 +459,7 @@ function callWithManifest(manifest, action, data) {
   if (action === 'getTypes') return getFile(manifest, 'types');
   if (action === 'getTypeRelations') return getFile(manifest, 'typeRelations').then((items) => items[payload.type] || { item: null, source: 'oss-static' });
   if (action === 'getEvolutionChain') return getAllRows(manifest, 'pokemon').then((items) => ({ items: items.filter((item) => (payload.ids || []).map(Number).includes(Number(item.id))), source: 'oss-static' }));
-  if (action === 'getDailyQuiz') return dailyQuiz(manifest, 'pokemon');
+  if (action === 'getDailyQuiz') return dailyQuiz(manifest, 'pokemon', payload.seed);
   if (action === 'submitDailyQuiz' || action === 'submitDailyCardQuiz') return answer(payload);
   if (action === 'getDailyCardQuiz') return dailyQuiz(manifest, 'ptcg');
   if (action === 'analyzeTeam') return analyzeTeam(manifest, payload);

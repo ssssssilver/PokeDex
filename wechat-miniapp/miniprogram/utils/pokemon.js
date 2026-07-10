@@ -201,7 +201,7 @@ const SEED_POKEMON = [
     stats: { hp: 35, attack: 55, defense: 40, specialAttack: 50, specialDefense: 50, speed: 90 },
     evolution_chain: [25],
     moves_summary: ['电击', '电光一闪', '十万伏特', '电磁波'],
-    flavor: '速度快、辨识度高，是每日猜谜和新手入口最友好的宝可梦之一。'
+    flavor: '速度快、辨识度高，是宝可梦猜谜和新手入口最友好的宝可梦之一。'
   },
   {
     id: 94,
@@ -404,12 +404,6 @@ function analyzeTeam(ids) {
   };
 }
 
-function getDailyKey(date = new Date()) {
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-
 function hashString(value) {
   let hash = 2166136261;
   const text = String(value || '');
@@ -440,9 +434,9 @@ function shuffleWithRandom(items, random) {
   return next;
 }
 
-function getDailyQuiz() {
-  const dailyKey = getDailyKey();
-  const random = createSeededRandom(`pokemon-daily-${dailyKey}`);
+function getDailyQuiz(seed) {
+  const quizKey = seed || `${Date.now()}-${Math.random()}`;
+  const random = createSeededRandom(`pokemon-random-${quizKey}`);
   const answer = POKEMON[Math.floor(random() * POKEMON.length)];
   const options = [answer];
   while (options.length < 4) {
@@ -453,7 +447,7 @@ function getDailyQuiz() {
   }
 
   return {
-    quizId: `pokemon-daily-${dailyKey}-${answer.id}`,
+    quizId: `pokemon-random-${quizKey}-${answer.id}`,
     answerId: answer.id,
     silhouette: answer.image,
     hints: [
@@ -480,7 +474,7 @@ function submitDailyQuiz(payload) {
   const correct = selectedId === answerId;
   return {
     correct,
-    message: correct ? '猜对了，今天的图鉴灵感到手。' : '差一点，看看详情再来熟悉一下。'
+    message: correct ? '猜对了，再来挑战一题吧。' : '差一点，看看详情再来熟悉一下。'
   };
 }
 

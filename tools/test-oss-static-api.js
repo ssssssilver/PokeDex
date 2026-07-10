@@ -97,8 +97,11 @@ async function main() {
   assert.strictEqual(decks.items.length, 4);
   assert(pocketDecks.total >= 300);
 
-  const quiz = await staticApi.call('getDailyQuiz', {});
+  const quiz = await staticApi.call('getDailyQuiz', { seed: 'pokemon-random-a' });
+  const nextQuiz = await staticApi.call('getDailyQuiz', { seed: 'pokemon-random-b' });
   assert.strictEqual(quiz.item.options.length, 4);
+  assert.strictEqual(nextQuiz.item.options.length, 4);
+  assert.notStrictEqual(quiz.item.answerId, nextQuiz.item.answerId, 'Pokemon quiz seeds should produce independent questions');
   const team = await staticApi.call('analyzeTeam', { ids: [1, 6, 25] });
   assert.strictEqual(team.item.members.length, 3);
   const physicalPack = await staticApi.call('openCardPack', { setId: cardPage.items[0].set_id, count: 10 });

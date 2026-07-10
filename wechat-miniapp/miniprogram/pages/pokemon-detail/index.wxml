@@ -63,7 +63,6 @@
     <scroll-view wx:if="{{relatedCards.length}}" scroll-x class="related-card-scroll">
       <view wx:for="{{relatedCards}}" wx:key="id" class="related-card" data-id="{{item.id}}" data-source="{{item.cardSource}}" bindtap="openRelatedCard">
         <image src="{{item.image}}" mode="aspectFit" />
-        <view class="related-card-name">{{item.display_name || item.name_zh || item.name}}</view>
       </view>
     </scroll-view>
     <view wx:else class="section-empty">暂无{{relatedCardMode === 'pocket' ? ' Pocket' : '实体'}}关联卡牌</view>

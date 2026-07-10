@@ -310,23 +310,26 @@ function getTypeRelations(event) {
   };
 }
 
-async function getDailyQuiz() {
+async function getDailyQuiz(event = {}) {
   const items = await getSummaries();
-  const daySeed = Math.floor(Date.now() / 86400000);
-  const answer = items[daySeed % items.length];
+  const randomSeed = String(event.seed || `${Date.now()}-${Math.random()}`);
+  let state = Array.from(randomSeed).reduce((value, character) => Math.imul(value ^ character.charCodeAt(0), 16777619) >>> 0, 2166136261);
+  const random = () => {
+    state = Math.imul(state ^ (state >>> 15), state | 1) >>> 0;
+    return state / 4294967296;
+  };
+  const answer = items[Math.floor(random() * items.length)];
   const options = [answer];
-  let cursor = (daySeed + 3) % items.length;
   while (options.length < 4 && options.length < items.length) {
-    const candidate = items[cursor % items.length];
+    const candidate = items[Math.floor(random() * items.length)];
     if (!options.find((item) => Number(item.id) === Number(candidate.id))) {
       options.push(candidate);
     }
-    cursor += 2;
   }
 
   return {
     item: {
-      quizId: `daily-${daySeed}`,
+      quizId: `pokemon-random-${Date.now()}-${answer.id}`,
       answerId: answer.id,
       silhouette: answer.image,
       hints: [
@@ -335,7 +338,7 @@ async function getDailyQuiz() {
         `种族值总和：${answer.stat_total || '-'}`,
         `分类：${answer.category || '未知'}`
       ],
-      options: sortPokemon(options, 'id').map(decoratePokemon)
+      options: options.sort(() => random() - 0.5).map(decoratePokemon)
     },
     source: 'cloud'
   };
@@ -346,7 +349,7 @@ function submitDailyQuiz(event) {
   return {
     item: {
       correct,
-      message: correct ? '猜对了，今天的图鉴灵感到手。' : '差一点，看看详情再来熟悉一下。'
+      message: correct ? '猜对了，再来挑战一题吧。' : '差一点，看看详情再来熟悉一下。'
     },
     source: 'cloud'
   };

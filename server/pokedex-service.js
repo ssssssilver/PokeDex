@@ -26,12 +26,6 @@ const POKEDEX_GROUPS = {
 const DEFAULT_LIST_PAGE_SIZE = 40;
 const MAX_LIST_PAGE_SIZE = 100;
 
-function getDailyKey(date = new Date()) {
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${date.getFullYear()}-${month}-${day}`;
-}
-
 function hashString(value) {
   let hash = 2166136261;
   const text = String(value || '');
@@ -434,11 +428,11 @@ class PokedexService {
     };
   }
 
-  getDailyQuiz() {
+  getDailyQuiz(seed) {
     const summaries = this.getSummaries();
     const items = summaries.items;
-    const dailyKey = getDailyKey();
-    const random = createSeededRandom(`pokemon-daily-${dailyKey}`);
+    const quizKey = seed || `${Date.now()}-${Math.random()}`;
+    const random = createSeededRandom(`pokemon-random-${quizKey}`);
     const answer = items[Math.floor(random() * items.length)];
     const options = [answer];
     while (options.length < 4 && options.length < items.length) {
@@ -450,7 +444,7 @@ class PokedexService {
 
     return {
       item: {
-        quizId: `pokemon-daily-${dailyKey}-${answer.id}`,
+        quizId: `pokemon-random-${quizKey}-${answer.id}`,
         answerId: answer.id,
         silhouette: decoratePokemon(answer, this).image,
         hints: [
@@ -470,7 +464,7 @@ class PokedexService {
     return {
       item: {
         correct,
-        message: correct ? '猜对了，今天的图鉴灵感到手。' : '差一点，看看详情再来熟悉一下。'
+        message: correct ? '猜对了，再来挑战一题吧。' : '差一点，看看详情再来熟悉一下。'
       },
       source: 'remote-cache'
     };

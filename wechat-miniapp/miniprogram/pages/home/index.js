@@ -27,7 +27,6 @@ Page({
     dailyPokemon: null,
     dailyCard: null,
     dailyPocketCard: null,
-    featured: [],
     hotDecks: [],
     pocketEvents: [],
     pocketDecks: [],
@@ -42,21 +41,18 @@ Page({
     this.setData({ loading: true });
     Promise.all([
       safe(api.listPokemon({ sort: 'id' }), { items: [] }),
-      safe(api.getDailyQuiz(), { item: null }),
       safe(api.listCards({ sort: 'releaseDate', page: 1, pageSize: 20 }), { items: [] }),
       safe(api.getHotDecks({ limit: 4 }), { items: [] }),
       safe(api.listPocketCards({ page: 1, pageSize: 60 }), { items: [] }),
       safe(api.listPocketEvents({ page: 1, pageSize: 8 }), { items: [] }),
       safe(api.listPocketHotDecks({ page: 1, pageSize: 3 }), { items: [] })
-    ]).then(([pokemonResult, quizResult, cardResult, deckResult, pocketCardResult, pocketEventResult, pocketDeckResult]) => {
+    ]).then(([pokemonResult, cardResult, deckResult, pocketCardResult, pocketEventResult, pocketDeckResult]) => {
       const pokemon = pokemonResult.items || [];
       const cards = cardResult.items || [];
       const pocketCards = pocketCardResult.items || [];
-      const quiz = quizResult.item || {};
       this.setData({
         loading: false,
-        featured: pokemon.slice(0, 6),
-        dailyPokemon: pokemon.find((item) => item.id === quiz.answerId) || dailyItem(pokemon),
+        dailyPokemon: dailyItem(pokemon),
         dailyCard: dailyItem(cards),
         dailyPocketCard: dailyItem(pocketCards),
         hotDecks: deckResult.items || [],

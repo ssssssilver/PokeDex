@@ -64,6 +64,10 @@ expectedApiMethods.forEach((method) => {
 const pocketSources = expectedPages.map((page) => fs.readFileSync(path.join(root, `${page}.js`), 'utf8')).join('\n');
 const pocketTabWxml = fs.readFileSync(path.join(root, 'pages', 'pocket', 'index.wxml'), 'utf8');
 const pokemonDetailWxml = fs.readFileSync(path.join(root, 'pages', 'pokemon-detail', 'index.wxml'), 'utf8');
+const homeWxml = fs.readFileSync(path.join(root, 'pages', 'home', 'index.wxml'), 'utf8');
+const homeSource = fs.readFileSync(path.join(root, 'pages', 'home', 'index.js'), 'utf8');
+const profileWxml = fs.readFileSync(path.join(root, 'pages', 'profile', 'index.wxml'), 'utf8');
+const quizWxml = fs.readFileSync(path.join(root, 'pages', 'quiz', 'index.wxml'), 'utf8');
 checks.push(check(!pocketSources.includes('/pages/card-detail/index'), 'Pocket pages do not open physical-card detail'));
 checks.push(check(!pocketSources.includes('/pages/card-pack/index'), 'Pocket pages do not open physical-card pack simulator'));
 checks.push(check(pocketTabWxml.includes('card-list') && pocketTabWxml.includes('card-row'), 'Pocket tab uses the physical-card dex list pattern'));
@@ -71,6 +75,15 @@ checks.push(check(!pocketTabWxml.includes('LIVE'), 'Pocket dex has no channel LI
 checks.push(check(pocketTabWxml.includes('resetFilters') && pocketTabWxml.includes('filter-panel'), 'Pocket search filters expose applied state and reset controls'));
 checks.push(check(!pokemonDetailWxml.includes('model-preview-button'), 'Pokemon 3D controls do not duplicate the hero preview button'));
 checks.push(check(pokemonDetailWxml.includes('detail-image-wrap') && pokemonDetailWxml.includes('bindtap="previewModel3d"'), 'Pokemon hero image keeps 3D preview interaction'));
+checks.push(check(!pokemonDetailWxml.includes('related-card-name'), 'related Pokemon cards do not repeat the Pokemon name'));
+checks.push(check(homeWxml.includes('宝可梦猜谜') && !homeWxml.includes('每日猜谜'), 'Pokemon quiz is labeled as a random light game'));
+checks.push(check(!homeWxml.includes('快速发现宝可梦'), 'home removes quick Pokemon discovery'));
+checks.push(check(!homeSource.includes('quiz.answerId'), 'daily Pokemon is independent from the quiz answer'));
+checks.push(check(balancedWxml(path.join(root, 'pages', 'profile', 'index.wxml')), 'profile WXML has balanced tags'));
+checks.push(check(['宝可梦', '实体卡牌', 'Pocket'].every((label) => profileWxml.includes(label)), 'profile groups saved data by product domain'));
+checks.push(check(!profileWxml.includes('最近查看') && !profileWxml.includes('数据源') && !profileWxml.includes('同步'), 'profile removes recent and sync diagnostics'));
+checks.push(check(profileWxml.includes('open-type="feedback"') && profileWxml.includes('modone@qq.com') === false, 'profile uses native feedback and binds the contact email'));
+checks.push(check(quizWxml.includes('随机挑战') && quizWxml.includes('再猜一题'), 'Pokemon quiz supports repeated random rounds'));
 
 const failed = checks.filter((item) => !item.ok);
 process.stdout.write(`${JSON.stringify({ ok: failed.length === 0, checks, failed }, null, 2)}\n`);

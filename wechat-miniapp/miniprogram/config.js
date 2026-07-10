@@ -1,4 +1,5 @@
 const defaults = {
+  appVersion: '1.0.0',
   cloudEnv: '',
   useCloudApi: false,
   useRemoteApi: false,

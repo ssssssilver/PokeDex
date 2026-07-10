@@ -596,14 +596,6 @@
   border-radius: 8rpx;
 }
 
-.related-card-name {
-  overflow: hidden;
-  width: 100%;
-  margin-top: 8rpx;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .relation-block {
   padding: 14rpx 0;
   border-top: 1rpx solid #eef2f6;

@@ -1,7 +1,7 @@
 <view wx:if="{{quiz}}" class="page quiz-page">
   <view class="card quiz-card">
-    <view class="muted">每日一题</view>
-    <view class="quiz-title">猜猜今天是谁？</view>
+    <view class="muted">随机挑战</view>
+    <view class="quiz-title">猜猜这是谁？</view>
     <image class="silhouette {{result ? 'revealed' : ''}}" src="{{quiz.silhouette}}" mode="aspectFit" />
   </view>
 
@@ -24,6 +24,9 @@
   <view wx:if="{{result}}" class="card result-card">
     <view class="result-title {{result.correct ? 'correct' : 'wrong'}}">{{result.correct ? '猜对了' : '猜错了'}}</view>
     <view class="muted">{{result.message}}</view>
-    <view class="button-primary result-button" bindtap="openAnswer">查看详情</view>
+    <view class="result-actions">
+      <view class="button-secondary" bindtap="openAnswer">查看详情</view>
+      <view class="button-primary" bindtap="nextQuiz">再猜一题</view>
+    </view>
   </view>
 </view>

@@ -10,7 +10,12 @@ Page({
   },
 
   onLoad() {
-    api.getDailyQuiz().then((result) => {
+    this.loadQuiz();
+  },
+
+  loadQuiz() {
+    this.setData({ quiz: null, selectedId: 0, result: null, revealedHints: 2 });
+    api.getDailyQuiz({ seed: `${Date.now()}-${Math.random()}` }).then((result) => {
       this.setData({ quiz: result.item });
     });
   },
@@ -43,6 +48,9 @@ Page({
 
   openAnswer() {
     wx.navigateTo({ url: `/pages/pokemon-detail/index?id=${this.data.quiz.answerId}` });
+  },
+
+  nextQuiz() {
+    this.loadQuiz();
   }
 });
-

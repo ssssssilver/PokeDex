@@ -1,181 +1,46 @@
-.profile-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 28rpx;
-}
+.profile-page { padding-bottom: 40rpx; }
 
-.profile-card + .profile-card {
-  margin-top: 18rpx;
-}
+.profile-heading { padding: 12rpx 2rpx 22rpx; }
+.profile-title { color: #17202a; font-size: 40rpx; font-weight: 900; }
+.profile-heading .muted { margin-top: 8rpx; font-size: 23rpx; }
 
-.profile-title {
-  margin-top: 6rpx;
-  color: #101828;
-  font-size: 44rpx;
-  font-weight: 900;
-}
+.domain-section { margin-bottom: 24rpx; border: 1rpx solid #dfe6ec; border-radius: 8rpx; background: #fff; overflow: hidden; }
+.domain-head { display: flex; align-items: center; min-height: 92rpx; padding: 18rpx 20rpx; border-bottom: 1rpx solid #edf1f4; box-sizing: border-box; }
+.domain-mark { display: flex; align-items: center; justify-content: center; flex: 0 0 54rpx; height: 54rpx; margin-right: 16rpx; border-radius: 8rpx; background: #e6f6f3; color: #0f766e; font-size: 24rpx; font-weight: 900; }
+.domain-mark.cardmark { background: #eef3ff; color: #315ea8; }
+.domain-mark.pocket { background: #edf0f4; color: #202b38; }
+.domain-title { color: #17202a; font-size: 29rpx; font-weight: 900; }
+.domain-head .muted { margin-top: 2rpx; font-size: 20rpx; }
+.domain-link { margin-left: auto; color: #0f766e; font-size: 22rpx; font-weight: 800; }
 
-.data-card {
-  margin-top: 18rpx;
-  padding: 24rpx;
-}
+.stats-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 20rpx 10rpx; }
+.stats-grid.two-columns { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.stats-grid > view { display: flex; flex-direction: column; align-items: center; min-height: 76rpx; border-right: 1rpx solid #edf1f4; }
+.stats-grid > view:last-child { border-right: 0; }
+.stat-value { color: #17202a; font-size: 34rpx; font-weight: 900; line-height: 42rpx; }
+.stats-grid text { margin-top: 4rpx; color: #718096; font-size: 21rpx; }
 
-.data-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-}
+.team-list { border-top: 1rpx solid #edf1f4; }
+.team-row { display: flex; align-items: center; min-height: 86rpx; margin: 0 20rpx; border-bottom: 1rpx solid #edf1f4; }
+.team-row:last-child { border-bottom: 0; }
+.team-index { display: flex; align-items: center; justify-content: center; flex: 0 0 42rpx; height: 42rpx; border-radius: 50%; background: #f0f7f5; color: #0f766e; font-size: 20rpx; font-weight: 900; }
+.team-copy { flex: 1; min-width: 0; margin-left: 14rpx; color: #263442; font-size: 24rpx; font-weight: 800; }
+.team-copy text { display: block; margin-top: 2rpx; color: #84909d; font-size: 19rpx; font-weight: 400; }
+.team-count { color: #526171; font-size: 21rpx; font-weight: 800; }
+.row-arrow { margin-left: 12rpx; color: #a0aab5; font-size: 36rpx; line-height: 1; }
 
-.data-title {
-  margin-top: 6rpx;
-  color: #182230;
-  font-size: 30rpx;
-  font-weight: 800;
-}
-
-.data-pill {
-  padding: 8rpx 16rpx;
-  border-radius: 999rpx;
-  background: #f1f5f9;
-  color: #64748b;
-  font-size: 22rpx;
-  font-weight: 800;
-}
-
-.data-pill.ready {
-  background: #e6fffb;
-  color: #0f766e;
-}
-
-.data-pill.local {
-  background: #f1f5f9;
-  color: #64748b;
-}
-
-.data-pill.stale {
-  background: #fff1f2;
-  color: #be123c;
-}
-
-.data-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18rpx;
-  margin-top: 22rpx;
-  color: #182230;
-  font-size: 26rpx;
-  font-weight: 700;
-}
-
-.run-list {
-  margin-top: 24rpx;
-  border-top: 1rpx solid #edf2f7;
-  padding-top: 18rpx;
-}
-
-.run-title {
-  margin-bottom: 12rpx;
-  color: #182230;
-  font-size: 26rpx;
-  font-weight: 800;
-}
-
-.run-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  padding: 12rpx 0;
-}
-
-.run-main {
-  color: #182230;
-  font-size: 25rpx;
-  font-weight: 800;
-}
-
-.run-metrics {
-  flex: 0 0 170rpx;
-  color: #182230;
-  font-size: 24rpx;
-  font-weight: 800;
-  text-align: right;
-}
-
-.check-card {
-  margin-top: 18rpx;
-  padding: 24rpx;
-}
-
-.play-entry-card {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-  margin-top: 18rpx;
-  padding: 24rpx;
-}
-
-.check-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16rpx;
-}
-
-.check-title {
-  margin-top: 6rpx;
-  color: #182230;
-  font-size: 30rpx;
-  font-weight: 800;
-}
-
-.check-button {
-  min-width: 150rpx;
-  text-align: center;
-}
-
-.check-body {
-  margin-top: 20rpx;
-}
-
-.check-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18rpx;
-  margin-top: 18rpx;
-  color: #182230;
-  font-size: 26rpx;
-  font-weight: 700;
-}
-
-.mini-list {
-  display: flex;
-  flex-direction: column;
-  gap: 14rpx;
-}
-
-.mini-row {
-  display: flex;
-  align-items: center;
-  padding: 16rpx;
-}
-
-.mini-row image {
-  width: 86rpx;
-  height: 86rpx;
-  margin-right: 16rpx;
-}
-
-.mini-row image.card-mini-art {
-  width: 76rpx;
-  height: 108rpx;
-  border-radius: 8rpx;
-}
-
-.mini-name {
-  color: #182230;
-  font-size: 30rpx;
-  font-weight: 800;
-}
+.settings-section { margin-top: 32rpx; }
+.section-label { margin: 0 2rpx 12rpx; color: #596878; font-size: 23rpx; font-weight: 800; }
+.settings-list { border: 1rpx solid #dfe6ec; border-radius: 8rpx; background: #fff; overflow: hidden; }
+.settings-row { display: flex; align-items: center; width: 100%; min-height: 94rpx; padding: 16rpx 20rpx; border: 0; border-bottom: 1rpx solid #edf1f4; border-radius: 0; background: #fff; text-align: left; box-sizing: border-box; }
+.settings-row:last-child { border-bottom: 0; }
+.feedback-button::after { border: 0; }
+.settings-icon { display: flex; align-items: center; justify-content: center; flex: 0 0 48rpx; height: 48rpx; border-radius: 8rpx; background: #edf6f4; color: #0f766e; font-size: 20rpx; font-weight: 900; }
+.settings-icon.support { background: #fff1ee; color: #c94e42; }
+.settings-icon.mail { background: #eef3ff; color: #315ea8; }
+.settings-icon.version { background: #f1f3f5; color: #4c5968; }
+.settings-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; margin-left: 16rpx; line-height: 1.3; }
+.settings-title { color: #263442; font-size: 25rpx; font-weight: 800; }
+.settings-copy text { margin-top: 4rpx; color: #84909d; font-size: 20rpx; }
+.row-action { color: #0f766e; font-size: 22rpx; font-weight: 800; }
+.version-value { color: #596878; font-size: 22rpx; font-weight: 800; }

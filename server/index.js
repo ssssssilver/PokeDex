@@ -743,7 +743,7 @@ function createApp(options = {}) {
       }
 
       if (req.method === 'GET' && pathname === '/api/quiz/daily') {
-        sendJson(res, 200, service.getDailyQuiz());
+        sendJson(res, 200, service.getDailyQuiz(currentUrl.searchParams.get('seed')));
         return;
       }
 

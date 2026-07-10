@@ -88,6 +88,12 @@ async function main() {
     assert.ok(seedList.items.length > 0);
     assert.strictEqual(seedList.source, 'local-seed');
 
+    const quizA = await requestJson(app.publicBaseUrl, 'GET', '/api/quiz/daily?seed=smoke-a');
+    const quizB = await requestJson(app.publicBaseUrl, 'GET', '/api/quiz/daily?seed=smoke-b');
+    assert.strictEqual(quizA.item.options.length, 4);
+    assert.strictEqual(quizB.item.options.length, 4);
+    assert.notStrictEqual(quizA.item.answerId, quizB.item.answerId);
+
     const sync = await requestJson(app.publicBaseUrl, 'POST', '/api/sync/pokeapi', {
       startId: 1,
       endId: 3,

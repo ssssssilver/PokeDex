@@ -10,7 +10,7 @@
   <view class="section home-quick-section"><view class="section-title"><text>常用功能</text></view>
     <view wx:if="{{homeMode === 'pokemon'}}" class="quick-grid">
       <view class="quick-card" bindtap="openPokedex"><view class="quick-icon">鉴</view><view class="quick-title">宝可梦图鉴</view><view class="quick-sub">搜索与筛选</view></view>
-      <view class="quick-card" bindtap="openQuiz"><view class="quick-icon">猜</view><view class="quick-title">每日猜谜</view><view class="quick-sub">4 选 1</view></view>
+      <view class="quick-card" bindtap="openQuiz"><view class="quick-icon">猜</view><view class="quick-title">宝可梦猜谜</view><view class="quick-sub">随机 4 选 1</view></view>
       <view class="quick-card" bindtap="openTeam"><view class="quick-icon">队</view><view class="quick-title">队伍分析</view><view class="quick-sub">多队伍编辑</view></view>
       <view class="quick-card" bindtap="openTypes"><view class="quick-icon gold">属</view><view class="quick-title">属性速查</view><view class="quick-sub">克制关系</view></view>
       <view class="quick-card" bindtap="openPlay"><view class="quick-icon ink">玩</view><view class="quick-title">玩法盒子</view><view class="quick-sub">宝可梦玩法</view></view>
@@ -34,7 +34,6 @@
   <block wx:if="{{homeMode === 'pokemon'}}">
     <view wx:if="{{dailyPokemon}}" class="card hero-card" data-id="{{dailyPokemon.id}}" bindtap="openPokemon"><view class="hero-copy"><view class="muted">今日宝可梦</view><view class="hero-name">{{dailyPokemon.name_zh}}</view><view class="hero-en">#{{dailyPokemon.id}} {{dailyPokemon.name_en}}</view><view class="type-line"><view wx:for="{{dailyPokemon.types}}" wx:key="*this" class="type-badge type-{{item}}">{{dailyPokemon.typeNames[index]}}</view></view></view><image class="hero-image" src="{{dailyPokemon.image}}" mode="aspectFit" /></view>
     <view class="section"><view class="section-title"><text>最近查看</text><text class="muted" bindtap="openPokedex">去宝可梦图鉴</text></view><scroll-view wx:if="{{recent.length}}" scroll-x class="recent-row"><view wx:for="{{recent}}" wx:key="id" class="recent-card" data-id="{{item.id}}" bindtap="openPokemon"><image src="{{item.image}}" mode="aspectFit" /><view>{{item.name_zh}}</view></view></scroll-view><view wx:else class="card empty-state"><view class="title">还没有浏览记录</view></view></view>
-    <view class="section"><view class="section-title"><text>快速发现宝可梦</text></view><view class="featured-list"><view wx:for="{{featured}}" wx:key="id" class="featured-item card" data-id="{{item.id}}" bindtap="openPokemon"><image src="{{item.image}}" mode="aspectFit" /><view class="featured-copy"><view class="featured-name">{{item.name_zh}}</view><view class="muted">#{{item.id}} {{item.name_en}}</view></view></view></view></view>
   </block>
 
   <block wx:elif="{{homeMode === 'card'}}">

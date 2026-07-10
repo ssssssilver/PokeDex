@@ -127,7 +127,7 @@ function remoteRoute(action, data) {
     return { method: 'GET', path: `/api/evolution?${buildQuery({ ids: (payload.ids || []).join(',') })}` };
   }
   if (action === 'getDailyQuiz') {
-    return { method: 'GET', path: '/api/quiz/daily' };
+    return { method: 'GET', path: `/api/quiz/daily?${buildQuery({ seed: payload.seed })}` };
   }
   if (action === 'submitDailyQuiz') {
     return { method: 'POST', path: '/api/quiz/daily/answer', data: payload };
@@ -344,9 +344,10 @@ function getEvolutionChain(ids) {
   }));
 }
 
-function getDailyQuiz() {
-  return apiCall('getDailyQuiz', {}, () => ({
-    item: local.getDailyQuiz(),
+function getDailyQuiz(options) {
+  const payload = options || {};
+  return apiCall('getDailyQuiz', payload, () => ({
+    item: local.getDailyQuiz(payload.seed),
     source: 'local'
   }));
 }
