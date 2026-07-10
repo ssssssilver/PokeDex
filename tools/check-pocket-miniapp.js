@@ -3,6 +3,7 @@ const path = require('path');
 
 const root = path.join(__dirname, '..', 'wechat-miniapp', 'miniprogram');
 const app = JSON.parse(fs.readFileSync(path.join(root, 'app.json'), 'utf8'));
+const configSource = fs.readFileSync(path.join(root, 'config.js'), 'utf8');
 const expectedPages = [
   'pages/pocket/index',
   'pages/pocket-carddex/index',
@@ -45,6 +46,7 @@ checks.push(check(app.tabBar.list.some((item) => item.pagePath === 'pages/pocket
 checks.push(check(app.tabBar.list[3].pagePath === 'pages/pocket/index', 'Pocket tab is immediately before profile'));
 checks.push(check(app.tabBar.list.find((item) => item.pagePath === 'pages/pocket/index').text === 'Pocket图鉴', 'Pocket tab is labeled as a dex'));
 checks.push(check(app.tabBar.list.every((item) => item.iconPath && item.selectedIconPath), 'every tab has normal and selected icons'));
+checks.push(check(/useStaticApi:\s*true/.test(configSource) && configSource.includes('oss-cn-shenzhen.aliyuncs.com/Server/pokechill'), 'miniapp defaults to the production OSS snapshot'));
 
 expectedPages.forEach((page) => {
   checks.push(check(app.pages.includes(page), `${page} is registered`));
@@ -82,7 +84,7 @@ checks.push(check(!homeSource.includes('quiz.answerId'), 'daily Pokemon is indep
 checks.push(check(balancedWxml(path.join(root, 'pages', 'profile', 'index.wxml')), 'profile WXML has balanced tags'));
 checks.push(check(['宝可梦', '实体卡牌', 'Pocket'].every((label) => profileWxml.includes(label)), 'profile groups saved data by product domain'));
 checks.push(check(!profileWxml.includes('最近查看') && !profileWxml.includes('数据源') && !profileWxml.includes('同步'), 'profile removes recent and sync diagnostics'));
-checks.push(check(profileWxml.includes('open-type="feedback"') && profileWxml.includes('modone@qq.com') === false, 'profile uses native feedback and binds the contact email'));
+checks.push(check(profileWxml.includes('open-type="feedback"') && !profileWxml.includes('联系邮箱'), 'profile keeps native feedback without a duplicate contact email'));
 checks.push(check(quizWxml.includes('随机挑战') && quizWxml.includes('再猜一题'), 'Pokemon quiz supports repeated random rounds'));
 
 const failed = checks.filter((item) => !item.ok);

@@ -411,6 +411,7 @@ function analyzeTeam(manifest, payload) {
       return result;
     }, {});
     const typeCounts = {};
+    const relationIds = (values) => (values || []).map((entry) => typeof entry === 'string' ? entry : entry.id);
     members.forEach((member) => (member.types || []).forEach((type) => { typeCounts[type] = (typeCounts[type] || 0) + 1; }));
     Object.keys(relations).forEach((type) => {
       let count = 0;
@@ -419,9 +420,9 @@ function analyzeTeam(manifest, payload) {
       members.forEach((member) => {
         const multiplier = (member.types || []).reduce((value, defender) => {
           const relation = (relations[defender] || {}).item || {};
-          if ((relation.immuneTo || []).includes(type)) return 0;
-          if ((relation.weakTo || []).includes(type)) return value * 2;
-          if ((relation.resists || []).includes(type)) return value * 0.5;
+          if (relationIds(relation.immuneTo).includes(type)) return 0;
+          if (relationIds(relation.weakTo).includes(type)) return value * 2;
+          if (relationIds(relation.resists).includes(type)) return value * 0.5;
           return value;
         }, 1);
         if (multiplier >= 2) count += 1;
@@ -436,7 +437,11 @@ function analyzeTeam(manifest, payload) {
     resistances.sort((a, b) => b.count - a.count);
     immunities.sort((a, b) => b.count - a.count);
     const primaryTypes = Object.keys(typeCounts).sort((a, b) => typeCounts[b] - typeCounts[a]).slice(0, 3).map((type) => names[type] || type);
-    return { item: { members, score: Math.max(40, Math.min(95, 82 - weaknesses.length * 3 + resistances.length * 2 + immunities.length * 2)), primaryTypes, weaknesses: weaknesses.slice(0, 6), resistances: resistances.slice(0, 6), immunities: immunities.slice(0, 6), summary: '' }, source: 'oss-static' };
+    const leadingWeaknesses = weaknesses.slice(0, 3).map((item) => item.name).join('、');
+    const summary = members.length
+      ? `当前队伍以${primaryTypes.join('、') || '混合'}属性为主，主要风险来自${leadingWeaknesses || '暂无明显共同弱点'}。`
+      : '先选择 1 到 6 只宝可梦，再查看队伍属性分析。';
+    return { item: { members, score: Math.max(40, Math.min(95, 82 - weaknesses.length * 3 + resistances.length * 2 + immunities.length * 2)), primaryTypes, weaknesses: weaknesses.slice(0, 6), resistances: resistances.slice(0, 6), immunities: immunities.slice(0, 6), summary }, source: 'oss-static' };
   });
 }
 

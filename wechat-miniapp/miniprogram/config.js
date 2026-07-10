@@ -3,9 +3,9 @@ const defaults = {
   cloudEnv: '',
   useCloudApi: false,
   useRemoteApi: false,
-  useStaticApi: false,
+  useStaticApi: true,
   apiBaseUrl: '',
-  staticBaseUrl: '',
+  staticBaseUrl: 'https://yilian-upload-prod-oss-bucket.oss-cn-shenzhen.aliyuncs.com/Server/pokechill',
   requestTimeoutMs: 10000,
   pageSize: 30
 };

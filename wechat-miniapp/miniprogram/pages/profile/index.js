@@ -1,12 +1,9 @@
 const config = require('../../config');
 const storage = require('../../utils/storage');
 
-const FEEDBACK_EMAIL = 'modone@qq.com';
-
 Page({
   data: {
     version: config.appVersion,
-    feedbackEmail: FEEDBACK_EMAIL,
     pokemonStats: { favorites: 0, teams: 0, quizCount: 0 },
     cardStats: { favorites: 0, owned: 0, wishlist: 0 },
     pocketStats: { favorites: 0, owned: 0 },
@@ -46,14 +43,5 @@ Page({
   openPocket() { wx.switchTab({ url: '/pages/pocket/index' }); },
   openTeam() { wx.navigateTo({ url: '/pages/team/index' }); },
   openQuiz() { wx.navigateTo({ url: '/pages/quiz/index' }); },
-  openPlay() { wx.navigateTo({ url: '/pages/play/index' }); },
-
-  copyFeedbackEmail() {
-    wx.setClipboardData({
-      data: FEEDBACK_EMAIL,
-      success() {
-        wx.showToast({ title: '邮箱已复制', icon: 'none' });
-      }
-    });
-  }
+  openPlay() { wx.navigateTo({ url: '/pages/play/index' }); }
 });

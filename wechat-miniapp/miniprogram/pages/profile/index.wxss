@@ -37,10 +37,8 @@
 .feedback-button::after { border: 0; }
 .settings-icon { display: flex; align-items: center; justify-content: center; flex: 0 0 48rpx; height: 48rpx; border-radius: 8rpx; background: #edf6f4; color: #0f766e; font-size: 20rpx; font-weight: 900; }
 .settings-icon.support { background: #fff1ee; color: #c94e42; }
-.settings-icon.mail { background: #eef3ff; color: #315ea8; }
 .settings-icon.version { background: #f1f3f5; color: #4c5968; }
 .settings-copy { display: flex; flex: 1; min-width: 0; flex-direction: column; margin-left: 16rpx; line-height: 1.3; }
 .settings-title { color: #263442; font-size: 25rpx; font-weight: 800; }
 .settings-copy text { margin-top: 4rpx; color: #84909d; font-size: 20rpx; }
-.row-action { color: #0f766e; font-size: 22rpx; font-weight: 800; }
 .version-value { color: #596878; font-size: 22rpx; font-weight: 800; }

@@ -83,6 +83,11 @@
   font-size: 24rpx;
 }
 
+.weakness-tag { background: #fff0ee; color: #b83b32; }
+.resistance-tag { background: #eaf8f5; color: #0f766e; }
+.immunity-tag { background: #eef3ff; color: #315ea8; }
+.analysis-empty { color: #94a3b8; font-size: 23rpx; }
+
 .team-list {
   display: flex;
   flex-direction: column;

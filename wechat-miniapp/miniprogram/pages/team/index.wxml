@@ -19,8 +19,9 @@
 
   <view wx:if="{{analysis}}" class="card analysis-card">
     <view class="analysis-text">{{analysis.summary}}</view>
-    <view class="analysis-section"><view class="analysis-title">主要弱点</view><view class="tag-line"><view wx:for="{{analysis.weaknesses}}" wx:key="id" class="soft-tag">{{item.name}} × {{item.count}}</view></view></view>
-    <view class="analysis-section"><view class="analysis-title">抗性覆盖</view><view class="tag-line"><view wx:for="{{analysis.resistances}}" wx:key="id" class="soft-tag">{{item.name}} × {{item.count}}</view></view></view>
+    <view class="analysis-section"><view class="analysis-title">主要弱点</view><view wx:if="{{analysis.weaknesses.length}}" class="tag-line"><view wx:for="{{analysis.weaknesses}}" wx:key="id" class="soft-tag weakness-tag">{{item.name}} × {{item.count}}</view></view><view wx:else class="analysis-empty">暂无明显共同弱点</view></view>
+    <view class="analysis-section"><view class="analysis-title">抗性覆盖</view><view wx:if="{{analysis.resistances.length}}" class="tag-line"><view wx:for="{{analysis.resistances}}" wx:key="id" class="soft-tag resistance-tag">{{item.name}} × {{item.count}}</view></view><view wx:else class="analysis-empty">暂无抗性覆盖</view></view>
+    <view wx:if="{{analysis.immunities.length}}" class="analysis-section"><view class="analysis-title">免疫覆盖</view><view class="tag-line"><view wx:for="{{analysis.immunities}}" wx:key="id" class="soft-tag immunity-tag">{{item.name}} × {{item.count}}</view></view></view>
   </view>
   <view wx:else class="card team-empty-analysis">添加宝可梦后显示队伍属性分析</view>
 

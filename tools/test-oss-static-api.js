@@ -104,6 +104,9 @@ async function main() {
   assert.notStrictEqual(quiz.item.answerId, nextQuiz.item.answerId, 'Pokemon quiz seeds should produce independent questions');
   const team = await staticApi.call('analyzeTeam', { ids: [1, 6, 25] });
   assert.strictEqual(team.item.members.length, 3);
+  assert(team.item.weaknesses.length > 0, 'OSS team analysis should report weaknesses');
+  assert(team.item.resistances.length > 0, 'OSS team analysis should report resistances');
+  assert(team.item.summary.includes('主要风险'), 'OSS team analysis should provide a readable summary');
   const physicalPack = await staticApi.call('openCardPack', { setId: cardPage.items[0].set_id, count: 10 });
   assert.strictEqual(physicalPack.item.cards.length, 10);
   const packs = await staticApi.call('listPocketPacks', { page: 1, pageSize: 100 });
