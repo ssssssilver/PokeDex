@@ -3,9 +3,8 @@ import { Block, View, ScrollView, Text } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
-const pokemonUtils = require('../../utils/pokemon.js')
+const { TYPE_META } = require('../../utils/type-meta.js')
 import './index.scss'
-const TYPE_META = pokemonUtils.TYPE_META || {}
 function multiplierText(multiplier) {
   if (multiplier === 0) return '×0'
   if (multiplier === 0.25) return '×0.25'
@@ -33,23 +32,14 @@ function cellTone(multiplier) {
 function buildTypeColumns() {
   return Object.keys(TYPE_META).map((type) => typeChip(type, 1))
 }
-function buildTypeTable() {
-  const types = Object.keys(TYPE_META)
-  return types.map((attackingType) => {
-    const attack = typeChip(attackingType, 1)
-    return Object.assign({}, attack, {
-      cells: types.map((defenderType) => {
-        const multiplier = pokemonUtils.getDamageMultiplier(attackingType, [
-          defenderType,
-        ])
-        return {
-          key: `${attackingType}-${defenderType}`,
-          text: multiplierText(multiplier),
-          tone: cellTone(multiplier),
-        }
-      }),
-    })
-  })
+function buildTypeTable(rows) {
+  return (rows || []).map((row) => Object.assign({}, row, {
+    cells: (row.cells || []).map((cell) => ({
+      key: cell.key,
+      text: multiplierText(cell.multiplier),
+      tone: cellTone(cell.multiplier),
+    })),
+  }))
 }
 function decorateRelation(relation) {
   const item = relation || {}
@@ -61,20 +51,22 @@ function decorateRelation(relation) {
 }
 cacheOptions.setOptionsToCache({
   data: {
-    types: pokemonUtils.getAllTypes(),
+    types: [],
     activeType: 'fire',
     relation: null,
     typeColumns: buildTypeColumns(),
-    typeRows: buildTypeTable(),
+    typeRows: [],
   },
   onLoad(options) {
     const activeType = (options && options.type) || this.data.activeType
     this.setData({
       activeType,
     })
-    api.getTypes().then((result) => {
+    api.getTypeChart().then((result) => {
       this.setData({
-        types: result.items || this.data.types,
+        types: result.items || [],
+        typeColumns: (result.items || []).map((item) => typeChip(item.id, 1)),
+        typeRows: buildTypeTable(result.rows),
       })
       this.loadRelation()
     })

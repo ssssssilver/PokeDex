@@ -25,7 +25,18 @@ cd web
 npm run build
 ```
 
-Web 默认使用阿里云 OSS 静态数据，不依赖本地 Node 服务。构建产物位于 `web/dist/`。
+Web 使用自有 Node 服务提供图鉴、卡牌、玩法和图片缓存 API，不再读取小程序 OSS 静态 API。生产构建产物位于 `web/dist/`，`server/index.js` 会直接托管该目录。
+
+本地一体化运行：
+
+```powershell
+cd web
+npm run build
+cd ..
+node server\index.js
+```
+
+打开 `http://127.0.0.1:8787/`。部署时通过 `POKECHILL_PUBLIC_BASE_URL` 设置公网 HTTPS 地址。
 
 如需维护已封版的小程序，可从 `miniapp-v1.0.0` 标签创建修复分支，并用微信开发者工具导入 `wechat-miniapp/`。
 

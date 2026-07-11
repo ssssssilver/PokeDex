@@ -34,7 +34,7 @@ export default defineConfig(async (merge, { command, mode }) => {
       }
     },
     cache: {
-      enable: false // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
+      enable: true
     },
     mini: {
       postcss: {
@@ -62,6 +62,29 @@ export default defineConfig(async (merge, { command, mode }) => {
     h5: {
       publicPath: '/',
       staticDirectory: 'static',
+      webpackChain(chain) {
+        chain.optimization.splitChunks({
+          chunks: 'all',
+          cacheGroups: {
+            vendors: {
+              name: 'vendors',
+              test: /[\\/]node_modules[\\/]/,
+              priority: 30,
+              chunks: 'all',
+              enforce: true,
+              reuseExistingChunk: true
+            },
+            common: {
+              name: 'common',
+              minChunks: 2,
+              priority: 20,
+              chunks: 'all',
+              enforce: true,
+              reuseExistingChunk: true
+            }
+          }
+        })
+      },
       output: {
         filename: 'js/[name].[hash:8].js',
         chunkFilename: 'js/[name].[chunkhash:8].js'

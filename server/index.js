@@ -1,6 +1,7 @@
 const fs = require('fs');
 const http = require('http');
 const path = require('path');
+const zlib = require('zlib');
 const { URL } = require('url');
 const { CacheStore } = require('./cache-store');
 const { PokedexService } = require('./pokedex-service');
@@ -82,10 +83,64 @@ function idsFromQuery(value) {
 
 function contentTypeFor(filePath) {
   const ext = path.extname(filePath).toLowerCase();
+  if (ext === '.html') return 'text/html; charset=utf-8';
+  if (ext === '.js' || ext === '.mjs') return 'text/javascript; charset=utf-8';
+  if (ext === '.css') return 'text/css; charset=utf-8';
+  if (ext === '.json' || ext === '.map') return 'application/json; charset=utf-8';
+  if (ext === '.svg') return 'image/svg+xml';
+  if (ext === '.ico') return 'image/x-icon';
+  if (ext === '.woff') return 'font/woff';
+  if (ext === '.woff2') return 'font/woff2';
   if (ext === '.jpg' || ext === '.jpeg') return 'image/jpeg';
   if (ext === '.webp') return 'image/webp';
   if (ext === '.gif') return 'image/gif';
   return 'image/png';
+}
+
+function serveWebApp(req, res, pathname, webRoot) {
+  if ((req.method !== 'GET' && req.method !== 'HEAD') || !webRoot || !fs.existsSync(webRoot)) {
+    return false;
+  }
+  if (pathname === '/health' || pathname.startsWith('/api/')) return false;
+
+  let relativePath = pathname === '/' ? 'index.html' : decodeURIComponent(pathname).replace(/^\/+/, '');
+  let filePath = path.resolve(webRoot, relativePath);
+  const rootPrefix = `${path.resolve(webRoot)}${path.sep}`;
+  if (filePath !== path.resolve(webRoot) && !filePath.startsWith(rootPrefix)) return false;
+
+  if (!fs.existsSync(filePath) || !fs.statSync(filePath).isFile()) {
+    filePath = path.join(webRoot, 'index.html');
+  }
+  if (!fs.existsSync(filePath)) return false;
+
+  const contentType = contentTypeFor(filePath);
+  const acceptsGzip = /\bgzip\b/.test(String(req.headers['accept-encoding'] || ''));
+  const compressible = /^(text\/|application\/(javascript|json))/.test(contentType);
+  const immutableAsset = /[.-][0-9a-f]{8,}\./i.test(path.basename(filePath));
+  const headers = {
+    'Content-Type': contentType,
+    'Cache-Control': path.basename(filePath) === 'index.html'
+      ? 'no-cache'
+      : immutableAsset
+        ? 'public, max-age=31536000, immutable'
+        : 'public, max-age=86400'
+  };
+  if (acceptsGzip && compressible) {
+    headers['Content-Encoding'] = 'gzip';
+    headers.Vary = 'Accept-Encoding';
+  }
+  res.writeHead(200, headers);
+  if (req.method === 'HEAD') {
+    res.end();
+  } else {
+    const stream = fs.createReadStream(filePath);
+    if (acceptsGzip && compressible) {
+      stream.pipe(zlib.createGzip({ level: zlib.constants.Z_BEST_SPEED })).pipe(res);
+    } else {
+      stream.pipe(res);
+    }
+  }
+  return true;
 }
 
 function ensureDir(dir) {
@@ -393,6 +448,7 @@ function createApp(options = {}) {
   const host = options.host || process.env.POKECHILL_HOST || DEFAULT_HOST;
   const port = Number(options.port || process.env.POKECHILL_PORT || DEFAULT_PORT);
   const publicBaseUrl = options.publicBaseUrl || process.env.POKECHILL_PUBLIC_BASE_URL || `http://${host}:${port}`;
+  const webRoot = options.webRoot || process.env.POKECHILL_WEB_ROOT || path.resolve(__dirname, '../web/dist');
   const dataDir = options.dataDir || process.env.POKECHILL_DATA_DIR || path.join(__dirname, '.data');
   const store = options.store || new CacheStore({
     filePath: path.join(dataDir, 'pokedex-cache.json')
@@ -500,6 +556,8 @@ function createApp(options = {}) {
           ok: true,
           service: 'pokechill-self-hosted-api',
           publicBaseUrl,
+          webRoot,
+          webReady: fs.existsSync(path.join(webRoot, 'index.html')),
           cacheFile: store.filePath,
           scheduler: {
             enabled: scheduler.status().enabled,
@@ -736,6 +794,11 @@ function createApp(options = {}) {
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/api/type-chart') {
+        sendJson(res, 200, service.getTypeChart());
+        return;
+      }
+
       const typeMatch = pathname.match(/^\/api\/types\/([^/]+)\/relations$/);
       if (req.method === 'GET' && typeMatch) {
         sendJson(res, 200, service.getTypeRelations(decodeURIComponent(typeMatch[1])));
@@ -810,6 +873,8 @@ function createApp(options = {}) {
         return;
       }
 
+      if (serveWebApp(req, res, pathname, webRoot)) return;
+
       sendJson(res, 404, { error: 'Not found' });
     } catch (error) {
       sendJson(res, 500, {
@@ -822,6 +887,7 @@ function createApp(options = {}) {
     host,
     port,
     publicBaseUrl,
+    webRoot,
     dataDir,
     store,
     ptcgStore,

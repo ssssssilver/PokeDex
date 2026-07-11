@@ -4,10 +4,9 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
-const pokemonUtils = require('../../utils/pokemon.js')
+const { TYPE_META } = require('../../utils/type-meta.js')
 import './index.scss'
 const MOVE_PAGE_SIZE = 60
-const TYPE_META = pokemonUtils.TYPE_META || {}
 const STAT_ROWS = [
   {
     key: 'hp',
@@ -559,47 +558,11 @@ function typeName(type) {
 function typeColor(type) {
   return TYPE_META[type] ? TYPE_META[type].color : '#64748b'
 }
-function multiplierText(multiplier) {
-  if (multiplier === 0) return '×0'
-  if (multiplier === 0.25) return '×0.25'
-  if (multiplier === 0.5) return '×0.5'
-  if (multiplier === 4) return '×4'
-  if (multiplier === 2) return '×2'
-  return `×${multiplier}`
-}
-function relationChip(type, multiplier) {
-  return {
-    id: type,
-    name: typeName(type),
-    color: typeColor(type),
-    multiplier,
-    multiplierText: multiplierText(multiplier),
-  }
-}
-function sortRelationChips(a, b) {
-  return b.multiplier - a.multiplier || a.name.localeCompare(b.name)
-}
 function buildDefensiveRelations(pokemon) {
-  const defenderTypes = pokemon.types || []
-  const chips = Object.keys(TYPE_META).map((type) => {
-    const multiplier = pokemonUtils.getDamageMultiplier
-      ? pokemonUtils.getDamageMultiplier(type, defenderTypes)
-      : 1
-    return relationChip(type, multiplier)
-  })
-  return {
-    title: `${defenderTypes.map(typeName).join(' / ')}属性防守`,
-    weaknesses: chips
-      .filter((item) => item.multiplier > 1)
-      .sort(sortRelationChips),
-    resistances: chips
-      .filter((item) => item.multiplier > 0 && item.multiplier < 1)
-      .sort(
-        (a, b) => a.multiplier - b.multiplier || a.name.localeCompare(b.name)
-      ),
-    immunities: chips
-      .filter((item) => item.multiplier === 0)
-      .sort((a, b) => a.name.localeCompare(b.name)),
+  return pokemon.defensive_relations || {
+    weaknesses: [],
+    resistances: [],
+    immunities: [],
   }
 }
 function normalizeModelForms(model3d) {

@@ -332,6 +332,30 @@ function getDamageMultiplier(attackingType, defenderTypes) {
   }, 1);
 }
 
+function relationChip(type, multiplier) {
+  const meta = seed.TYPE_META[type] || {};
+  return {
+    id: type,
+    name: meta.name || type,
+    color: meta.color || '#64748b',
+    multiplier,
+    multiplierText: `×${multiplier}`
+  };
+}
+
+function getDefensiveRelations(defenderTypes) {
+  const types = Object.keys(seed.TYPE_META);
+  const chips = types.map((type) => relationChip(type, getDamageMultiplier(type, defenderTypes)));
+  return {
+    weaknesses: chips.filter((item) => item.multiplier > 1)
+      .sort((a, b) => b.multiplier - a.multiplier || a.name.localeCompare(b.name)),
+    resistances: chips.filter((item) => item.multiplier > 0 && item.multiplier < 1)
+      .sort((a, b) => a.multiplier - b.multiplier || a.name.localeCompare(b.name)),
+    immunities: chips.filter((item) => item.multiplier === 0)
+      .sort((a, b) => a.name.localeCompare(b.name))
+  };
+}
+
 class PokedexService {
   constructor(store, options = {}) {
     this.store = store;
@@ -391,6 +415,7 @@ class PokedexService {
     const item = decoratePokemon(detail, this);
     if (item) {
       item.evolution = this.resolveEvolution(item.evolution_chain);
+      item.defensive_relations = getDefensiveRelations(item.types || []);
     }
 
     return {
@@ -424,6 +449,23 @@ class PokedexService {
   getTypeRelations(type) {
     return {
       item: seed.getTypeRelations(type || 'fire'),
+      source: 'seed'
+    };
+  }
+
+  getTypeChart() {
+    const types = seed.getAllTypes();
+    return {
+      items: types,
+      rows: types.map((attackingType) => ({
+        id: attackingType.id,
+        name: attackingType.name,
+        color: attackingType.color,
+        cells: types.map((defenderType) => ({
+          key: `${attackingType.id}-${defenderType.id}`,
+          multiplier: getDamageMultiplier(attackingType.id, [defenderType.id])
+        }))
+      })),
       source: 'seed'
     };
   }
