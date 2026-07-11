@@ -4,6 +4,7 @@ import React from "react";
 import Taro from "@tarojs/taro";
 const config = require("./config.js");
 import "./app.scss";
+import WebShell from './components/web-shell'
 cacheOptions.setOptionsToCache({
   onLaunch() {
     if (config.useCloudApi && Taro.cloud) {
@@ -23,7 +24,7 @@ cacheOptions.setOptionsToCache({
 @withWeapp(cacheOptions.getOptionsFromCache(), true)
 class App extends React.Component {
   render() {
-    return this.props.children;
+    return <WebShell>{this.props.children}</WebShell>;
   }
 }
 export default App;

@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { localize } = require('../../i18n/index.js')
 import './index.scss'
 const PAGE_SIZE = 40
 const MAX_TYPE_FILTERS = 2
@@ -546,7 +547,7 @@ class _C extends React.Component {
                           {item.generationText}
                         </Text>
                       </View>
-                      <View className="row-name">{item.name_zh}</View>
+                      <View className="row-name">{localize(item)}</View>
                       <View className="row-subtitle">
                         <Text>{item.name_en}</Text>
                         {item.name_ja && <Text>{'/ ' + item.name_ja}</Text>}

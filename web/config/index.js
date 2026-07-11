@@ -62,6 +62,9 @@ export default defineConfig(async (merge, { command, mode }) => {
     h5: {
       publicPath: '/',
       staticDirectory: 'static',
+      router: {
+        mode: 'browser'
+      },
       webpackChain(chain) {
         chain.optimization.splitChunks({
           chunks: 'all',

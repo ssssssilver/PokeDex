@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const config = require('../../config.js')
 const storage = require('../../utils/storage.js')
+const { t } = require('../../i18n/index.js')
 import './index.scss'
 cacheOptions.setOptionsToCache({
   data: {
@@ -92,14 +93,14 @@ class _C extends React.Component {
     return (
       <View className="page profile-page">
         <View className="profile-heading">
-          <View className="profile-title">我的图鉴数据</View>
+          <View className="profile-title">{t('profile')}</View>
           <View className="muted">收藏、拥有状态与队伍保存在当前微信设备</View>
         </View>
         <View className="domain-section">
           <View className="domain-head">
             <View className="domain-mark pokemon">宝</View>
             <View>
-              <View className="domain-title">宝可梦</View>
+              <View className="domain-title">{t('pokemon')}</View>
               <View className="muted">图鉴收藏与队伍</View>
             </View>
             <View className="domain-link" onClick={this.openPokedex}>
@@ -146,7 +147,7 @@ class _C extends React.Component {
           <View className="domain-head">
             <View className="domain-mark cardmark">卡</View>
             <View>
-              <View className="domain-title">实体卡牌</View>
+              <View className="domain-title">{t('physicalCards')}</View>
               <View className="muted">收藏、拥有与愿望单</View>
             </View>
             <View className="domain-link" onClick={this.openCarddex}>
@@ -204,8 +205,8 @@ class _C extends React.Component {
             <View className="settings-row version-row">
               <View className="settings-icon version">版</View>
               <View className="settings-copy">
-                <View className="settings-title">版本号</View>
-                <Text>宝批小站</Text>
+                <View className="settings-title">{t('version')}</View>
+                <Text>{t('appName')}</Text>
               </View>
               <View className="version-value">{'v' + version}</View>
             </View>
@@ -215,7 +216,7 @@ class _C extends React.Component {
             >
               <View className="settings-icon support">意</View>
               <View className="settings-copy">
-                <View className="settings-title">用户意见反馈</View>
+                <View className="settings-title">{t('feedback')}</View>
                 <Text>通过微信反馈问题或建议</Text>
               </View>
               <View className="row-arrow">›</View>

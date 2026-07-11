@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { localize } = require('../../i18n/index.js')
 import EnergyIcon from '../../components/energy-icon/index'
 import './index.scss'
 const PAGE_SIZE = 30
@@ -88,7 +89,7 @@ function decorateCard(card, favorites, owned) {
   )
   return Object.assign({}, card, {
     collection,
-    title: card.name_zh || card.name_en,
+    title: localize(card),
     subtitle: card.name_en && card.name_en !== card.name_zh ? card.name_en : '',
     setText: [
       collection.expansion_name_zh || collection.expansion_id,

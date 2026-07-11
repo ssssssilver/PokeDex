@@ -2,13 +2,26 @@
 <html>
 <head>
   <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
-  <meta content="width=device-width,initial-scale=1,user-scalable=no" name="viewport">
+  <meta content="width=device-width,initial-scale=1,viewport-fit=cover" name="viewport">
+  <meta name="description" content="PokeChill provides a multilingual Pokémon Pokédex, Pokémon TCG and Pokémon TCG Pocket card database, deck rankings and lightweight tools.">
+  <meta name="keywords" content="Pokémon,Pokédex,Pokémon TCG,TCG Pocket,宝可梦图鉴,卡牌图鉴">
+  <meta name="theme-color" content="#0f766e">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="PokeChill">
+  <meta property="og:title" content="PokeChill | Pokémon and Card Database">
+  <meta property="og:description" content="Explore Pokémon, physical TCG cards and Pokémon TCG Pocket cards in three languages.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-touch-fullscreen" content="yes">
   <meta name="format-detection" content="telephone=no,address=no">
   <meta name="apple-mobile-web-app-status-bar-style" content="white">
   <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" >
-  <title>taroConvert</title>
+  <title>PokeChill | Pokémon and Card Database</title>
+  <script>
+    (function () {
+      var lang = new URLSearchParams(window.location.search).get('lang');
+      if (lang) window.sessionStorage.setItem('pokechill:requestedLocale', lang);
+    }());
+  </script>
   <script><%= htmlWebpackPlugin.options.script %></script>
 </head>
 <body>

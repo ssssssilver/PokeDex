@@ -36,6 +36,7 @@
 }
 
 .search-tabs {
+  width: 100%;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
@@ -304,6 +305,7 @@
 }
 
 .quick-grid {
+  width: 100%;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 14px;
@@ -315,6 +317,7 @@
 }
 
 .quick-card {
+  min-width: 0;
   min-height: 148px;
   padding: 18px 10px;
   border: 1px solid #e6eaf0;

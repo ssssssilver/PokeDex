@@ -1,0 +1,20 @@
+.desktop-sidebar { display: none; }
+.mobile-locale-switch { position: fixed; z-index: 1200; top: 12px; right: 16px; display: flex; overflow: hidden; border: 1px solid #d9e2ec; border-radius: 6px; background: rgba(255,255,255,.96); box-shadow: 0 2px 8px rgba(15,23,42,.08); }
+.mobile-locale-switch button { min-width: 34px; height: 32px; padding: 0 7px; border: 0; border-right: 1px solid #e6eaf0; background: transparent; color: #52606d; font-size: 12px; }
+.mobile-locale-switch button:last-child { border-right: 0; }
+.mobile-locale-switch button.active { background: #0f766e; color: #fff; font-weight: 700; }
+@media (min-width: 1024px) {
+  .web-app-shell { min-height: 100vh; }
+  .desktop-sidebar { position: fixed; z-index: 1000; inset: 0 auto 0 0; display: flex; width: 248px; padding: 28px 18px; box-sizing: border-box; flex-direction: column; border-right: 1px solid #e2e8f0; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
+  .desktop-brand { padding: 4px 14px 28px; color: #0f766e; font-size: 24px; font-weight: 800; }
+  .desktop-nav { display: grid; gap: 6px; }
+  .desktop-nav-item { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 14px; border-radius: 6px; color: #465467; cursor: pointer; font-size: 15px; }
+  .desktop-nav-item:hover { background: #f1f5f9; }
+  .desktop-nav-item.active { background: #e6fffb; color: #0f766e; font-weight: 700; }
+  .desktop-nav-icon { display: grid; width: 24px; height: 24px; place-items: center; font-weight: 700; }
+  .locale-control { display: grid; gap: 8px; margin-top: auto; padding: 14px; color: #64748b; font-size: 13px; }
+  .locale-control select { width: 100%; height: 38px; padding: 0 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #1e293b; }
+  .web-main { min-height: 100vh; margin-left: 248px; }
+  .web-main > .taro_page { max-width: 1440px; margin: 0 auto; }
+  .mobile-locale-switch, .taro-tabbar__tabbar { display: none !important; }
+}

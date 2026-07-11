@@ -873,6 +873,22 @@ function createApp(options = {}) {
         return;
       }
 
+      if (req.method === 'GET' && pathname === '/robots.txt') {
+        const origin = publicBaseUrl.replace(/\/$/, '');
+        res.writeHead(200, { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
+        res.end(`User-agent: *\nAllow: /\nDisallow: /api/\nSitemap: ${origin}/sitemap.xml\n`);
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/sitemap.xml') {
+        const origin = publicBaseUrl.replace(/\/$/, '');
+        const paths = ['/', '/pages/pokedex/index', '/pages/carddex/index', '/pages/pocket/index'];
+        const urls = paths.map((path) => `<url><loc>${origin}${path}</loc><changefreq>daily</changefreq></url>`).join('');
+        res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
+        res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`);
+        return;
+      }
+
       if (serveWebApp(req, res, pathname, webRoot)) return;
 
       sendJson(res, 404, { error: 'Not found' });

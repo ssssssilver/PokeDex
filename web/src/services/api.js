@@ -1,5 +1,6 @@
 const Taro = require('@tarojs/taro')
 const config = require('../config.js')
+const { getLocale } = require('../i18n/index.js')
 
 function buildQuery(params) {
   return Object.keys(params || {})
@@ -23,7 +24,10 @@ function request(path, options) {
     method: settings.method || 'GET',
     data: settings.data || {},
     timeout: config.requestTimeoutMs || 15000,
-    header: settings.data ? { 'Content-Type': 'application/json' } : {},
+    header: Object.assign(
+      { 'Accept-Language': getLocale() },
+      settings.data ? { 'Content-Type': 'application/json' } : {}
+    ),
   }).then((response) => {
     if (response.statusCode >= 200 && response.statusCode < 300) return response.data
     const message = response.data && response.data.error

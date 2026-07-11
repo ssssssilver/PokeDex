@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { localize } = require('../../i18n/index.js')
 import EnergyIcon from '../../components/energy-icon/index'
 import './index.scss'
 const PAGE_SIZE = 30
@@ -43,7 +44,7 @@ function decorateRow(card, favorites, owned) {
     },
     card,
     {
-      title: card.display_name || card.name_zh || card.name,
+      title: localize(card) || card.display_name,
       subtitle: card.name_zh && card.name_zh !== card.name ? card.name : '',
       setText: [card.set_name, card.number ? `#${card.number}` : '']
         .filter(Boolean)

@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { t, localize } = require('../../i18n/index.js')
 import './index.scss'
 function safe(promise, fallback) {
   return promise.catch(() => fallback)
@@ -304,7 +305,7 @@ class _C extends React.Component {
             src={require('../../assets/banner/home-banner.jpg')}
             mode="aspectFill"
           ></Image>
-          <View className="home-banner-title">宝批小站</View>
+          <View className="home-banner-title">{t('appName')}</View>
         </View>
         <View className="search-tabs three-tabs">
           <View
@@ -357,7 +358,7 @@ class _C extends React.Component {
             <View className="quick-grid">
               <View className="quick-card" onClick={this.openPokedex}>
                 <View className="quick-icon">鉴</View>
-                <View className="quick-title">宝可梦图鉴</View>
+                <View className="quick-title">{t('pokedex')}</View>
                 <View className="quick-sub">搜索与筛选</View>
               </View>
               <View className="quick-card" onClick={this.openQuiz}>
@@ -385,7 +386,7 @@ class _C extends React.Component {
             <View className="quick-grid">
               <View className="quick-card" onClick={this.openCarddex}>
                 <View className="quick-icon">鉴</View>
-                <View className="quick-title">卡牌图鉴</View>
+                <View className="quick-title">{t('cards')}</View>
                 <View className="quick-sub">实体卡牌</View>
               </View>
               <View className="quick-card" onClick={this.openCardQuiz}>
@@ -413,7 +414,7 @@ class _C extends React.Component {
             <View className="quick-grid">
               <View className="quick-card" onClick={this.openPocketCarddex}>
                 <View className="quick-icon">鉴</View>
-                <View className="quick-title">Pocket图鉴</View>
+                <View className="quick-title">{t('pocket')}</View>
                 <View className="quick-sub">搜索与筛选</View>
               </View>
               <View
@@ -453,7 +454,7 @@ class _C extends React.Component {
               >
                 <View className="hero-copy">
                   <View className="muted">今日宝可梦</View>
-                  <View className="hero-name">{dailyPokemon.name_zh}</View>
+                  <View className="hero-name">{localize(dailyPokemon)}</View>
                   <View className="hero-en">
                     {'#' + dailyPokemon.id + ' ' + dailyPokemon.name_en}
                   </View>
@@ -492,7 +493,7 @@ class _C extends React.Component {
                         onClick={this.openPokemon}
                       >
                         <Image src={item.image} mode="aspectFit"></Image>
-                        <View>{item.name_zh}</View>
+                        <View>{localize(item)}</View>
                       </View>
                     )
                   })}
@@ -619,7 +620,7 @@ class _C extends React.Component {
                 </View>
                 <View className="pocket-home-copy">
                   <View className="pocket-label">今日 Pocket 卡牌</View>
-                  <View className="pocket-name">{dailyPocketCard.name_zh}</View>
+                  <View className="pocket-name">{localize(dailyPocketCard)}</View>
                   <View className="pocket-en">{dailyPocketCard.name_en}</View>
                   <View className="pocket-meta">
                     {dailyPocketCard.collections[0].expansion_id +
@@ -654,7 +655,7 @@ class _C extends React.Component {
                     >
                       <Text>{item.typeText}</Text>
                       <View>
-                        <Strong>{item.name_zh}</Strong>
+                        <Strong>{localize(item)}</Strong>
                         <View>{item.statusText}</View>
                       </View>
                     </View>
@@ -723,7 +724,7 @@ class _C extends React.Component {
                         onClick={this.openPocketCard}
                       >
                         <Image src={item.image} mode="aspectFit"></Image>
-                        <View>{item.name_zh}</View>
+                        <View>{localize(item)}</View>
                       </View>
                     )
                   })}
