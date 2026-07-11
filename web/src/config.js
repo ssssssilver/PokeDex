@@ -10,10 +10,4 @@ const defaults = {
   requestTimeoutMs: 10000,
   pageSize: 30,
 }
-let local = {}
-try {
-  local = require('./config.local.js')
-} catch (error) {
-  local = {}
-}
-module.exports = Object.assign({}, defaults, local)
+module.exports = defaults
