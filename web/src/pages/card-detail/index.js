@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import EnergyIcon from '../../components/energy-icon/index'
 import './index.scss'
 const ENERGY_BY_NAME = {
@@ -133,17 +134,20 @@ function normalizeEnergies(items, text) {
     )
 }
 function buildInfoRows(card) {
+  const english = getLocale() === 'en'
   return [
     row(
       '卡牌编号',
       card.number ? `${card.set_id || ''} #${card.number}` : card.id
     ),
     row('系列', [card.set_name, card.set_series].filter(Boolean).join(' / ')),
-    row('稀有度', card.rarity_name || card.rarity),
+    row('稀有度', english ? card.rarity : card.rarity_name || card.rarity),
     row('画师', card.artist),
     row(
       '卡牌类型',
-      [card.supertype_name, ...(card.subtype_names || [])]
+      english
+        ? [card.supertype, ...(card.subtypes || [])]
+        : [card.supertype_name || card.supertype, ...(card.subtype_names || card.subtypes || [])]
         .filter(Boolean)
         .join(' / ')
     ),
@@ -166,17 +170,20 @@ function buildBattleRows(card) {
   ].filter(Boolean)
 }
 function decorateCard(card) {
-  const title = card.display_name || card.name_zh || card.name
-  const descriptionText = card.description_zh || card.flavor_text || ''
-  const descriptionEnglish = card.description_zh
+  const english = getLocale() === 'en'
+  const title = localize(card) || card.display_name
+  const descriptionText = english
+    ? card.flavor_text_en || card.flavor_text || card.description_zh || ''
+    : card.description_zh || card.flavor_text || ''
+  const descriptionEnglish = !english && card.description_zh
     ? card.flavor_text_en || card.flavor_text || ''
     : ''
   const decorateTextBlock = (item) =>
     Object.assign({}, item, {
-      display_name: item.name_zh || item.name,
-      english_name: item.name_zh && item.name_zh !== item.name ? item.name : '',
-      display_text: item.text_zh || item.text || item.original_text || '',
-      english_text: item.text_zh ? item.original_text || item.text || '' : '',
+      display_name: english ? item.name || item.name_zh : item.name_zh || item.name,
+      english_name: !english && item.name_zh && item.name_zh !== item.name ? item.name : '',
+      display_text: english ? item.original_text || item.text || item.text_zh || '' : item.text_zh || item.text || item.original_text || '',
+      english_text: !english && item.text_zh ? item.original_text || item.text || '' : '',
     })
   const ruleBlocks = (
     card.rule_blocks ||
@@ -185,8 +192,8 @@ function decorateCard(card) {
     }))
   ).map((rule, index) => ({
     key: `${index}-${rule.text_zh || rule.original_text || ''}`,
-    display_text: rule.text_zh || rule.original_text || '',
-    english_text: rule.text_zh ? rule.original_text || '' : '',
+    display_text: english ? rule.original_text || rule.text_zh || '' : rule.text_zh || rule.original_text || '',
+    english_text: !english && rule.text_zh ? rule.original_text || '' : '',
   }))
   return Object.assign(
     {
@@ -204,7 +211,8 @@ function decorateCard(card) {
     card,
     {
       title,
-      subtitle: card.name_zh && card.name_zh !== card.name ? card.name : '',
+      rarityDisplay: english ? card.rarity : card.rarity_name || card.rarity,
+      subtitle: !english && card.name_zh && card.name_zh !== card.name ? card.name : '',
       type_energy: normalizeEnergies(card.type_energy),
       abilities: (card.abilities || []).map(decorateTextBlock),
       attacks: (card.attacks || []).map((attack) =>
@@ -219,13 +227,12 @@ function decorateCard(card) {
       ),
       descriptionText,
       descriptionEnglish,
-      descriptionSource:
-        card.description_source || (descriptionText ? '原卡牌描述' : ''),
-      typeText: (card.type_names || []).join(' / '),
+      descriptionSource: english ? '' : card.description_source || (descriptionText ? '原卡牌描述' : ''),
+      typeText: (english ? card.types || [] : card.type_names || card.types || []).join(' / '),
       legalitiesText: (card.legalities_text || [])
         .map(
           (item) =>
-            `${item.name}${item.status_name ? `：${item.status_name}` : ''}`
+            `${english ? item.key : item.name}${english ? `: ${item.status}` : item.status_name ? `：${item.status_name}` : ''}`
         )
         .join('、'),
     }
@@ -347,8 +354,8 @@ class _C extends React.Component {
                   ></EnergyIcon>
                 )
               })}
-              {card.rarity_name && (
-                <View className="plain-badge">{card.rarity_name}</View>
+              {card.rarityDisplay && (
+                <View className="plain-badge">{card.rarityDisplay}</View>
               )}
             </View>
             <View className="hero-actions">
@@ -574,7 +581,7 @@ class _C extends React.Component {
                     onClick={this.openPokemon}
                   >
                     <View className="ref-number">{'#' + item.id}</View>
-                    <View>{item.name_zh || item.name_en}</View>
+                    <View>{localize(item)}</View>
                   </View>
                 )
               })}

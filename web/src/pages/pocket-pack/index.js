@@ -3,6 +3,7 @@ import { Block, View, Image, Text, ScrollView } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import './index.scss'
 function selectRows(items, id) {
   return (items || []).map((item) =>
@@ -14,7 +15,7 @@ function selectRows(items, id) {
 function decorateCard(card) {
   const collection = (card.collections || [])[0] || {}
   return Object.assign({}, card, {
-    title: card.name_zh || card.name_en,
+    title: localize(card),
     setText: `${collection.expansion_id || ''} #${collection.number || ''}`,
   })
 }
@@ -117,21 +118,21 @@ class _C extends React.Component {
               )}
               <View className="pack-copy">
                 <View className="pack-series">{selectedPack.expansion_id}</View>
-                <View className="pack-title">{selectedPack.name_zh}</View>
-                <View className="pack-desc">{selectedPack.description_zh}</View>
+                <View className="pack-title">{localize(selectedPack)}</View>
+                <View className="pack-desc">{getLocale() === 'en' ? selectedPack.description_en : selectedPack.description_zh}</View>
               </View>
             </View>
             <View className="pack-stats">
               <View>
-                <Strong>{selectedPack.card_ids.length}</Strong>
+                <Text className="strong">{selectedPack.card_ids.length}</Text>
                 <Text>卡池</Text>
               </View>
               <View>
-                <Strong>{selectedPack.is_promo ? 1 : 5}</Strong>
+                <Text className="strong">{selectedPack.is_promo ? 1 : 5}</Text>
                 <Text>每包张数</Text>
               </View>
               <View>
-                <Strong>{selectedPack.is_promo ? '等概率' : '0.05%'}</Strong>
+                <Text className="strong">{selectedPack.is_promo ? '等概率' : '0.05%'}</Text>
                 <Text>{selectedPack.is_promo ? '抽取规则' : '稀有包'}</Text>
               </View>
             </View>
@@ -152,7 +153,7 @@ class _C extends React.Component {
                   )}
                   <View className="pack-option-copy">
                     <Text>{item.expansion_id}</Text>
-                    <View>{item.name_zh}</View>
+                    <View>{localize(item)}</View>
                   </View>
                 </View>
               )
@@ -183,7 +184,7 @@ class _C extends React.Component {
                   ? '稀有包'
                   : '普通包'}
               </Text>
-              <Strong>{result.pack_type}</Strong>
+              <Text className="strong">{result.pack_type}</Text>
             </View>
             <View>{result.count + ' 张'}</View>
           </View>

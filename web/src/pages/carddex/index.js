@@ -4,7 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
-const { localize } = require('../../i18n/index.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import EnergyIcon from '../../components/energy-icon/index'
 import './index.scss'
 const PAGE_SIZE = 30
@@ -36,8 +36,9 @@ function filterCount(data) {
   )
 }
 function decorateRow(card, favorites, owned) {
-  const typeText = (card.type_names || []).join(' / ')
-  const subtypeText = (card.subtype_names || []).slice(0, 2).join(' / ')
+  const english = getLocale() === 'en'
+  const typeText = (english ? card.types : card.type_names || card.types || []).join(' / ')
+  const subtypeText = (english ? card.subtypes : card.subtype_names || card.subtypes || []).slice(0, 2).join(' / ')
   return Object.assign(
     {
       type_energy: [],
@@ -45,13 +46,13 @@ function decorateRow(card, favorites, owned) {
     card,
     {
       title: localize(card) || card.display_name,
-      subtitle: card.name_zh && card.name_zh !== card.name ? card.name : '',
+      subtitle: !english && card.name_zh && card.name_zh !== card.name ? card.name : '',
       setText: [card.set_name, card.number ? `#${card.number}` : '']
         .filter(Boolean)
         .join(' · '),
       metaText: [
-        card.rarity_name || card.rarity,
-        card.supertype_name,
+        english ? card.rarity : card.rarity_name || card.rarity,
+        english ? card.supertype : card.supertype_name || card.supertype,
         subtypeText,
       ]
         .filter(Boolean)

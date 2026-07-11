@@ -4,7 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
-const { localize } = require('../../i18n/index.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import './index.scss'
 const PAGE_SIZE = 40
 const MAX_TYPE_FILTERS = 2
@@ -76,17 +76,20 @@ function filterCount(data) {
 }
 function decorateRow(item, favoriteIds, activePokedex) {
   const regionalDex = pickRegionalDex(item, activePokedex)
+  const english = getLocale() === 'en'
   return Object.assign({}, item, {
     idText: `#${padId(item.id)}`,
     liked: favoriteIds.includes(item.id),
-    generationText: item.generation ? `第 ${item.generation} 世代` : '世代未知',
+    generationText: item.generation
+      ? english ? `Generation ${item.generation}` : `第 ${item.generation} 世代`
+      : '世代未知',
     regionalDexText:
       item.regional_dex_text ||
       (regionalDex
-        ? `${regionalDex.name} #${regionalDex.entry_number}`
+        ? `${english && regionalDex.key === 'national' ? 'National' : regionalDex.name} #${regionalDex.entry_number}`
         : '未收录地区编号'),
-    moveText: item.move_count ? `${item.move_count} 招式` : '',
-    statText: item.stat_total ? `种族值 ${item.stat_total}` : '',
+    moveText: item.move_count ? english ? `${item.move_count} moves` : `${item.move_count} 招式` : '',
+    statText: item.stat_total ? english ? `BST ${item.stat_total}` : `种族值 ${item.stat_total}` : '',
   })
 }
 function resultCountText(loaded, total) {
@@ -549,8 +552,8 @@ class _C extends React.Component {
                       </View>
                       <View className="row-name">{localize(item)}</View>
                       <View className="row-subtitle">
-                        <Text>{item.name_en}</Text>
-                        {item.name_ja && <Text>{'/ ' + item.name_ja}</Text>}
+                        {getLocale() !== 'en' && <Text>{item.name_en}</Text>}
+                        {getLocale() === 'zh-CN' && item.name_ja && <Text>{'/ ' + item.name_ja}</Text>}
                       </View>
                       <View className="row-types">
                         {item.types.map((type, typeIndex) => {

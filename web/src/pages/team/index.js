@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import './index.scss'
 function teamTabs(teams, activeId) {
   return (teams || []).map((team) =>
@@ -188,7 +189,7 @@ class _C extends React.Component {
                     onClick={this.selectTeam}
                   >
                     <Text>{item.name}</Text>
-                    <Small>{item.count + ' / 6'}</Small>
+                    <Text className="small">{item.count + ' / 6'}</Text>
                   </View>
                 )
               })}
@@ -234,7 +235,7 @@ class _C extends React.Component {
                     >
                       ×
                     </View>
-                    <Text>{item.pokemon.name_zh}</Text>
+                    <Text>{localize(item.pokemon)}</Text>
                   </Block>
                 ) : (
                   <Text className="slot-empty">+</Text>
@@ -316,10 +317,8 @@ class _C extends React.Component {
                 >
                   <Image src={item.image} mode="aspectFit"></Image>
                   <View className="member-main">
-                    <View className="member-name">{item.name_zh}</View>
-                    <View className="muted">
-                      {'#' + item.id + ' ' + item.name_en}
-                    </View>
+                    <View className="member-name">{localize(item)}</View>
+                    <View className="muted">{'#' + item.id + (getLocale() === 'en' ? '' : ' ' + item.name_en)}</View>
                     <View className="member-types">
                       {item.types.map((type, typeIndex) => {
                         return (

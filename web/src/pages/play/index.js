@@ -110,7 +110,7 @@ class _C extends React.Component {
           <View className="play-list">
             <View className="category-heading">
               <Text>宝可梦玩法</Text>
-              <Small>图鉴与属性数据</Small>
+              <Text className="small">图鉴与属性数据</Text>
             </View>
             <View className="card play-card" onClick={this.openQuiz}>
               <View className="play-icon">猜</View>
@@ -138,7 +138,7 @@ class _C extends React.Component {
           <View className="play-list">
             <View className="category-heading">
               <Text>实体卡牌玩法</Text>
-              <Small>PTCG 数据</Small>
+              <Text className="small">PTCG 数据</Text>
             </View>
             <View className="card play-card" onClick={this.openCardQuiz}>
               <View className="play-icon coral">猜</View>
@@ -166,7 +166,7 @@ class _C extends React.Component {
           <View className="play-list">
             <View className="category-heading">
               <Text>Pocket 玩法</Text>
-              <Small>移动端卡牌数据</Small>
+              <Text className="small">移动端卡牌数据</Text>
             </View>
             <View className="card play-card" onClick={this.openPocketPack}>
               <View className="play-icon blue">包</View>

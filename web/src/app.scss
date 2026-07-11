@@ -71,6 +71,13 @@ page {
   font-size: 24px;
 }
 
+.strong { font-weight: 700; }
+.small { color: #697586; font-size: 24px; }
+
+@media (min-width: 1024px) {
+  .small { font-size: 13px; }
+}
+
 .card {
   overflow: hidden;
   border: 1px solid #e6eaf0;

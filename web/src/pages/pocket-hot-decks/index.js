@@ -106,9 +106,9 @@ class _C extends React.Component {
                       </View>
                     </View>
                     <View className="ranking-metrics">
-                      <Strong>{item.shareText}</Strong>
+                      <Text className="strong">{item.shareText}</Text>
                       <Text>使用率</Text>
-                      <Strong>{item.winRateText}</Strong>
+                      <Text className="strong">{item.winRateText}</Text>
                       <Text>胜率</Text>
                     </View>
                   </View>

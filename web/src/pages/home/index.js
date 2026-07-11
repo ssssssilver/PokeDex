@@ -655,7 +655,7 @@ class _C extends React.Component {
                     >
                       <Text>{item.typeText}</Text>
                       <View>
-                        <Strong>{localize(item)}</Strong>
+                        <Text className="strong">{localize(item)}</Text>
                         <View>{item.statusText}</View>
                       </View>
                     </View>
@@ -692,7 +692,7 @@ class _C extends React.Component {
                         })}
                       </View>
                       <View>
-                        <Strong>{item.name}</Strong>
+                        <Text className="strong">{item.name}</Text>
                         <View>
                           {'使用率 ' +
                             item.share +

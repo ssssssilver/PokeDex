@@ -3,6 +3,7 @@ import { Block, View, ScrollView } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
+const { localize } = require('../../i18n/index.js')
 import './index.scss'
 const TABS = [
   {
@@ -208,7 +209,7 @@ class _C extends React.Component {
                     </View>
                   </View>
                   <View className="event-name">
-                    {item.name_zh || item.typeText}
+                    {localize(item) || item.typeText}
                   </View>
                   <View className="event-range">{item.rangeText}</View>
                   {item.detailLines.length > 0 && (

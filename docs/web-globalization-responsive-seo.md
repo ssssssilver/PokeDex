@@ -4,7 +4,7 @@
 
 Web 版面向海外用户，第一阶段支持 `zh-CN`（简体中文）、`zh-TW`（繁体中文）和 `en`（英文），同时覆盖手机、平板和桌面浏览器。小程序继续冻结在 `miniapp-v1.0.0`，Web 使用 Node 服务端 API，不再依赖静态 OSS API。
 
-本阶段已交付：三语 locale 基础设施、语言持久化、API 语言标识、三类图鉴名称本地化回退、桌面侧栏、移动端语言切换、核心响应式约束、浏览器路由、基础 meta/canonical、`robots.txt` 和 `sitemap.xml`，以及 Pocket 全国图鉴编号修复。
+本阶段已交付：三语 locale 基础设施、语言持久化、API 语言标识、全部旧页面的本地化桥接、按需加载的 OpenCC 繁体词库、三类图鉴名称和详情文本本地化回退、桌面侧栏、移动端语言切换、核心响应式约束、浏览器路由、服务端本地化 meta/canonical/hreflang/JSON-LD、无脚本文本回退、分类型 sitemap，以及 Pocket 全国图鉴编号修复。
 
 ## 2. 当前问题与结论
 
@@ -19,7 +19,7 @@ Web 版面向海外用户，第一阶段支持 `zh-CN`（简体中文）、`zh-T
 
 - 语言优先级：用户保存值 > 浏览器语言 > `zh-CN`。
 - locale 使用 BCP 47：`zh-CN`、`zh-TW`、`en`。请求携带 `Accept-Language`。
-- 公共导航、命令、状态统一从 `web/src/i18n` 取值；禁止新增硬编码界面文案。
+- 公共导航、命令、状态统一从 `web/src/i18n` 取值；禁止新增硬编码界面文案。小程序迁移产生的旧类组件暂由 `legacy-ui` 桥接，新增页面不得依赖该桥接。
 - 英文通常比中文长 30%-80%，按钮、筛选项和卡片标题必须允许换行或省略，不能依赖固定字宽。
 - 日期、数字、百分比使用 `Intl.DateTimeFormat`、`Intl.NumberFormat`；不要拼接“只、张、世代”等量词。
 - 宝可梦、招式、特性、系列名维护审核过的三语术语表。机器转换只可作为缺失时的临时回退，并记录来源。
@@ -48,15 +48,16 @@ Web 版面向海外用户，第一阶段支持 `zh-CN`（简体中文）、`zh-T
 
 - 使用 browser history 路由，服务端对前端路径执行 SPA fallback。
 - 首页提供 title、description、keywords、Open Graph 与 theme color。
-- 路由切换更新页面标题和 canonical。
-- Node 服务提供 `robots.txt` 和包含三类核心图鉴入口的 `sitemap.xml`。
+- 路由切换更新页面标题和 canonical；服务端在首个 HTML 响应中同步输出本地化值。
+- 详情页服务端输出 `hreflang`、Open Graph、`ItemPage` JSON-LD 和 `noscript` 文本回退。
+- Node 服务提供 `robots.txt`、sitemap index，以及宝可梦、实体卡、Pocket 三份详情 sitemap。
 - `/api/` 明确禁止搜索引擎抓取。
 
 ### SEO 的真实边界
 
-当前仍是客户端渲染 SPA。meta、sitemap 和干净 URL 能改善发现与分享，但不能保证搜索引擎稳定索引图鉴正文。面向海外正式获客前，必须增加服务端渲染或构建期预渲染：
+当前正文交互仍是客户端渲染 SPA，服务端已提供详情语义、结构化数据和无脚本摘要，足以作为首版索引基础，但不等同于完整 SSR。自然搜索成为主要获客渠道后，应继续增加服务端渲染或构建期预渲染：
 
-1. 为 `/zh-cn`、`/zh-tw`、`/en` 建立可抓取语言路径，并输出 `hreflang` 与 `x-default`。
+1. 将当前 `?lang=zh-CN/zh-TW/en` 语言变体升级为 `/zh-cn`、`/zh-tw`、`/en` 目录路径；当前已经输出 `hreflang` 与 `x-default`。
 2. 为宝可梦、卡牌、卡组生成稳定语义 URL，例如 `/en/pokemon/charizard`，不要只使用查询参数或内部数字。
 3. 服务端输出每个详情页的本地化 title、description、canonical、Open Graph 图片和正文首屏。
 4. 增加 `WebSite`、`BreadcrumbList` 和适用的 `ItemList` JSON-LD；不伪造不适用的 Product/Review 数据。

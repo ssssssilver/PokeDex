@@ -4,7 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
-const { localize } = require('../../i18n/index.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import EnergyIcon from '../../components/energy-icon/index'
 import './index.scss'
 const PAGE_SIZE = 30
@@ -78,6 +78,7 @@ function activeFilterCount(data) {
   ].filter(Boolean).length
 }
 function decorateCard(card, favorites, owned) {
+  const english = getLocale() === 'en'
   const collection = (card.collections || [])[0] || {}
   const typeBadges = (card.types || []).map((id) =>
     Object.assign(
@@ -90,16 +91,16 @@ function decorateCard(card, favorites, owned) {
   return Object.assign({}, card, {
     collection,
     title: localize(card),
-    subtitle: card.name_en && card.name_en !== card.name_zh ? card.name_en : '',
+    subtitle: !english && card.name_en && card.name_en !== card.name_zh ? card.name_en : '',
     setText: [
-      collection.expansion_name_zh || collection.expansion_id,
+      english ? (card.rules || {}).booster_pack || collection.expansion_id : collection.expansion_name_zh || collection.expansion_id,
       collection.number ? `#${collection.number}` : '',
     ]
       .filter(Boolean)
       .join(' · '),
     metaText: [
       card.rarity,
-      card.card_type === 'pokemon' ? '宝可梦' : '训练家',
+      card.card_type === 'pokemon' ? (english ? 'Pokémon' : '宝可梦') : (english ? 'Trainer' : '训练家'),
       card.hp ? `HP ${card.hp}` : '',
     ]
       .filter(Boolean)
@@ -177,7 +178,9 @@ cacheOptions.setOptionsToCache({
     ]).then(([expansionResult, rarityResult]) => {
       const expansions = (expansionResult.items || []).map((item) => ({
         id: item.id,
-        name: item.name_long_zh || item.name_zh || item.id,
+        name: getLocale() === 'en'
+          ? item.name_long_en || item.name_en || (item.name || {}).en || item.id
+          : item.name_long_zh || item.name_zh || item.id,
         code: item.id,
       }))
       const rarities = optionRows(rarityResult.item || {})

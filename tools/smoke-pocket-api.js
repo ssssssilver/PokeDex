@@ -58,7 +58,7 @@ async function main() {
     const packImage = await fetch(`${baseUrl}/assets/pocket/packs/${encodeURIComponent(promoPack.id)}`);
 
     assert(meta.counts.cards >= 3000, 'Pocket meta card count is incomplete');
-    assert(Object.keys(meta.sources || {}).length === 10, 'Pocket source metadata is incomplete');
+    assert(Object.keys(meta.sources || {}).length === 11, 'Pocket source metadata is incomplete');
     assert(cards.total > 0, 'Pocket card search returned no data');
     assert(chineseSearch.total > 0, 'Pocket Chinese card search returned no data');
     assert(expansionFilter.total > 0 && expansionFilter.items.every((card) => card.collections.some((entry) => entry.expansion_id === 'A1a')), 'Pocket expansion filter is ineffective');

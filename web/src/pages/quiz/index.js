@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import './index.scss'
 cacheOptions.setOptionsToCache({
   data: {
@@ -27,8 +28,17 @@ cacheOptions.setOptionsToCache({
         seed: `${Date.now()}-${Math.random()}`,
       })
       .then((result) => {
+        const quiz = result.item
+        if (quiz && getLocale() === 'en') {
+          const answer = (quiz.options || []).find(item => Number(item.id) === Number(quiz.answerId)) || {}
+          quiz.hints = [
+            `Type: ${(answer.types || []).map(type => type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')).join(' / ') || 'Unknown'}`,
+            `Generation: ${answer.generation || 'Unknown'}`,
+            `Base stat total: ${answer.stat_total || 'Unknown'}`
+          ]
+        }
         this.setData({
-          quiz: result.item,
+          quiz,
         })
       })
   },
@@ -123,7 +133,7 @@ class _C extends React.Component {
                   data-id={item.id}
                   onClick={this.chooseOption}
                 >
-                  <View className="option-name">{item.name_zh}</View>
+                  <View className="option-name">{localize(item)}</View>
                   <View className="muted">{'#' + item.id}</View>
                 </View>
               )

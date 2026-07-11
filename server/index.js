@@ -26,7 +26,7 @@ function sendJson(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept-Language',
     'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
   });
   res.end(body);
@@ -35,7 +35,9 @@ function sendJson(res, statusCode, payload) {
 function sendText(res, statusCode, payload) {
   res.writeHead(statusCode, {
     'Content-Type': 'text/plain; charset=utf-8',
-    'Access-Control-Allow-Origin': '*'
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type, Accept-Language',
+    'Access-Control-Allow-Methods': 'GET,POST,OPTIONS'
   });
   res.end(payload);
 }
@@ -97,7 +99,118 @@ function contentTypeFor(filePath) {
   return 'image/png';
 }
 
-function serveWebApp(req, res, pathname, webRoot) {
+function escapeHtml(value) {
+  return String(value || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function localizedName(item, locale) {
+  if (!item) return '';
+  if (locale === 'en') return item.name_en || item.name || item.display_name || item.name_zh;
+  if (locale === 'zh-TW') return item.name_zh_tw || item.name_zh || item.display_name || item.name || item.name_en;
+  return item.name_zh_cn || item.name_zh || item.display_name || item.name || item.name_en;
+}
+
+function buildSeoMetadata(pathname, searchParams, services, publicBaseUrl, acceptLanguage) {
+  const localeValue = String(searchParams.get('lang') || acceptLanguage || 'zh-CN').toLowerCase();
+  const locale = localeValue.startsWith('en') ? 'en' : localeValue.includes('tw') || localeValue.includes('hk') || localeValue.includes('hant') ? 'zh-TW' : 'zh-CN';
+  const copy = {
+    'zh-CN': { site: '宝批小站', home: '宝可梦、实体卡牌与 Pocket 图鉴', pokedex: '宝可梦图鉴', cards: '宝可梦实体卡牌图鉴', pocket: 'Pokémon TCG Pocket 图鉴' },
+    'zh-TW': { site: '寶批小站', home: '寶可夢、實體卡牌與 Pocket 圖鑑', pokedex: '寶可夢圖鑑', cards: '寶可夢實體卡牌圖鑑', pocket: 'Pokémon TCG Pocket 圖鑑' },
+    en: { site: 'PokeChill', home: 'Pokémon, Physical TCG and Pocket Database', pokedex: 'Pokédex', cards: 'Pokémon TCG Card Database', pocket: 'Pokémon TCG Pocket Card Database' }
+  }[locale];
+  let title = `${copy.home} | ${copy.site}`;
+  let description = locale === 'en'
+    ? 'Explore Pokémon, physical Pokémon TCG cards, Pocket cards, deck rankings and lightweight tools.'
+    : locale === 'zh-TW'
+      ? '查詢寶可夢、實體寶可夢卡牌、Pocket 卡牌、熱門牌組與實用工具。'
+      : '查询宝可梦、实体宝可梦卡牌、Pocket 卡牌、热门卡组与实用工具。';
+  let image = '';
+  let entityName = copy.site;
+  const id = searchParams.get('id');
+  try {
+    if (pathname.includes('/pokemon-detail/') && id) {
+      const item = services.pokedex.getPokemon(Number(id)).item;
+      if (item) {
+        entityName = localizedName(item, locale);
+        title = `${entityName} #${item.id} | ${copy.pokedex}`;
+        const entries = item.flavor_entries || [];
+        const language = locale === 'en' ? 'en' : locale === 'zh-TW' ? 'zh-hant' : 'zh-hans';
+        description = (entries.find((entry) => entry.language === language) || entries.find((entry) => entry.language === 'en') || {}).text || description;
+        image = item.image || item.image_remote || '';
+      }
+    } else if (pathname.includes('/card-detail/') && id) {
+      const item = services.ptcg.getCard(id).item;
+      if (item) {
+        entityName = localizedName(item, locale);
+        title = `${entityName} ${item.set_id || ''} #${item.number || ''} | ${copy.cards}`.replace(/\s+/g, ' ');
+        description = locale === 'en' ? item.flavor_text_en || item.flavor_text || description : item.description_zh || item.flavor_text || description;
+        image = item.image || item.image_large || '';
+      }
+    } else if (pathname.includes('/pocket-card-detail/') && id) {
+      const item = services.pocket.getCard(id).item;
+      if (item) {
+        entityName = localizedName(item, locale);
+        title = `${entityName} | ${copy.pocket}`;
+        description = locale === 'en'
+          ? ((item.rules || {}).attacks || []).map((attack) => attack.effect).filter(Boolean).join(' ') || description
+          : (item.attacks || []).map((attack) => attack.description_zh_template).filter(Boolean).join(' ') || description;
+        image = item.image || '';
+      }
+    } else if (pathname.includes('/pokedex/')) title = `${copy.pokedex} | ${copy.site}`;
+    else if (pathname.includes('/carddex/')) title = `${copy.cards} | ${copy.site}`;
+    else if (pathname.includes('/pocket/')) title = `${copy.pocket} | ${copy.site}`;
+  } catch (error) {
+    // A missing cache record should not prevent the SPA shell from loading.
+  }
+  const origin = publicBaseUrl.replace(/\/$/, '');
+  const canonicalUrl = new URL(pathname, `${origin}/`);
+  if (id) canonicalUrl.searchParams.set('id', id);
+  const canonical = canonicalUrl.toString();
+  const imageUrl = image ? new URL(image, `${origin}/`).toString() : '';
+  const languageLinks = ['zh-CN', 'zh-TW', 'en'].map((language) => {
+    const url = new URL(canonical);
+    url.searchParams.set('lang', language);
+    return `<link rel="alternate" hreflang="${language}" href="${escapeHtml(url.toString())}">`;
+  }).join('') + `<link rel="alternate" hreflang="x-default" href="${escapeHtml(canonical)}">`;
+  const structuredData = {
+    '@context': 'https://schema.org',
+    '@type': pathname.includes('-detail/') ? 'ItemPage' : 'WebPage',
+    name: entityName,
+    description,
+    url: canonical,
+    inLanguage: locale,
+    isPartOf: { '@type': 'WebSite', name: copy.site, url: `${origin}/` }
+  };
+  return { locale, title, description: String(description).replace(/\s+/g, ' ').slice(0, 240), imageUrl, canonical, languageLinks, structuredData };
+}
+
+function injectSeo(html, seo) {
+  if (!seo) return html;
+  let output = html
+    .replace(/<html(?:\s+lang="[^"]*")?/, `<html lang="${seo.locale}"`)
+    .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeHtml(seo.title)}</title>`)
+    .replace(/<meta name="description"[^>]*>/i, `<meta name="description" content="${escapeHtml(seo.description)}">`)
+    .replace(/<meta property="og:title"[^>]*>/i, `<meta property="og:title" content="${escapeHtml(seo.title)}">`)
+    .replace(/<meta property="og:description"[^>]*>/i, `<meta property="og:description" content="${escapeHtml(seo.description)}">`);
+  const extras = `<link rel="canonical" href="${escapeHtml(seo.canonical)}">${seo.languageLinks}` +
+    `<meta property="og:url" content="${escapeHtml(seo.canonical)}">` +
+    `<meta property="og:locale" content="${seo.locale.replace('-', '_')}">` +
+    '<meta name="twitter:card" content="summary_large_image">' +
+    (seo.imageUrl ? `<meta property="og:image" content="${escapeHtml(seo.imageUrl)}">` : '') +
+    `<script type="application/ld+json">${JSON.stringify(seo.structuredData).replace(/</g, '\\u003c')}</script>`;
+  output = output.replace('</head>', `${extras}</head>`);
+  const fallback = `<noscript><main><h1>${escapeHtml(seo.title)}</h1><p>${escapeHtml(seo.description)}</p>` +
+    (seo.imageUrl ? `<img src="${escapeHtml(seo.imageUrl)}" alt="${escapeHtml(seo.structuredData.name)}">` : '') +
+    '</main></noscript>';
+  return output.replace('<body>', `<body>${fallback}`);
+}
+
+function serveWebApp(req, res, pathname, webRoot, seo) {
   if ((req.method !== 'GET' && req.method !== 'HEAD') || !webRoot || !fs.existsSync(webRoot)) {
     return false;
   }
@@ -129,10 +242,18 @@ function serveWebApp(req, res, pathname, webRoot) {
     headers['Content-Encoding'] = 'gzip';
     headers.Vary = 'Accept-Encoding';
   }
+  const isHtml = path.basename(filePath) === 'index.html';
+  if (isHtml) headers['Content-Language'] = seo ? seo.locale : 'zh-CN';
   res.writeHead(200, headers);
   if (req.method === 'HEAD') {
     res.end();
   } else {
+    if (isHtml) {
+      const body = Buffer.from(injectSeo(fs.readFileSync(filePath, 'utf8'), seo));
+      if (acceptsGzip) zlib.gzip(body, { level: zlib.constants.Z_BEST_SPEED }, (error, compressed) => res.end(error ? body : compressed));
+      else res.end(body);
+      return true;
+    }
     const stream = fs.createReadStream(filePath);
     if (acceptsGzip && compressible) {
       stream.pipe(zlib.createGzip({ level: zlib.constants.Z_BEST_SPEED })).pipe(res);
@@ -882,14 +1003,31 @@ function createApp(options = {}) {
 
       if (req.method === 'GET' && pathname === '/sitemap.xml') {
         const origin = publicBaseUrl.replace(/\/$/, '');
-        const paths = ['/', '/pages/pokedex/index', '/pages/carddex/index', '/pages/pocket/index'];
-        const urls = paths.map((path) => `<url><loc>${origin}${path}</loc><changefreq>daily</changefreq></url>`).join('');
+        const maps = ['core', 'pokemon', 'ptcg', 'pocket'].map((name) => `<sitemap><loc>${origin}/sitemaps/${name}.xml</loc></sitemap>`).join('');
+        res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
+        res.end(`<?xml version="1.0" encoding="UTF-8"?><sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${maps}</sitemapindex>`);
+        return;
+      }
+
+      const sitemapMatch = pathname.match(/^\/sitemaps\/(core|pokemon|ptcg|pocket)\.xml$/);
+      if (req.method === 'GET' && sitemapMatch) {
+        const origin = publicBaseUrl.replace(/\/$/, '');
+        let paths = ['/', '/pages/pokedex/index', '/pages/carddex/index', '/pages/pocket/index'];
+        if (sitemapMatch[1] === 'pokemon') paths = store.getSummaries().map((item) => `/pages/pokemon-detail/index?id=${encodeURIComponent(item.id)}`);
+        if (sitemapMatch[1] === 'ptcg') paths = ptcgStore.getCardSummaries().map((item) => `/pages/card-detail/index?id=${encodeURIComponent(item.id)}`);
+        if (sitemapMatch[1] === 'pocket') paths = pocketStore.getCards().map((item) => `/pages/pocket-card-detail/index?id=${encodeURIComponent(item.id)}`);
+        const urls = paths.map((itemPath) => `<url><loc>${escapeHtml(`${origin}${itemPath}`)}</loc></url>`).join('');
         res.writeHead(200, { 'Content-Type': 'application/xml; charset=utf-8', 'Cache-Control': 'public, max-age=3600' });
         res.end(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`);
         return;
       }
 
-      if (serveWebApp(req, res, pathname, webRoot)) return;
+      const seo = buildSeoMetadata(pathname, currentUrl.searchParams, {
+        pokedex: service,
+        ptcg: ptcgService,
+        pocket: pocketService
+      }, publicBaseUrl, req.headers['accept-language']);
+      if (serveWebApp(req, res, pathname, webRoot, seo)) return;
 
       sendJson(res, 404, { error: 'Not found' });
     } catch (error) {

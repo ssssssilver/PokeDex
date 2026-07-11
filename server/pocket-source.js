@@ -4,6 +4,7 @@ const SOURCE_URLS = {
   raenonxMaster: 'https://ptcgp.raenonx.cc/api/data/global-master',
   raenonxEvents: 'https://ptcgp.raenonx.cc/api/data/event-brief',
   raenonxLocale: 'https://ptcgp.raenonx.cc/zh/card',
+  raenonxLocaleEn: 'https://ptcgp.raenonx.cc/en/card',
   chaseCards: 'https://raw.githubusercontent.com/chase-mew/pokemon-tcg-pocket-cards/main/v4.json',
   chaseExpansions: 'https://raw.githubusercontent.com/chase-mew/pokemon-tcg-pocket-cards/main/expansions.json',
   flibustierSets: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist/sets.json',
@@ -182,11 +183,13 @@ function normalizeHotDecks(html) {
   };
 }
 
-function normalizeAttack(attack, locale) {
+function normalizeAttack(attack, locale, localeEn) {
   return {
     id: attack.id,
     name_zh: localizeText(locale.Attack && locale.Attack.Name, attack.nameI18nId),
+    name_en: localizeText(localeEn.Attack && localeEn.Attack.Name, attack.nameI18nId),
     description_zh_template: localizeText(locale.Attack && locale.Attack.Description, attack.descriptionI18nId),
+    description_en_template: localizeText(localeEn.Attack && localeEn.Attack.Description, attack.descriptionI18nId),
     energy: attack.energy || {},
     energy_total: Number(attack.energyTotal || 0),
     damage: attack.damageMarking || null,
@@ -194,11 +197,13 @@ function normalizeAttack(attack, locale) {
   };
 }
 
-function normalizeAbility(ability, locale) {
+function normalizeAbility(ability, locale, localeEn) {
   return {
     id: ability.id,
     name_zh: localizeText(locale.Ability && locale.Ability.Name, ability.nameI18nId),
+    name_en: localizeText(localeEn.Ability && localeEn.Ability.Name, ability.nameI18nId),
     description_zh_template: localizeText(locale.Ability && locale.Ability.Description, ability.descriptionI18nId),
+    description_en_template: localizeText(localeEn.Ability && localeEn.Ability.Description, ability.descriptionI18nId),
     effect: ability.effect || ability.move || null
   };
 }
@@ -246,7 +251,7 @@ function buildNationalDexResolver(pokemonRows) {
   };
 }
 
-function normalizeCards(master, locale, chaseCards, deckgymCards, pokemonRows) {
+function normalizeCards(master, locale, localeEn, chaseCards, deckgymCards, pokemonRows) {
   const chaseMap = new Map(chaseCards.map((card) => [chaseKey(card), card]).filter(([key]) => key));
   const deckgymMap = new Map(deckgymCards.map(deckgymEntry).filter(Boolean).map((entry) => [entry.key, entry]));
   const resolveNationalDexNumber = buildNationalDexResolver(pokemonRows);
@@ -256,6 +261,8 @@ function normalizeCards(master, locale, chaseCards, deckgymCards, pokemonRows) {
       expansion_id: entry.expansion && entry.expansion.id,
       expansion_name_zh: localizeText(locale.Expansion, `LONG_${entry.expansion && entry.expansion.nameI18nId}`) ||
         localizeText(locale.Expansion, entry.expansion && entry.expansion.nameI18nId),
+      expansion_name_en: localizeText(localeEn.Expansion, `LONG_${entry.expansion && entry.expansion.nameI18nId}`) ||
+        localizeText(localeEn.Expansion, entry.expansion && entry.expansion.nameI18nId),
       number: Number(entry.num || 0),
       key: collectionKey(entry.expansion && entry.expansion.id, entry.num)
     }));
@@ -288,8 +295,8 @@ function normalizeCards(master, locale, chaseCards, deckgymCards, pokemonRows) {
       evolution: play.evolution || null,
       retreat: play.retreat === undefined ? null : Number(play.retreat),
       weakness: play.weakness || null,
-      attacks: (play.attacks || []).map((attack) => normalizeAttack(attack, locale)),
-      abilities: (play.abilities || []).map((ability) => normalizeAbility(ability, locale)),
+      attacks: (play.attacks || []).map((attack) => normalizeAttack(attack, locale, localeEn)),
+      abilities: (play.abilities || []).map((ability) => normalizeAbility(ability, locale, localeEn)),
       variant: play.variant || '',
       rules: deckgym ? deckgym.card : null,
       provenance: {
@@ -307,7 +314,7 @@ function normalizeCards(master, locale, chaseCards, deckgymCards, pokemonRows) {
   });
 }
 
-function normalizeExpansions(master, locale, flibustierSets) {
+function normalizeExpansions(master, locale, localeEn, flibustierSets) {
   const supplemental = Object.values(flibustierSets || {}).flat();
   const supplementalMap = new Map(supplemental.map((set) => [String(set.code || '').toUpperCase(), set]));
   return Object.values(master.cardExpansionMap || {}).map((expansion) => {
@@ -316,6 +323,8 @@ function normalizeExpansions(master, locale, flibustierSets) {
       id: expansion.id,
       name_zh: localizeText(locale.Expansion, expansion.nameI18nId),
       name_long_zh: localizeText(locale.Expansion, `LONG_${expansion.nameI18nId}`),
+      name_en: localizeText(localeEn.Expansion, expansion.nameI18nId),
+      name_long_en: localizeText(localeEn.Expansion, `LONG_${expansion.nameI18nId}`),
       name: extra.name || {},
       series: expansion.series || '',
       release_date: extra.releaseDate || '',
@@ -329,7 +338,7 @@ function normalizeExpansions(master, locale, flibustierSets) {
   });
 }
 
-function normalizePacks(master, locale, chaseExpansions, cards) {
+function normalizePacks(master, locale, localeEn, chaseExpansions, cards) {
   const packNameAliases = {
     dialga: '帝牙盧卡',
     palkia: '帕路奇亞',
@@ -367,6 +376,7 @@ function normalizePacks(master, locale, chaseExpansions, cards) {
       const matched = chasePack(pack, nameZh);
       return {
         name_zh: nameZh,
+        name_en: localizeText(localeEn.Pack && localeEn.Pack.Name, pack.nameI18nId),
         image: matched ? matched.image || '' : '',
         image_source_id: matched ? matched.id || '' : ''
       };
@@ -374,6 +384,7 @@ function normalizePacks(master, locale, chaseExpansions, cards) {
     id: pack.id,
     expansion_id: pack.expansionId || '',
     description_zh: localizeText(locale.Pack && locale.Pack.Description, pack.descriptionId),
+    description_en: localizeText(localeEn.Pack && localeEn.Pack.Description, pack.descriptionId),
     timeframe: pack.timeframe || null,
     released_at: pack.releasedAtEpochMs ? new Date(pack.releasedAtEpochMs).toISOString() : '',
     card_ids: (pack.cards && pack.cards.available) || [],
@@ -386,7 +397,7 @@ function normalizePacks(master, locale, chaseExpansions, cards) {
   }));
 }
 
-function eventName(event, locale, cardNameMap) {
+function eventName(event, locale, cardNameMap, english = false) {
   const data = event.data || {};
   const resolvers = {
     itemShop: locale.Shop && locale.Shop.Tab,
@@ -405,14 +416,17 @@ function eventName(event, locale, cardNameMap) {
       .filter((content) => content.cardId)
       .map((content) => cardNameMap.get(content.cardId))
       .filter(Boolean))));
-    const label = event.type === 'wonderPickChansey' ? '吉利蛋得卡挑戰' : '免費得卡挑戰';
+    const label = english
+      ? event.type === 'wonderPickChansey' ? 'Chansey Wonder Pick' : 'Free Wonder Pick'
+      : event.type === 'wonderPickChansey' ? '吉利蛋得卡挑戰' : '免費得卡挑戰';
     return cardNames.length ? `${cardNames.join('、')} ${label}` : label;
   }
   return event.type;
 }
 
-function normalizeEvents(events, locale, cards) {
+function normalizeEvents(events, locale, localeEn, cards) {
   const cardNameMap = new Map((cards || []).map((card) => [card.id, card.name_zh]));
+  const cardNameMapEn = new Map((cards || []).map((card) => [card.id, card.name_en]));
   return (events || []).map((event, index) => {
     const data = event.data || {};
     const timeframe = data.timeframe || data.eventTimeframe || null;
@@ -420,6 +434,7 @@ function normalizeEvents(events, locale, cards) {
       id: `${event.type}:${data.id || data.groupId || data.seasonId || index}`,
       type: event.type,
       name_zh: eventName(event, locale, cardNameMap),
+      name_en: eventName(event, localeEn, cardNameMapEn, true),
       timeframe,
       start_epoch: timeframe ? Number(timeframe.startEpoch || 0) : 0,
       end_epoch: timeframe && timeframe.endEpoch ? Number(timeframe.endEpoch) : null,
@@ -428,10 +443,11 @@ function normalizeEvents(events, locale, cards) {
   });
 }
 
-function normalizeNamedMap(map, dictionary) {
+function normalizeNamedMap(map, dictionary, dictionaryEn) {
   return Object.values(map || {}).map((item) => ({
     id: item.id,
     name_zh: localizeText(dictionary, item.nameI18nId || item.id),
+    name_en: localizeText(dictionaryEn, item.nameI18nId || item.id),
     data: item
   }));
 }
@@ -439,24 +455,25 @@ function normalizeNamedMap(map, dictionary) {
 function normalizePocketData(payload) {
   const master = payload.raenonxMaster;
   const locale = payload.locale;
-  const cards = normalizeCards(master, locale, payload.chaseCards, payload.deckgymCards, payload.pokedex);
-  const events = normalizeEvents(payload.raenonxEvents, locale, cards);
+  const localeEn = payload.localeEn || {};
+  const cards = normalizeCards(master, locale, localeEn, payload.chaseCards, payload.deckgymCards, payload.pokedex);
+  const events = normalizeEvents(payload.raenonxEvents, locale, localeEn, cards);
   const hotDecks = normalizeHotDecks(payload.limitlessDecks);
   return {
     cards,
-    expansions: normalizeExpansions(master, locale, payload.flibustierSets),
-    packs: normalizePacks(master, locale, payload.chaseExpansions, cards),
+    expansions: normalizeExpansions(master, locale, localeEn, payload.flibustierSets),
+    packs: normalizePacks(master, locale, localeEn, payload.chaseExpansions, cards),
     events,
     collections: {
       missions: events.filter((event) => event.type === 'missionGroup'),
       battles: events.filter((event) => ['soloBattle', 'pvpEmblemBattle', 'rankedPvpSeason'].includes(event.type)),
       shops: events.filter((event) => ['itemShop', 'pokeGoldShop'].includes(event.type)),
       wonder_picks: events.filter((event) => ['wonderPickFree', 'wonderPickChansey'].includes(event.type)),
-      profile_decorations: normalizeNamedMap(master.profileDecorationMap, locale.Item && locale.Item.ProfileDecoration),
-      peripheral_goods: normalizeNamedMap(master.peripheralGoodsMap, locale.Item && locale.Item.Peripheral),
-      rental_decks: normalizeNamedMap(master.rentalDeckMap, locale.Deck && locale.Deck.Rental),
-      preset_decks: normalizeNamedMap(master.presetDeckMap, locale.Deck && locale.Deck.Preset),
-      pvp_ranks: normalizeNamedMap(master.pvpRankDataMap, locale.RankedPvp && locale.RankedPvp.Rank),
+      profile_decorations: normalizeNamedMap(master.profileDecorationMap, locale.Item && locale.Item.ProfileDecoration, localeEn.Item && localeEn.Item.ProfileDecoration),
+      peripheral_goods: normalizeNamedMap(master.peripheralGoodsMap, locale.Item && locale.Item.Peripheral, localeEn.Item && localeEn.Item.Peripheral),
+      rental_decks: normalizeNamedMap(master.rentalDeckMap, locale.Deck && locale.Deck.Rental, localeEn.Deck && localeEn.Deck.Rental),
+      preset_decks: normalizeNamedMap(master.presetDeckMap, locale.Deck && locale.Deck.Preset, localeEn.Deck && localeEn.Deck.Preset),
+      pvp_ranks: normalizeNamedMap(master.pvpRankDataMap, locale.RankedPvp && locale.RankedPvp.Rank, localeEn.RankedPvp && localeEn.RankedPvp.Rank),
       hot_decks: hotDecks.items
     },
     auxiliary: {
@@ -469,7 +486,8 @@ function normalizePocketData(payload) {
         attack_names: Object.keys((locale.Attack && locale.Attack.Name) || {}).length,
         attack_descriptions: Object.keys((locale.Attack && locale.Attack.Description) || {}).length,
         ability_names: Object.keys((locale.Ability && locale.Ability.Name) || {}).length,
-        mission_entries: Object.keys((locale.Mission && locale.Mission.Entry) || {}).length
+        mission_entries: Object.keys((locale.Mission && locale.Mission.Entry) || {}).length,
+        card_names_en: Object.keys((localeEn.Card && localeEn.Card.Name) || {}).length
       }
     }
   };

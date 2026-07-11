@@ -76,7 +76,7 @@ function main() {
   check((associationSamples[150] || []).every((name) => /^Mewtwo(?: ex)?$/i.test(name)), 'Mewtwo has unrelated Pocket cards', associationSamples[150]);
   check(metrics.events > 0 && metrics.missions > 0 && metrics.battles > 0, 'Pocket live operation data is incomplete', metrics);
   check(metrics.shops > 0 && metrics.wonderPicks > 0, 'Pocket shop or wonder-pick data is incomplete', metrics);
-  check(metrics.sourceCount === 10, 'Not all configured Pocket sources were recorded', metrics);
+  check(metrics.sourceCount === 11, 'Not all configured Pocket sources were recorded', metrics);
   check(metrics.hotDecks >= 20, 'Pocket hot-deck data is incomplete', metrics.hotDecks);
   check(metrics.pullRateSets >= 15, 'Pocket pull-rate data is incomplete', metrics.pullRateSets);
 

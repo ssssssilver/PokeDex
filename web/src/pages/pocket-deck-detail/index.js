@@ -3,6 +3,7 @@ import { Block, View, Image, Text } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import './index.scss'
 function decorate(item) {
   const source = item || {}
@@ -17,7 +18,7 @@ function decorate(item) {
       ? [
           source.representative.player,
           source.representative.place
-            ? `第 ${source.representative.place} 名`
+            ? getLocale() === 'en' ? `Place ${source.representative.place}` : `第 ${source.representative.place} 名`
             : '',
         ]
           .filter(Boolean)
@@ -25,7 +26,7 @@ function decorate(item) {
       : '',
     cards: (source.cards || []).map((card) =>
       Object.assign({}, card, {
-        displayName: card.name_zh || card.name,
+        displayName: localize(card) || card.name,
         setText: `${card.set || ''} #${card.number || ''}`,
       })
     ),
@@ -134,20 +135,20 @@ class _C extends React.Component {
                 </View>
                 <View className="deck-energy">
                   <Text>能量</Text>
-                  <Strong>{deck.energy}</Strong>
+                  <Text className="strong">{deck.energy}</Text>
                 </View>
               </View>
               <View className="deck-metrics">
                 <View>
-                  <Strong>{deck.total_cards}</Strong>
+                  <Text className="strong">{deck.total_cards}</Text>
                   <Text>卡牌总数</Text>
                 </View>
                 <View>
-                  <Strong>{deck.shareText}</Strong>
+                  <Text className="strong">{deck.shareText}</Text>
                   <Text>使用率</Text>
                 </View>
                 <View>
-                  <Strong>{deck.winRateText}</Strong>
+                  <Text className="strong">{deck.winRateText}</Text>
                   <Text>胜率</Text>
                 </View>
               </View>

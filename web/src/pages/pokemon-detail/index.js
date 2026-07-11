@@ -5,6 +5,7 @@ import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
 const { TYPE_META } = require('../../utils/type-meta.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import './index.scss'
 const MOVE_PAGE_SIZE = 60
 const STAT_ROWS = [
@@ -106,7 +107,7 @@ function padId(id) {
 function joinNames(items) {
   return (
     (items || [])
-      .map((item) => item.name || item)
+      .map((item) => getLocale() === 'en' && item.key ? titleCase(item.key) : item.name || item)
       .filter(Boolean)
       .join('、') || '暂无'
   )
@@ -119,7 +120,7 @@ function titleCase(value) {
     .join(' ')
 }
 function growthRateName(value) {
-  return GROWTH_RATE_NAMES[value] || titleCase(value) || '未知'
+  return getLocale() === 'en' ? titleCase(value) || 'Unknown' : GROWTH_RATE_NAMES[value] || titleCase(value) || '未知'
 }
 function valueText(value, fallback) {
   if (value === '' || value === null || value === undefined)
@@ -155,7 +156,11 @@ function normalizeAbility(item) {
     },
     item || {}
   )
-  ability.description = ability.flavor || ability.short_effect || ''
+  const locale = getLocale()
+  ability.name = locale === 'en' ? ability.name_en || ability.name : ability.name
+  ability.description = locale === 'en'
+    ? ability.short_effect || ability.flavor || ''
+    : ability.flavor || ability.short_effect || ''
   return ability
 }
 function methodGroup(method) {
@@ -192,7 +197,9 @@ function normalizeMove(item) {
   const move = item || {}
   const method = move.method || 'other'
   const level = Number(move.level || 0)
-  const name = move.name || titleCase(move.key)
+  const name = getLocale() === 'en'
+    ? move.name_en || move.name || titleCase(move.key)
+    : move.name || move.name_en || titleCase(move.key)
   const nameEn = move.name_en || ''
   const type = move.type || ''
   return Object.assign({}, move, {
@@ -202,14 +209,14 @@ function normalizeMove(item) {
     type,
     type_name: move.type_name || typeName(type),
     type_color: typeColor(type),
-    damage_class_name: move.damage_class_name || '-',
-    category_name: move.category_name || '',
+    damage_class_name: getLocale() === 'en' ? titleCase(move.damage_class) || '-' : move.damage_class_name || '-',
+    category_name: getLocale() === 'en' ? titleCase(move.category) : move.category_name || '',
     powerText: valueText(move.power),
     accuracyText: valueText(move.accuracy),
     ppText: valueText(move.pp),
     priorityText: valueText(move.priority, '0'),
     method_group: methodGroup(method),
-    method_name: move.method_name || titleCase(method),
+    method_name: getLocale() === 'en' ? titleCase(method) : move.method_name || titleCase(method),
     levelText: level ? `Lv.${level}` : '',
     learnText: [level ? `Lv.${level}` : '', move.version_group_name || '']
       .filter(Boolean)
@@ -321,16 +328,26 @@ function buildSelectedFlavor(pokemon, selectedDex) {
       ? Number(selectedDex.generation)
       : Number(pokemon.generation || 0)
   const entries = sortFlavorEntries(pokemon.flavor_entries || [])
-  const chineseEntries = entries.filter(isChineseFlavor)
-  const sameGeneration = chineseEntries.find(
+  const locale = getLocale()
+  const preferredLanguages = locale === 'en'
+    ? ['en']
+    : locale === 'zh-TW'
+      ? ['zh-hant', 'zh-hans']
+      : ['zh-hans', 'zh-hant']
+  const localizedEntries = preferredLanguages.flatMap(language =>
+    entries.filter(entry => String(entry.language || '').toLowerCase() === language)
+  )
+  const sameGeneration = localizedEntries.find(
     (entry) => Number(entry.generation || 0) === targetGeneration
   )
-  const samePokemonGeneration = chineseEntries.find(
+  const samePokemonGeneration = localizedEntries.find(
     (entry) => Number(entry.generation || 0) === Number(pokemon.generation || 0)
   )
-  const fallbackFlavor = hasChineseText(pokemon.flavor) ? pokemon.flavor : ''
+  const fallbackFlavor = locale === 'en'
+    ? pokemon.flavor_en || ''
+    : hasChineseText(pokemon.flavor) ? pokemon.flavor : ''
   const selected =
-    sameGeneration || samePokemonGeneration || chineseEntries[0] || null
+    sameGeneration || samePokemonGeneration || localizedEntries[0] || null
   const title = selectedDex
     ? `${selectedDex.label}${
         targetGeneration ? ` · 第 ${targetGeneration} 世代` : ''
@@ -354,6 +371,7 @@ function buildEncounterRows(encounters) {
     (row, index) => {
       const minLevel = Number(row.min_level || 0)
       const maxLevel = Number(row.max_level || 0)
+      const english = getLocale() === 'en'
       return Object.assign({}, row, {
         key: `${row.location}-${row.version}-${index}`,
         levelText:
@@ -363,13 +381,18 @@ function buildEncounterRows(encounters) {
               : `Lv.${minLevel}-${maxLevel}`
             : '',
         chanceText: row.chance ? `${row.chance}%` : '',
+        location: english ? titleCase(row.location_key) : row.location,
+        version_name: english ? titleCase(row.version) : row.version_name,
+        method_name: english ? titleCase(row.method) : row.method_name,
       })
     }
   )
   return {
     rows,
     locations: encounters && encounters.locations ? encounters.locations : [],
-    methods: encounters && encounters.methods ? encounters.methods : [],
+    methods: getLocale() === 'en'
+      ? Array.from(new Set(rows.map(row => row.method_name).filter(Boolean)))
+      : encounters && encounters.methods ? encounters.methods : [],
     count: encounters ? Number(encounters.count || rows.length || 0) : 0,
   }
 }
@@ -434,6 +457,7 @@ function buildMoveDetail(move) {
   })
 }
 function buildInfoRows(pokemon) {
+  const english = getLocale() === 'en'
   return [
     {
       label: '全国编号',
@@ -441,11 +465,11 @@ function buildInfoRows(pokemon) {
     },
     {
       label: '世代',
-      value: pokemon.generation ? `第 ${pokemon.generation} 世代` : '未知',
+      value: pokemon.generation ? english ? `Generation ${pokemon.generation}` : `第 ${pokemon.generation} 世代` : '未知',
     },
     {
       label: '分类',
-      value: pokemon.category || '未知',
+      value: english ? pokemon.category_en || 'Pokémon' : pokemon.category || '未知',
     },
     {
       label: '身高',
@@ -507,7 +531,7 @@ function buildRegionalDexes(pokemon, selectedKey) {
         DEX_GENERATION_MAP[key] === undefined
           ? fallbackGeneration
           : DEX_GENERATION_MAP[key],
-      label: `${item.name} #${item.entry_number}`,
+      label: `${getLocale() === 'en' ? (key === 'national' ? 'National' : titleCase(key)) : item.name} #${item.entry_number}`,
       selected: key === selectedKey,
     })
   })
@@ -710,7 +734,9 @@ cacheOptions.setOptionsToCache({
           generationText: pokemon.generation
             ? `第 ${pokemon.generation} 世代`
             : '世代未知',
-          evYieldText: pokemon.ev_yield_text || '-',
+          evYieldText: getLocale() === 'en'
+            ? (pokemon.ev_yield || []).map(item => `${titleCase(item.key)} +${item.value}`).join(' / ') || '-'
+            : pokemon.ev_yield_text || '-',
         }),
         infoRows: buildInfoRows(pokemon),
         breedingRows: buildBreedingRows(pokemon),
@@ -1020,10 +1046,10 @@ class _C extends React.Component {
                 <Text>{pokemon.idText}</Text>
                 <Text>{pokemon.generationText}</Text>
               </View>
-              <View className="detail-name">{pokemon.name_zh}</View>
+              <View className="detail-name">{localize(pokemon)}</View>
               <View className="detail-subtitle">
-                <Text>{pokemon.name_en}</Text>
-                {pokemon.name_ja && <Text>{'/ ' + pokemon.name_ja}</Text>}
+                {getLocale() !== 'en' && <Text>{pokemon.name_en}</Text>}
+                {getLocale() === 'zh-CN' && pokemon.name_ja && <Text>{'/ ' + pokemon.name_ja}</Text>}
               </View>
               <View className="type-line">
                 {pokemon.types.map((item, index) => {
@@ -1243,7 +1269,7 @@ class _C extends React.Component {
                   <View className="ability-head">
                     <View>
                       <Text className="ability-name">{item.name}</Text>
-                      {item.name_en && (
+                      {getLocale() !== 'en' && item.name_en && (
                         <Text className="ability-en">{item.name_en}</Text>
                       )}
                     </View>
@@ -1251,7 +1277,7 @@ class _C extends React.Component {
                       <View className="hidden-pill">隐藏</View>
                     )}
                   </View>
-                  {item.name_ja && (
+                  {getLocale() === 'zh-CN' && item.name_ja && (
                     <View className="muted">{item.name_ja}</View>
                   )}
                   {item.description && (
@@ -1471,7 +1497,7 @@ class _C extends React.Component {
                     onClick={this.openPokemon}
                   >
                     <Image src={item.image} mode="aspectFit"></Image>
-                    <View className="evolution-name">{item.name_zh}</View>
+                    <View className="evolution-name">{localize(item)}</View>
                     <View
                       className={
                         'evolution-condition ' + (item.active ? 'active' : '')

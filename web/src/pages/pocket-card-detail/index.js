@@ -4,6 +4,7 @@ import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const storage = require('../../utils/storage.js')
+const { getLocale, localize } = require('../../i18n/index.js')
 import EnergyIcon from '../../components/energy-icon/index'
 import './index.scss'
 const TYPE_META = {
@@ -151,6 +152,8 @@ function acquisitionRows(source) {
       ]
 }
 function decorateCard(card) {
+  const english = getLocale() === 'en'
+  const englishRules = card.rules || {}
   const type = TYPE_META[(card.types || [])[0]] || TYPE_META[9]
   const weakness = card.weakness
     ? TYPE_META[card.weakness.id] || TYPE_META[9]
@@ -172,24 +175,33 @@ function decorateCard(card) {
     ),
     collectionRows: (card.collections || []).map((item) =>
       Object.assign({}, item, {
-        text: `${item.expansion_name_zh || item.expansion_id} · #${
+        text: `${english ? item.expansion_name_en || englishRules.booster_pack || item.expansion_id : item.expansion_name_zh || item.expansion_id} · #${
           item.number
         }`,
       })
     ),
-    attacks: (card.attacks || []).map((attack) =>
+    displayName: localize(card),
+    attacks: (card.attacks || []).map((attack, index) =>
       Object.assign({}, attack, {
+        displayName: english
+          ? attack.name_en || (englishRules.attacks || [])[index]?.title || attack.name_zh
+          : attack.name_zh || (englishRules.attacks || [])[index]?.title,
         costItems: energyCost(attack.energy),
         damageText:
           attack.damage && attack.damage.value !== undefined
             ? String(attack.damage.value)
             : '',
-        descriptionText: cleanGameText(attack.description_zh_template),
+        descriptionText: english
+          ? cleanGameText(attack.description_en_template) || (englishRules.attacks || [])[index]?.effect || cleanGameText(attack.description_zh_template)
+          : cleanGameText(attack.description_zh_template),
       })
     ),
     abilities: (card.abilities || []).map((ability) =>
       Object.assign({}, ability, {
-        descriptionText: cleanGameText(ability.description_zh_template),
+        displayName: english ? ability.name_en || englishRules.ability?.title || ability.name_zh : ability.name_zh,
+        descriptionText: english
+          ? cleanGameText(ability.description_en_template) || englishRules.ability?.effect || cleanGameText(ability.description_zh_template)
+          : cleanGameText(ability.description_zh_template),
       })
     ),
     acquisitionRows: acquisitionRows(card.source || {}),
@@ -244,7 +256,7 @@ cacheOptions.setOptionsToCache({
           })
         }
         Taro.setNavigationBarTitle({
-          title: card.name_zh || 'Pocket 卡牌详情',
+          title: card.displayName || 'Pocket 卡牌详情',
         })
       })
       .catch((error) =>
@@ -307,8 +319,8 @@ class _C extends React.Component {
                       ' #' +
                       card.collectionRows[0].number}
                   </View>
-                  <View className="detail-name">{card.name_zh}</View>
-                  <View className="detail-en">{card.name_en}</View>
+                  <View className="detail-name">{card.displayName}</View>
+                  {getLocale() !== 'en' && <View className="detail-en">{card.name_en}</View>}
                   <View className="detail-badges">
                     <EnergyIcon
                       type={card.type.iconType}
@@ -324,13 +336,13 @@ class _C extends React.Component {
                 <View className="stats-grid">
                   <View>
                     <Text>HP</Text>
-                    <Strong>{card.hp || '-'}</Strong>
+                    <Text className="strong">{card.hp || '-'}</Text>
                   </View>
                   <View>
                     <Text>卡牌类型</Text>
-                    <Strong>
+                    <Text className="strong">
                       {card.card_type === 'pokemon' ? '宝可梦' : '训练家'}
-                    </Strong>
+                    </Text>
                   </View>
                   <View>
                     <Text>弱点</Text>
@@ -340,10 +352,10 @@ class _C extends React.Component {
                           type={card.weakness.iconType}
                           label={card.weakness.name + '能量'}
                         ></EnergyIcon>
-                        <Strong>{'+' + card.weakness.bonus}</Strong>
+                        <Text className="strong">{'+' + card.weakness.bonus}</Text>
                       </View>
                     ) : (
-                      <Strong>-</Strong>
+                      <Text className="strong">-</Text>
                     )}
                   </View>
                   <View>
@@ -358,7 +370,7 @@ class _C extends React.Component {
                           ></EnergyIcon>
                         )
                       })}
-                      {!card.retreatItems.length && <Strong>0</Strong>}
+                      {!card.retreatItems.length && <Text className="strong">0</Text>}
                     </View>
                   </View>
                 </View>
@@ -371,7 +383,7 @@ class _C extends React.Component {
                       <View key={item.id} className="move-row">
                         <View className="move-head">
                           <View className="ability-label">特性</View>
-                          <View className="move-name">{item.name_zh}</View>
+                          <View className="move-name">{item.displayName}</View>
                         </View>
                         {item.descriptionText && (
                           <View className="move-text">
@@ -401,7 +413,7 @@ class _C extends React.Component {
                               )
                             })}
                           </View>
-                          <View className="move-name">{item.name_zh}</View>
+                          <View className="move-name">{item.displayName}</View>
                           <View className="move-damage">{item.damageText}</View>
                         </View>
                         {item.descriptionText && (
@@ -448,10 +460,8 @@ class _C extends React.Component {
                   <View className="related-pokemon" onClick={this.openPokemon}>
                     <Image src={relatedPokemon.image} mode="aspectFit"></Image>
                     <View>
-                      <Strong>{relatedPokemon.name_zh}</Strong>
-                      <Text>
-                        {'#' + relatedPokemon.id + ' ' + relatedPokemon.name_en}
-                      </Text>
+                      <Text className="strong">{localize(relatedPokemon)}</Text>
+                      <Text>{'#' + relatedPokemon.id + (getLocale() === 'en' ? '' : ' ' + relatedPokemon.name_en)}</Text>
                     </View>
                     <Text className="related-arrow">›</Text>
                   </View>

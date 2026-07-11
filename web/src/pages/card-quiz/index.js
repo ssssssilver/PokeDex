@@ -3,6 +3,7 @@ import { Block, View, Image } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
+const { localize } = require('../../i18n/index.js')
 import './index.scss'
 cacheOptions.setOptionsToCache({
   data: {
@@ -114,7 +115,7 @@ class _C extends React.Component {
                 >
                   <View>
                     <View className="option-name">
-                      {item.display_name || item.name_zh || item.name}
+                      {localize(item) || item.display_name}
                     </View>
                     <View className="muted">
                       {item.set_name + ' #' + item.number}

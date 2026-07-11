@@ -203,6 +203,17 @@
   text-align: center;
 }
 
+@media (min-width: 1024px) {
+  .card-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .card-row { min-width: 0; padding: 14px; }
+  .card-art-wrap { width: 82px; height: 116px; margin-right: 12px; border-radius: 6px; }
+  .card-art-wrap image { width: 76px; height: 108px; border-radius: 5px; }
+  .row-name { font-size: 18px; }
+  .row-subtitle, .row-facts { font-size: 12px; }
+  .set-number { font-size: 13px; }
+  .regulation-pill { font-size: 11px; }
+}
+
 .row-actions {
   display: flex;
   flex-direction: column;

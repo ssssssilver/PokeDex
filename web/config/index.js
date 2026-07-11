@@ -69,9 +69,20 @@ export default defineConfig(async (merge, { command, mode }) => {
         chain.optimization.splitChunks({
           chunks: 'all',
           cacheGroups: {
+            opencc: {
+              name: 'opencc-zh-tw',
+              test: /[\\/]node_modules[\\/]opencc-js[\\/]/,
+              priority: 40,
+              chunks: 'async',
+              enforce: true,
+              reuseExistingChunk: true
+            },
             vendors: {
               name: 'vendors',
-              test: /[\\/]node_modules[\\/]/,
+              test(module) {
+                const resource = module && module.resource ? module.resource : ''
+                return /[\\/]node_modules[\\/]/.test(resource) && !/[\\/]opencc-js[\\/]/.test(resource)
+              },
               priority: 30,
               chunks: 'all',
               enforce: true,

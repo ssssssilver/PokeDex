@@ -12,6 +12,7 @@ const SOURCE_PLAN = [
   { name: 'raenonxMaster', format: 'json' },
   { name: 'raenonxEvents', format: 'json' },
   { name: 'raenonxLocale', format: 'html' },
+  { name: 'raenonxLocaleEn', format: 'html' },
   { name: 'chaseCards', format: 'json' },
   { name: 'chaseExpansions', format: 'json' },
   { name: 'flibustierSets', format: 'json' },
@@ -135,6 +136,7 @@ async function syncPocket(store, event = {}, context = {}) {
     const resources = await Promise.all(SOURCE_PLAN.map((source) => fetchSource(source, options)));
     const payload = Object.fromEntries(resources.map((resource) => [resource.name, resource.data]));
     payload.locale = extractRaenonxMessages(payload.raenonxLocale);
+    payload.localeEn = extractRaenonxMessages(payload.raenonxLocaleEn);
     payload.pokedex = loadPokedexRows(options.dataDir);
     const normalized = normalizePocketData(payload);
     normalized.sourceMeta = Object.fromEntries(resources.map((resource) => [resource.name, resource.meta]));
