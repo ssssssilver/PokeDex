@@ -1,0 +1,136 @@
+.team-summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px;
+}
+
+.team-switcher { display: flex; align-items: stretch; gap: 10px; margin-bottom: 16px; }
+.team-tabs { flex: 1; min-width: 0; white-space: nowrap; }
+.team-tab-row { display: inline-flex; gap: 10px; }
+.team-tab { display: inline-flex; flex-direction: column; justify-content: center; min-width: 150px; min-height: 76px; padding: 8px 16px; border: 1px solid #d9e2ec; border-radius: 8px; background: #fff; color: #475569; box-sizing: border-box; }
+.team-tab text { overflow: hidden; max-width: 170px; font-size: 24px; font-weight: 900; text-overflow: ellipsis; }
+.team-tab small { margin-top: 2px; color: #94a3b8; font-size: 18px; }
+.team-tab.active { border-color: #0f766e; background: #e6fffb; color: #0f766e; }
+.add-team { display: flex; align-items: center; justify-content: center; flex: 0 0 76px; min-height: 76px; border: 1px solid #0f766e; border-radius: 8px; background: #fff; color: #0f766e; font-size: 42px; }
+.active-team-name { margin-top: 4px; color: #182230; font-size: 30px; font-weight: 900; }
+.team-commands { position: absolute; top: 20px; right: 22px; display: flex; gap: 12px; }
+.team-commands view { padding: 8px 12px; color: #0f766e; font-size: 21px; font-weight: 800; }
+.team-commands .danger { color: #b42318; }
+.team-summary .score { margin-top: 44px; }
+.selected-strip { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin: 16px 0; }
+.selected-slot { position: relative; display: flex; align-items: center; justify-content: center; min-width: 0; aspect-ratio: 1 / 1.2; border: 1px dashed #cbd5e1; border-radius: 8px; background: #f8fafc; }
+.selected-slot.filled { border-style: solid; border-color: #b8e5dc; background: #eaf8f5; }
+.selected-slot image { width: 100%; height: 82%; }
+.selected-slot > text:not(.slot-empty) { position: absolute; right: 2px; bottom: 2px; left: 2px; overflow: hidden; color: #334155; font-size: 16px; font-weight: 800; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
+.slot-empty { color: #94a3b8; font-size: 32px; }
+.slot-remove { position: absolute; z-index: 2; top: -6px; right: -4px; display: flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%; background: #b42318; color: #fff; font-size: 22px; line-height: 30px; }
+.team-empty-analysis { margin-top: 18px; padding: 28px; color: #64748b; text-align: center; }
+
+.team-count {
+  color: #101828;
+  font-size: 44px;
+  font-weight: 900;
+}
+
+.score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: #e6fffb;
+  color: #0f766e;
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.analysis-card {
+  margin-top: 18px;
+  padding: 24px;
+}
+
+.analysis-text {
+  color: #334155;
+  font-size: 28px;
+  line-height: 1.55;
+}
+
+.analysis-section {
+  margin-top: 18px;
+}
+
+.analysis-title {
+  margin-bottom: 10px;
+  color: #182230;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.tag-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.soft-tag {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 24px;
+}
+
+.weakness-tag { background: #fff0ee; color: #b83b32; }
+.resistance-tag { background: #eaf8f5; color: #0f766e; }
+.immunity-tag { background: #eef3ff; color: #315ea8; }
+.analysis-empty { color: #94a3b8; font-size: 23px; }
+
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.member-card {
+  display: flex;
+  align-items: center;
+  padding: 16px;
+}
+
+.member-card.active {
+  border-color: #0f766e;
+  background: #e6fffb;
+}
+
+.member-card image {
+  width: 92px;
+  height: 92px;
+  margin-right: 16px;
+}
+
+.member-main {
+  flex: 1;
+}
+
+.member-name {
+  color: #182230;
+  font-size: 30px;
+  font-weight: 800;
+}
+
+.member-types {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.member-mark {
+  width: 48px;
+  color: #0f766e;
+  font-size: 34px;
+  font-weight: 900;
+  text-align: center;
+}

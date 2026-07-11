@@ -1,0 +1,138 @@
+.pack-page {
+  padding-bottom: 48px;
+}
+
+.pack-header {
+  display: flex;
+  align-items: center;
+  min-height: 190px;
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #eef7ff 100%);
+}
+
+.pack-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.pack-title {
+  overflow: hidden;
+  margin-top: 8px;
+  color: #101828;
+  font-size: 40px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pack-sub {
+  margin-top: 8px;
+  color: #697586;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.pack-logo {
+  flex: 0 0 auto;
+  width: 180px;
+  height: 112px;
+  margin-left: 18px;
+}
+
+.set-row {
+  margin-top: 18px;
+  white-space: nowrap;
+}
+
+.set-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 156px;
+  height: 112px;
+  margin-right: 12px;
+  border: 1px solid #e6eaf0;
+  border-radius: 14px;
+  background: #ffffff;
+  color: #465467;
+  font-size: 20px;
+  font-weight: 800;
+  box-sizing: border-box;
+}
+
+.set-chip.selected {
+  border-color: #0f766e;
+  background: #e6fffb;
+  color: #0f766e;
+}
+
+.set-chip image {
+  width: 76px;
+  height: 44px;
+  margin-bottom: 8px;
+}
+
+.set-chip view {
+  overflow: hidden;
+  max-width: 132px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.open-button {
+  min-height: 76px;
+  margin-top: 20px;
+  border-radius: 14px;
+  background: #0f766e;
+  color: #ffffff;
+  font-size: 28px;
+  font-weight: 900;
+  line-height: 76px;
+  text-align: center;
+}
+
+.open-button.disabled {
+  opacity: 0.72;
+}
+
+.pack-result {
+  margin-top: 26px;
+}
+
+.pull-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.pull-card {
+  min-width: 0;
+  padding: 16px;
+  text-align: center;
+}
+
+.pull-card image {
+  width: 172px;
+  height: 240px;
+  border-radius: 10px;
+}
+
+.pull-name {
+  overflow: hidden;
+  margin-top: 10px;
+  color: #182230;
+  font-size: 24px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pull-meta {
+  overflow: hidden;
+  margin-top: 4px;
+  color: #697586;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

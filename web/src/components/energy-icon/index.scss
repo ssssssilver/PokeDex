@@ -1,0 +1,30 @@
+.energy-symbol {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 38px;
+  width: 38px;
+  height: 38px;
+  overflow: hidden;
+  border-radius: 50%;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+.energy-symbol image {
+  position: absolute;
+  width: 164.2px;
+  height: auto;
+  max-width: none;
+}
+
+.energy-fire image { left: -18.77px; top: 0; }
+.energy-water image { left: -63.33px; top: 0; }
+.energy-grass image { left: -107.67px; top: 0; }
+.energy-lightning image { left: -18.77px; top: -59.11px; }
+.energy-psychic image { left: -63.33px; top: -59.11px; }
+.energy-fighting image { left: -107.67px; top: -59.11px; }
+.energy-colorless image { left: -18.77px; top: -120.8px; }
+.energy-metal image { left: -63.33px; top: -120.8px; }
+.energy-darkness image { left: -107.67px; top: -120.8px; }
+.energy-dragon image { left: -18.77px; top: -182.22px; }
+.energy-fairy image { left: -63.33px; top: -182.22px; }

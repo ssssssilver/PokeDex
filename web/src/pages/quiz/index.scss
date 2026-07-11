@@ -1,0 +1,95 @@
+.quiz-card {
+  padding: 28px;
+  text-align: center;
+}
+
+.quiz-title {
+  margin-top: 8px;
+  color: #101828;
+  font-size: 42px;
+  font-weight: 900;
+}
+
+.silhouette {
+  width: 240px;
+  height: 240px;
+  margin-top: 20px;
+  filter: brightness(0);
+  opacity: 0.72;
+}
+
+.silhouette.revealed {
+  filter: none;
+  opacity: 1;
+}
+
+.hint-card {
+  margin-top: 18px;
+  padding: 22px;
+}
+
+.hint-row {
+  padding: 10px 0;
+  color: #334155;
+  font-size: 26px;
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.option-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 132px;
+  padding: 18px;
+  text-align: center;
+}
+
+.option-card.active {
+  border-color: #0f766e;
+  background: #e6fffb;
+}
+
+.option-name {
+  color: #182230;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.submit-button {
+  margin-top: 22px;
+}
+
+.result-card {
+  margin-top: 18px;
+  padding: 24px;
+}
+
+.result-title {
+  color: #182230;
+  font-size: 34px;
+  font-weight: 900;
+}
+
+.result-title.correct {
+  color: #0f766e;
+}
+
+.result-title.wrong {
+  color: #b42318;
+}
+
+.result-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.result-actions > view { text-align: center; }

@@ -1,0 +1,267 @@
+.deck-detail-page {
+  padding-bottom: 48px;
+}
+
+.loading-card {
+  padding: 48px 32px;
+  text-align: center;
+}
+
+.loading-title {
+  margin-bottom: 8px;
+  color: #182230;
+  font-size: 32px;
+  font-weight: 900;
+}
+
+.deck-hero {
+  padding: 24px;
+  background: linear-gradient(135deg, #ffffff 0%, #eefbf8 100%);
+}
+
+.deck-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.deck-rank,
+.deck-source {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.deck-rank {
+  background: #0f766e;
+  color: #ffffff;
+}
+
+.deck-source {
+  background: #ffffff;
+  color: #0f766e;
+}
+
+.deck-title {
+  margin-top: 18px;
+  color: #101828;
+  font-size: 40px;
+  font-weight: 900;
+  line-height: 1.22;
+}
+
+.deck-description {
+  margin-top: 10px;
+  color: #465467;
+  font-size: 24px;
+  line-height: 1.55;
+}
+
+.deck-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.deck-meta-item {
+  min-height: 96px;
+  padding: 12px 8px;
+  border: 1px solid #d9f3ee;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.meta-value {
+  overflow: hidden;
+  color: #101828;
+  font-size: 28px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.latest-result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.latest-label {
+  flex: 0 0 auto;
+  color: #697586;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.latest-value {
+  overflow: hidden;
+  color: #182230;
+  font-size: 24px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-hero-icons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.deck-hero-icons image {
+  width: 64px;
+  height: 64px;
+}
+
+.deck-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+.deck-actions .button-primary,
+.deck-actions .button-secondary,
+.copy-panel .button-primary {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.deck-gallery-section {
+  overflow: hidden;
+}
+
+.deck-gallery-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.deck-gallery-row {
+  display: inline-flex;
+  gap: 16px;
+  padding: 2px 2px 10px;
+}
+
+.deck-gallery-item {
+  display: inline-flex;
+  flex-direction: column;
+  width: 166px;
+  vertical-align: top;
+}
+
+.deck-card-thumb-wrap {
+  position: relative;
+  width: 166px;
+  height: 232px;
+  border-radius: 10px;
+  background: #eef2f6;
+}
+
+.deck-card-thumb {
+  width: 166px;
+  height: 232px;
+  border-radius: 10px;
+}
+
+.deck-card-quantity {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 42px;
+  height: 38px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(15, 118, 110, 0.94);
+  color: #ffffff;
+  font-size: 21px;
+  font-weight: 900;
+  line-height: 38px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+.deck-gallery-name {
+  overflow: hidden;
+  margin-top: 10px;
+  color: #182230;
+  font-size: 23px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-gallery-set {
+  overflow: hidden;
+  margin-top: 2px;
+  color: #697586;
+  font-size: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.deck-section-card {
+  padding: 0 18px;
+}
+
+.deck-card-row {
+  display: flex;
+  align-items: center;
+  min-height: 76px;
+  border-bottom: 1px solid #eef2f6;
+}
+
+.deck-card-row:last-child {
+  border-bottom: 0;
+}
+
+.deck-card-count {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 54px;
+  width: 54px;
+  height: 42px;
+  margin-right: 18px;
+  border-radius: 12px;
+  background: #e6fffb;
+  color: #0f766e;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.deck-card-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.deck-card-name {
+  overflow: hidden;
+  color: #182230;
+  font-size: 28px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-panel {
+  margin-top: 28px;
+}
+
+.retry-button {
+  margin-top: 24px;
+}

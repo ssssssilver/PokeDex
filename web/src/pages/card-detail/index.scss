@@ -1,0 +1,302 @@
+.card-detail-page {
+  padding-bottom: 48px;
+}
+
+.detail-hero {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 24px;
+}
+
+.card-art-large {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 226px;
+  height: 316px;
+  border-radius: 14px;
+  background: #f8fafc;
+}
+
+.card-art-large image {
+  width: 212px;
+  height: 300px;
+  border-radius: 12px;
+}
+
+.card-art-empty {
+  color: #94a3b8;
+  font-size: 24px;
+  font-weight: 900;
+}
+
+.hero-copy {
+  flex: 1;
+  min-width: 0;
+}
+
+.hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #0f766e;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.hero-meta text {
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #e6fffb;
+}
+
+.hero-name {
+  margin-top: 12px;
+  color: #101828;
+  font-size: 42px;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.hero-subtitle {
+  margin-top: 6px;
+  color: #697586;
+  font-size: 24px;
+}
+
+.hero-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.energy-badge,
+.plain-badge {
+  min-width: 58px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.plain-badge {
+  background: #475467;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.action {
+  min-height: 52px;
+  padding: 0 14px;
+  border: 1px solid #d9e2ec;
+  border-radius: 999px;
+  color: #334155;
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 52px;
+}
+
+.action.active {
+  border-color: #0f766e;
+  background: #e6fffb;
+  color: #0f766e;
+}
+
+.info-card {
+  margin-top: 18px;
+  padding: 24px;
+}
+
+.section-title.compact {
+  margin-bottom: 16px;
+  font-size: 30px;
+}
+
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.info-row {
+  min-width: 0;
+  color: #182230;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.text-block,
+.attack-row {
+  padding: 16px 0;
+  border-top: 1px solid #edf2f7;
+}
+
+.text-block:first-of-type,
+.attack-row:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.block-title {
+  color: #182230;
+  font-size: 28px;
+  font-weight: 900;
+}
+
+.block-name-en {
+  margin-top: 3px;
+  color: #7b8797;
+  font-size: 21px;
+  line-height: 1.35;
+}
+
+.block-copy {
+  margin-top: 8px;
+  color: #465467;
+  font-size: 24px;
+  line-height: 1.55;
+}
+
+.translation-en {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed #dfe5ec;
+  color: #7b8797;
+  font-size: 21px;
+  line-height: 1.5;
+}
+
+.rule-translation-en {
+  border-top-color: #e6eaf0;
+}
+
+.description-source {
+  margin-top: 12px;
+  color: #94a3b8;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.attack-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.damage {
+  flex: 0 0 auto;
+  min-width: 74px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: #fff7ed;
+  color: #c2410c;
+  font-size: 24px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.cost-line,
+.retreat-cost-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.retreat-cost-row {
+  padding-top: 18px;
+}
+
+.cost-label,
+.cost-total {
+  color: #697586;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.energy-icon-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.energy-icon {
+  width: 38px;
+  height: 38px;
+  border: 2px solid rgba(255, 255, 255, 0.84);
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: 900;
+  line-height: 38px;
+  text-align: center;
+}
+
+.relation-group {
+  margin-top: 20px;
+}
+
+.relation-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.relation-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 999px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 22px;
+  font-weight: 900;
+}
+
+.rule-row {
+  margin-top: 10px;
+  padding: 14px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #465467;
+  font-size: 24px;
+  line-height: 1.55;
+}
+
+.pokemon-ref-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.pokemon-ref {
+  min-width: 150px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #182230;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.ref-number {
+  color: #0f766e;
+  font-size: 22px;
+  font-weight: 900;
+}
