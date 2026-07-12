@@ -9,9 +9,6 @@ const {
   asArray,
   decorateEnergyList,
   formatLegalities,
-  localizeAbilityType,
-  localizeCardName,
-  localizeCardText,
   normalizeKeyword,
   titleCase
 } = require('./ptcg-utils');
@@ -58,14 +55,14 @@ function formatDate(value) {
 }
 
 function runStatusText(status) {
-  if (status === 'success') return '成功';
+  if (String(status || '').endsWith('success')) return '成功';
   if (status === 'running') return '运行中';
   if (status === 'failed') return '失败';
   return status || '未知';
 }
 
 function runHealthTone(status) {
-  if (status === 'success') return 'ready';
+  if (String(status || '').endsWith('success')) return 'ready';
   if (status === 'running') return 'local';
   return 'stale';
 }
@@ -162,20 +159,6 @@ function pokemonFlavor(card, pokemonStore) {
   return null;
 }
 
-function deriveChineseName(card, map) {
-  if (card.name_zh) return card.name_zh;
-  const numbers = card.national_pokedex_numbers || [];
-  if (!numbers.length) return '';
-  const first = map[Number(numbers[0])];
-  if (!first || !first.name_zh) return '';
-  const english = first.name_en || '';
-  if (!english || !card.name || card.name === english) return first.name_zh;
-  if (card.name.toLowerCase().startsWith(english.toLowerCase())) {
-    return `${first.name_zh}${card.name.slice(english.length)}`;
-  }
-  return first.name_zh;
-}
-
 function imagePath(card, size) {
   const id = encodeURIComponent(card.id);
   return `/assets/ptcg/cards/${id}/${size === 'large' ? 'large' : 'small'}`;
@@ -223,34 +206,24 @@ function enrichStoredEnergyList(list, rawTypes) {
   return decorateEnergyList(rawTypes || []);
 }
 
-function decorateTextBlocks(card, nameZh) {
-  const translatedText = (value) => {
-    const original = value || '';
-    let translated = localizeCardText(original);
-    if (nameZh && card.name) {
-      translated = translated.replace(new RegExp(card.name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), nameZh);
-    }
-    const englishResidue = translated.match(/[A-Za-z]+/g) || [];
-    return translated && translated !== original && englishResidue.length <= 2 ? translated : '';
-  };
+function decorateTextBlocks(card) {
   return {
     abilities: (card.abilities || []).map((ability) => Object.assign({}, ability, {
-      name_zh: ability.name_zh || localizeCardName(ability.name),
+      name_zh: ability.name_zh || '',
       original_name: ability.name || '',
-      type_name: localizeAbilityType(ability.type_name || ability.type),
-      text_zh: translatedText(ability.text),
+      text_zh: ability.text_zh || '',
       original_text: ability.text || ''
     })),
     attacks: (card.attacks || []).map((attack) => Object.assign({}, attack, {
-      name_zh: attack.name_zh || localizeCardName(attack.name),
+      name_zh: attack.name_zh || '',
       original_name: attack.name || '',
       cost_energy: enrichStoredEnergyList(attack.cost_energy, attack.cost),
-      text_zh: translatedText(attack.text),
+      text_zh: attack.text_zh || '',
       original_text: attack.text || ''
     })),
-    rules: (card.rules || []).map((rule) => translatedText(rule) || rule),
+    rules: (card.rules || []).slice(),
     ruleBlocks: (card.rules || []).map((rule) => ({
-      text_zh: translatedText(rule),
+      text_zh: '',
       original_text: rule || ''
     }))
   };
@@ -261,8 +234,8 @@ function decorateCard(card, context) {
   const pokemonMap = context.pokemonMap || {};
   const set = (context.setMap || {})[String(card.set_id || '')] || (card.set && card.set.id ? card.set : null);
   const decoratedSet = decorateSet(set, context);
-  const nameZh = deriveChineseName(card, pokemonMap);
-  const textBlocks = decorateTextBlocks(card, nameZh);
+  const nameZh = card.name_zh || '';
+  const textBlocks = decorateTextBlocks(card);
   const next = Object.assign({}, card, {
     name_zh: nameZh,
     display_name: nameZh || card.name,
@@ -512,6 +485,7 @@ class PtcgService {
 
     return {
       item: {
+        release: this.store.getRelease(),
         types,
         supertypes: Object.keys(SUPERTYPE_NAMES).map((id) => ({ id, name: SUPERTYPE_NAMES[id] })),
         subtypes: Object.keys(SUBTYPE_NAMES).map((id) => ({ id, name: SUBTYPE_NAMES[id] })),

@@ -6,7 +6,8 @@ const DEFAULT_STATE = {
   card_detail: {},
   card_sets: {},
   sync_meta: {},
-  sync_runs: {}
+  sync_runs: {},
+  data_release: null
 };
 
 function clone(value) {
@@ -97,6 +98,32 @@ class PtcgCacheStore {
       state.card_sets[String(set.id)] = clone(set);
     });
     this.save();
+  }
+
+  replaceCatalog(cards, sets, release = null) {
+    const current = this.load();
+    const cardSummary = {};
+    const cardDetail = {};
+    const cardSets = {};
+    (cards || []).forEach((transformed) => {
+      if (!transformed || !transformed.summary || !transformed.summary.id) return;
+      cardSummary[String(transformed.summary.id)] = clone(transformed.summary);
+      cardDetail[String(transformed.summary.id)] = clone(transformed.detail || transformed.summary);
+    });
+    (sets || []).forEach((set) => {
+      if (set && set.id) cardSets[String(set.id)] = clone(set);
+    });
+    this.state = Object.assign({}, current, {
+      card_summary: cardSummary,
+      card_detail: cardDetail,
+      card_sets: cardSets,
+      data_release: clone(release)
+    });
+    this.save();
+  }
+
+  getRelease() {
+    return clone(this.load().data_release || null);
   }
 
   getMeta(key = 'ptcg') {

@@ -7,6 +7,7 @@ const {
   sleep,
   transformPokemonBundle
 } = require('../wechat-miniapp/cloudfunctions/syncPokeapi/lib/pokeapi');
+const { validatePokedex } = require('./data-quality');
 
 const LOCK_TTL_MS = 20 * 60 * 1000;
 
@@ -284,9 +285,20 @@ async function syncPokeapi(store, event = {}, options = {}) {
       plan: buildPlanSnapshot(plan)
     });
 
-    const results = await mapLimit(plan.ids, plan.concurrency, (id) => syncOne(id, plan, client, store, {
+    let results = await mapLimit(plan.ids, plan.concurrency, (id) => syncOne(id, plan, client, store, {
       dataDir
     }));
+    const initialFailed = results.filter((result) => !result.ok);
+    if (initialFailed.length && event.recover !== false) {
+      const recoveryPlan = Object.assign({}, plan, {
+        retries: Math.min(5, plan.retries + 1),
+        timeoutMs: Math.min(60000, Math.max(plan.timeoutMs, Math.round(plan.timeoutMs * 1.5)))
+      });
+      const recovered = await mapLimit(initialFailed.map((item) => item.id), Math.min(2, plan.concurrency), (id) =>
+        syncOne(id, recoveryPlan, client, store, { dataDir }));
+      const recoveredById = new Map(recovered.map((item) => [item.id, item]));
+      results = results.map((item) => item.ok ? item : recoveredById.get(item.id) || item);
+    }
     const synced = results.filter((result) => result.ok);
     const imageCached = synced.filter((result) => result.imageCached);
     const imageUploaded = synced.filter((result) => result.imageUploaded);
@@ -301,6 +313,10 @@ async function syncPokeapi(store, event = {}, options = {}) {
     }));
     const finishedAt = new Date();
     const status = failed.length ? 'partial' : 'success';
+    const quality = validatePokedex(store, {
+      minimumCount: Math.max(1, plan.ids.length),
+      expectedIds: plan.ids
+    });
     const summary = Object.assign({
       ok: failed.length === 0,
       status,
@@ -315,6 +331,11 @@ async function syncPokeapi(store, event = {}, options = {}) {
       imageCacheFailed,
       failedCount: failed.length,
       failed,
+      initialFailedCount: initialFailed.length,
+      recoveredCount: initialFailed.length - failed.length,
+      retryQueue: failed.map((item) => item.id),
+      publishStatus: quality.ok ? (failed.length ? 'degraded-fallback' : 'published') : 'rejected',
+      quality,
       startedAt: now,
       finishedAt,
       syncedAt: finishedAt,

@@ -271,6 +271,7 @@ class PocketService {
   getMeta() {
     return {
       item: this.store.getMeta('pocket'),
+      release: this.store.getRelease(),
       sources: this.store.getSourceMeta(),
       counts: {
         cards: this.store.getCards().length,

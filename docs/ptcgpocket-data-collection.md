@@ -11,7 +11,7 @@ PTCG Pocket 是独立的手机网络游戏频道，数据和实体 PTCG 完全�
 | RaenonX 繁中页面载荷 | 繁中卡名、招式、特性、任务、活动、商店和道具文本 |
 | `chase-mew/pokemon-tcg-pocket-cards` | 英文名、卡图、系列和卡包交叉校验 |
 | `flibustier/pokemon-tcg-pocket-database` | 系列发布日期、稀有度和抽包概率 |
-| `bcollazo/deckgym-core` | 英文对战规则、招式、能量、弱点和撤退数据 |
+| `bcollazo/deckgym-core` | 仅作为未来对战模拟候选；AGPL 审查完成前不进入核心卡牌数据链路 |
 | Limitless Pocket | 当前赛制热门卡组、使用率、胜率、代表宝可梦和赛事牌表链接 |
 
 采集器只请求匿名公开资源，不执行登录、游戏账号同步或付费权限绕过。每份原始快照都会记录 URL、抓取时间、字节数、SHA-256、ETag 和新鲜度；网络暂时失败时可以回退到上一次原始快照，并将来源标记为 `stale-cache`。

@@ -7,6 +7,7 @@ const {
   requestJson,
   requestText
 } = require('./pocket-source');
+const { validatePocketSnapshot } = require('./data-quality');
 
 const SOURCE_PLAN = [
   { name: 'raenonxMaster', format: 'json' },
@@ -18,7 +19,6 @@ const SOURCE_PLAN = [
   { name: 'flibustierSets', format: 'json' },
   { name: 'flibustierRarities', format: 'json' },
   { name: 'flibustierPullRates', format: 'json' },
-  { name: 'deckgymCards', format: 'json' },
   { name: 'limitlessDecks', format: 'html' }
 ];
 
@@ -140,6 +140,20 @@ async function syncPocket(store, event = {}, context = {}) {
     payload.pokedex = loadPokedexRows(options.dataDir);
     const normalized = normalizePocketData(payload);
     normalized.sourceMeta = Object.fromEntries(resources.map((resource) => [resource.name, resource.meta]));
+    const staleSourceCount = resources.filter((resource) => resource.meta.status !== 'fresh').length;
+    const quality = validatePocketSnapshot(normalized, {
+      minimumCount: Number(event.minimumCardCount || 3000),
+      previousCount: store.getCards().length,
+      staleSourceCount,
+      maxCountChangeRatio: Number(event.maxCountChangeRatio || 0.2)
+    });
+    if (!quality.ok) throw new Error(`Pocket quality gate failed: ${quality.errors.map((check) => check.id).join(', ')}`);
+    normalized.release = {
+      id,
+      source: 'multi-source-pocket',
+      publishedAt: new Date().toISOString(),
+      quality
+    };
     if (!options.dryRun) store.replaceSnapshot(normalized);
 
     const finishedAt = new Date();
@@ -153,7 +167,8 @@ async function syncPocket(store, event = {}, context = {}) {
       syncedAt: finishedAt,
       durationMs: finishedAt.getTime() - startedAt.getTime(),
       dryRun: options.dryRun,
-      staleSourceCount: resources.filter((resource) => resource.meta.status !== 'fresh').length,
+      staleSourceCount,
+      quality,
       sources: normalized.sourceMeta,
       localeCounts: normalized.auxiliary.locale_counts
     }, counts(normalized));

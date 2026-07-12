@@ -84,6 +84,10 @@ async function main() {
     assert.strictEqual(health.ok, true);
     assert.strictEqual(health.scheduler.enabled, true);
 
+    const dataSources = await requestJson(app.publicBaseUrl, 'GET', '/api/data-sources');
+    assert.ok(dataSources.items.some((source) => source.id === 'pokeapi' && source.enabled));
+    assert.ok(dataSources.items.some((source) => source.id === 'ptcg-chs-datasets' && source.importForbidden));
+
     const seedList = await requestJson(app.publicBaseUrl, 'GET', '/api/pokemon?sort=id');
     assert.ok(seedList.items.length > 0);
     assert.strictEqual(seedList.source, 'local-seed');

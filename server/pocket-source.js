@@ -10,7 +10,6 @@ const SOURCE_URLS = {
   flibustierSets: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist/sets.json',
   flibustierRarities: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist/rarities.json',
   flibustierPullRates: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist/pullRates.json',
-  deckgymCards: 'https://raw.githubusercontent.com/bcollazo/deckgym-core/main/database.json',
   limitlessDecks: 'https://play.limitlesstcg.com/decks?game=POCKET'
 };
 
@@ -116,15 +115,6 @@ function collectionKey(set, number) {
 function chaseKey(card) {
   const match = String(card.id || '').match(/^([a-z0-9]+)-(\d+)$/i);
   return match ? collectionKey(match[1], match[2]) : '';
-}
-
-function deckgymEntry(row) {
-  if (!row || typeof row !== 'object') return null;
-  const kind = Object.keys(row)[0];
-  const card = row[kind];
-  if (!card) return null;
-  const match = String(card.id || '').match(/^(\S+)\s+(\d+)$/);
-  return match ? { key: collectionKey(match[1], match[2]), kind, card } : null;
 }
 
 function localizeText(dictionary, id) {
@@ -251,9 +241,8 @@ function buildNationalDexResolver(pokemonRows) {
   };
 }
 
-function normalizeCards(master, locale, localeEn, chaseCards, deckgymCards, pokemonRows) {
+function normalizeCards(master, locale, localeEn, chaseCards, pokemonRows) {
   const chaseMap = new Map(chaseCards.map((card) => [chaseKey(card), card]).filter(([key]) => key));
-  const deckgymMap = new Map(deckgymCards.map(deckgymEntry).filter(Boolean).map((entry) => [entry.key, entry]));
   const resolveNationalDexNumber = buildNationalDexResolver(pokemonRows);
   return Object.values(master.cardEntryMap || {}).map((card) => {
     const play = card.play || {};
@@ -268,13 +257,12 @@ function normalizeCards(master, locale, localeEn, chaseCards, deckgymCards, poke
     }));
     const primary = collections[0] || {};
     const chase = chaseMap.get(primary.key) || null;
-    const deckgym = deckgymMap.get(primary.key) || null;
     const nameId = play.characterI18nId;
     const pokemonId = play.pokemonId || '';
     const normalized = {
       id: card.cardId,
       name_zh: localizeText(locale.Card && locale.Card.Name, nameId),
-      name_en: (chase && chase.name) || (deckgym && deckgym.card.name) || '',
+      name_en: (chase && chase.name) || '',
       card_type: card.cardType || '',
       rarity: card.rarity || '',
       series_id: card.seriesId || '',
@@ -298,12 +286,12 @@ function normalizeCards(master, locale, localeEn, chaseCards, deckgymCards, poke
       attacks: (play.attacks || []).map((attack) => normalizeAttack(attack, locale, localeEn)),
       abilities: (play.abilities || []).map((ability) => normalizeAbility(ability, locale, localeEn)),
       variant: play.variant || '',
-      rules: deckgym ? deckgym.card : null,
+      rules: null,
       provenance: {
         game_data: 'raenonx-global-master',
         locale_zh: 'raenonx-zh-flight-messages',
         image: chase ? 'chase-mew' : '',
-        english_rules: deckgym ? 'deckgym-core' : '',
+        english_rules: 'raenonx-en-flight-messages',
         national_pokedex_number: 'pokedex-name-map'
       }
     };
@@ -456,7 +444,7 @@ function normalizePocketData(payload) {
   const master = payload.raenonxMaster;
   const locale = payload.locale;
   const localeEn = payload.localeEn || {};
-  const cards = normalizeCards(master, locale, localeEn, payload.chaseCards, payload.deckgymCards, payload.pokedex);
+  const cards = normalizeCards(master, locale, localeEn, payload.chaseCards, payload.pokedex);
   const events = normalizeEvents(payload.raenonxEvents, locale, localeEn, cards);
   const hotDecks = normalizeHotDecks(payload.limitlessDecks);
   return {

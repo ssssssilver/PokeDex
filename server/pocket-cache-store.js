@@ -9,6 +9,7 @@ const DEFAULT_STATE = {
   collections: {},
   auxiliary: {},
   source_meta: {},
+  data_release: null,
   sync_meta: {},
   sync_runs: {}
 };
@@ -61,7 +62,8 @@ class PocketCacheStore {
       events: clone(snapshot.events || []),
       collections: clone(snapshot.collections || {}),
       auxiliary: clone(snapshot.auxiliary || {}),
-      source_meta: clone(snapshot.sourceMeta || {})
+      source_meta: clone(snapshot.sourceMeta || {}),
+      data_release: clone(snapshot.release || null)
     });
     this.save();
   }
@@ -97,6 +99,10 @@ class PocketCacheStore {
 
   getSourceMeta() {
     return clone(this.load().source_meta || {});
+  }
+
+  getRelease() {
+    return clone(this.load().data_release || null);
   }
 
   getMeta(key = 'pocket') {

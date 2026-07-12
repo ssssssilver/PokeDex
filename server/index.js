@@ -17,6 +17,7 @@ const { PocketDeckService } = require('./pocket-deck-service');
 const { createSyncScheduler } = require('./sync-scheduler');
 const { HotDeckService } = require('./deck-service');
 const { PokemonModel3dService } = require('./projectpokemon-3d-service');
+const { sourceManifest } = require('./data-source-registry');
 
 const DEFAULT_PORT = 8787;
 const DEFAULT_HOST = '127.0.0.1';
@@ -698,6 +699,18 @@ function createApp(options = {}) {
 
       if (req.method === 'GET' && pathname === '/api/pokemon') {
         sendJson(res, 200, service.listPokemon(queryObject(currentUrl.searchParams)));
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/data-sources') {
+        sendJson(res, 200, {
+          items: sourceManifest(currentUrl.searchParams.get('product') || ''),
+          policy: {
+            commercialModel: 'free-with-advertising-or-sponsorship',
+            officialChineseOnly: true,
+            traditionalChineseStandard: 'zh-TW-official-terminology'
+          }
+        });
         return;
       }
 

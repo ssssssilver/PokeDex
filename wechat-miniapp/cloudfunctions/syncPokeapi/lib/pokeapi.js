@@ -229,6 +229,11 @@ function localizedName(species, fallback) {
   return match ? match.name : fallback;
 }
 
+function localizedNameFor(species, language, fallback) {
+  const match = findLanguage(species.names || [], 'name', language);
+  return match ? match.name : fallback;
+}
+
 function englishName(species, fallback) {
   const names = species.names || [];
   const match = findLanguage(names, 'name', 'en');
@@ -244,6 +249,11 @@ function japaneseName(species, fallback) {
 function localizedGenus(species) {
   const genera = species.genera || [];
   const match = findLocalized(genera, 'genus');
+  return match ? match.genus : '';
+}
+
+function localizedGenusFor(species, language) {
+  const match = findLanguage(species.genera || [], 'genus', language);
   return match ? match.genus : '';
 }
 
@@ -1307,11 +1317,17 @@ function transformPokemonBundle(bundle) {
   const moves = buildMoves(pokemon, bundle.moveDetails);
   const flavorEntries = buildFlavorEntries(species);
   const primaryFlavor = localizedFlavor(species) || (flavorEntries[0] && flavorEntries[0].text) || '';
+  const flavorFor = (language) => {
+    const entries = flavorEntries.filter((entry) => entry.language === language);
+    return entries.length ? entries[entries.length - 1].text : '';
+  };
   const detail = {
     id: pokemon.id,
     slug: pokemon.name,
     name_en: englishName(species, pokemon.name),
     name_zh: localizedName(species, pokemon.name),
+    name_zh_cn: localizedNameFor(species, 'zh-hans', localizedName(species, pokemon.name)),
+    name_zh_tw: localizedNameFor(species, 'zh-hant', localizedName(species, pokemon.name)),
     name_ja: japaneseName(species, pokemon.name),
     image: officialArtwork(pokemon),
     image_remote: officialArtwork(pokemon),
@@ -1321,6 +1337,9 @@ function transformPokemonBundle(bundle) {
     height: `${pokemon.height / 10} m`,
     weight: `${pokemon.weight / 10} kg`,
     category: localizedGenus(species),
+    category_zh_cn: localizedGenusFor(species, 'zh-hans') || localizedGenus(species),
+    category_zh_tw: localizedGenusFor(species, 'zh-hant') || localizedGenus(species),
+    category_en: localizedGenusFor(species, 'en'),
     color: resourceId(species.color),
     shape: resourceId(species.shape),
     habitat: resourceId(species.habitat),
@@ -1349,6 +1368,9 @@ function transformPokemonBundle(bundle) {
     move_count: moves.length,
     encounters: buildEncounterSummary(bundle.encounters),
     flavor: primaryFlavor,
+    flavor_zh_cn: flavorFor('zh-hans') || primaryFlavor,
+    flavor_zh_tw: flavorFor('zh-hant') || primaryFlavor,
+    flavor_en: flavorFor('en'),
     flavor_entries: flavorEntries,
     synced_from: 'pokeapi',
     synced_at: new Date().toISOString()
@@ -1358,6 +1380,8 @@ function transformPokemonBundle(bundle) {
     slug: detail.slug,
     name_en: detail.name_en,
     name_zh: detail.name_zh,
+    name_zh_cn: detail.name_zh_cn,
+    name_zh_tw: detail.name_zh_tw,
     name_ja: detail.name_ja,
     image: detail.image,
     image_remote: detail.image_remote,
@@ -1366,6 +1390,9 @@ function transformPokemonBundle(bundle) {
     generation: detail.generation,
     stat_total: detail.stat_total,
     category: detail.category,
+    category_zh_cn: detail.category_zh_cn,
+    category_zh_tw: detail.category_zh_tw,
+    category_en: detail.category_en,
     regional_dexes: detail.regional_dexes,
     regional_dex_keys: detail.regional_dex_keys,
     capture_rate: detail.capture_rate,

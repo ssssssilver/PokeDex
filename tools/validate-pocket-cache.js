@@ -40,7 +40,7 @@ function main() {
     cardsWithChineseName: cards.filter((card) => card.name_zh).length,
     cardsWithEnglishName: cards.filter((card) => card.name_en).length,
     cardsWithImage: cards.filter((card) => card.image).length,
-    cardsWithRules: cards.filter((card) => card.rules).length,
+    cardsWithEnglishAttacks: cards.filter((card) => (card.attacks || []).every((attack) => attack.name_en)).length,
     expansions: store.getExpansions().length,
     packs: packs.length,
     packsWithImage: packs.filter((pack) => pack.image).length,
@@ -64,7 +64,7 @@ function main() {
   check(metrics.cardsWithChineseName === metrics.cards, 'Some Pocket cards have no Chinese name', metrics);
   check(metrics.cardsWithEnglishName === metrics.cards, 'Some Pocket cards have no English fallback name', metrics);
   check(metrics.cardsWithImage === metrics.cards, 'Some Pocket cards have no image', metrics);
-  check(metrics.cardsWithRules === metrics.cards, 'Some Pocket cards have no DeckGym rule data', metrics);
+  check(metrics.cardsWithEnglishAttacks === metrics.cards, 'Some Pocket cards have no English attack fallback', metrics);
   check(metrics.expansions >= 20 && metrics.packs >= 50, 'Pocket expansion or pack coverage is incomplete', metrics);
   check(metrics.packsWithImage === metrics.packs, 'Some Pocket packs have no image', metrics);
   check(metrics.promoPacks > 0, 'Pocket promo packs are not identified', metrics);
@@ -76,7 +76,7 @@ function main() {
   check((associationSamples[150] || []).every((name) => /^Mewtwo(?: ex)?$/i.test(name)), 'Mewtwo has unrelated Pocket cards', associationSamples[150]);
   check(metrics.events > 0 && metrics.missions > 0 && metrics.battles > 0, 'Pocket live operation data is incomplete', metrics);
   check(metrics.shops > 0 && metrics.wonderPicks > 0, 'Pocket shop or wonder-pick data is incomplete', metrics);
-  check(metrics.sourceCount === 11, 'Not all configured Pocket sources were recorded', metrics);
+  check(metrics.sourceCount === 10, 'Not all configured Pocket sources were recorded', metrics);
   check(metrics.hotDecks >= 20, 'Pocket hot-deck data is incomplete', metrics.hotDecks);
   check(metrics.pullRateSets >= 15, 'Pocket pull-rate data is incomplete', metrics.pullRateSets);
 

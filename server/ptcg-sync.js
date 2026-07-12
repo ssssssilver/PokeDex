@@ -1,35 +1,9 @@
 const { transformCard, transformSet } = require('./ptcg-utils');
+const { SOURCES } = require('./data-source-registry');
+const { validatePtcgSnapshot } = require('./data-quality');
 
 const API_BASE = 'https://api.pokemontcg.io/v2';
 const DEFAULT_PAGE_SIZE = 250;
-const CARD_SELECT_FIELDS = [
-  'id',
-  'name',
-  'supertype',
-  'subtypes',
-  'level',
-  'hp',
-  'types',
-  'evolvesFrom',
-  'evolvesTo',
-  'rules',
-  'ancientTrait',
-  'abilities',
-  'attacks',
-  'weaknesses',
-  'resistances',
-  'retreatCost',
-  'convertedRetreatCost',
-  'set',
-  'number',
-  'artist',
-  'rarity',
-  'flavorText',
-  'nationalPokedexNumbers',
-  'legalities',
-  'regulationMark',
-  'images'
-];
 
 function boundedInteger(value, fallback, min, max) {
   const number = Number(value);
@@ -82,7 +56,8 @@ function buildPlan(event = {}) {
   const startPage = boundedInteger(event.startPage, 1, 1, 10000);
 
   return {
-    source: event.source || 'pokemontcg-api',
+    source: event.source || SOURCES.pokemonTcgApi.id,
+    full: event.full === true,
     dryRun: Boolean(event.dryRun),
     pageSize,
     startPage,
@@ -129,44 +104,45 @@ async function fetchPaged(path, params, plan, pageHandler) {
 }
 
 async function syncSets(store, plan) {
-  let syncedCount = 0;
+  const items = [];
   const result = await fetchPaged('/sets', {}, Object.assign({}, plan, {
+    pageSize: DEFAULT_PAGE_SIZE,
     startPage: 1,
     maxPages: 0
   }), async (rows) => {
     const sets = rows.map(transformSet);
-    if (!plan.dryRun) store.upsertSets(sets);
-    syncedCount += sets.length;
+    items.push(...sets);
   });
 
   return Object.assign({}, result, {
-    syncedCount
+    syncedCount: items.length,
+    items
   });
 }
 
 async function syncCards(store, plan) {
-  let syncedCount = 0;
-  const params = {
-    select: CARD_SELECT_FIELDS.join(',')
-  };
+  const items = [];
+  // The upstream API currently times out or returns 404 for otherwise valid
+  // card searches when `select` is present. Fetch full rows and trim locally.
+  const params = {};
   if (plan.query) params.q = plan.query;
   if (plan.orderBy) params.orderBy = plan.orderBy;
 
   const result = await fetchPaged('/cards', params, plan, async (rows) => {
     const cards = rows.map(transformCard);
-    if (!plan.dryRun) store.upsertCards(cards);
-    syncedCount += cards.length;
+    items.push(...cards);
   });
 
   return Object.assign({}, result, {
-    syncedCount
+    syncedCount: items.length,
+    items
   });
 }
 
 function buildSummary(status, plan, id, startedAt, patch = {}) {
   const finishedAt = new Date();
   return Object.assign({
-    ok: status === 'success',
+    ok: status.endsWith('success'),
     status,
     runId: id,
     source: plan.source,
@@ -212,7 +188,29 @@ async function syncPtcg(store, event = {}) {
       ? await syncCards(store, plan)
       : { syncedCount: 0, totalCount: store.getCardSummaries().length, fetchedPages: 0 };
 
-    const summary = buildSummary('success', plan, id, startedAt, {
+    const fullCatalog = plan.full && plan.startPage === 1 && plan.maxPages === 0 && plan.syncCards;
+    const quality = validatePtcgSnapshot(cardResult.items || [], setResult.items || store.getSets(), {
+      minimumCount: fullCatalog ? Math.max(1, Math.floor(Number(cardResult.totalCount || 0) * 0.98)) : 1,
+      previousCount: fullCatalog ? store.getCardSummaries().length : 0
+    });
+    if (!quality.ok) throw new Error(`PTCG quality gate failed: ${quality.errors.map((check) => check.id).join(', ')}`);
+    if (!plan.dryRun) {
+      if (fullCatalog) store.replaceCatalog(cardResult.items, setResult.items, {
+        id,
+        source: plan.source,
+        publishedAt: new Date().toISOString(),
+        quality
+      });
+      else {
+        if (setResult.items && setResult.items.length) store.upsertSets(setResult.items);
+        if (cardResult.items && cardResult.items.length) store.upsertCards(cardResult.items);
+      }
+    }
+    const successStatus = fullCatalog ? 'full_success' : plan.startPage > 1 ? 'resume_success' : 'incremental_success';
+    const summary = buildSummary(successStatus, plan, id, startedAt, {
+      ok: true,
+      syncMode: fullCatalog ? 'full' : plan.startPage > 1 ? 'resume' : 'incremental',
+      quality,
       setSyncedCount: setResult.syncedCount,
       setTotalCount: setResult.totalCount,
       setFetchedPages: setResult.fetchedPages,
