@@ -157,10 +157,16 @@ function normalizeAbility(item) {
     item || {}
   )
   const locale = getLocale()
-  ability.name = locale === 'en' ? ability.name_en || ability.name : ability.name
+  ability.name = locale === 'en'
+    ? ability.name_en || ability.name
+    : locale === 'zh-TW'
+      ? ability.name_zh_tw || ability.name
+      : ability.name_zh_cn || ability.name
   ability.description = locale === 'en'
-    ? ability.short_effect || ability.flavor || ''
-    : ability.flavor || ability.short_effect || ''
+    ? ability.flavor_en || ability.short_effect || ability.flavor || ''
+    : locale === 'zh-TW'
+      ? ability.flavor_zh_tw || ability.flavor || ability.short_effect || ''
+      : ability.flavor_zh_cn || ability.flavor || ability.short_effect || ''
   return ability
 }
 function methodGroup(method) {
@@ -197,14 +203,22 @@ function normalizeMove(item) {
   const move = item || {}
   const method = move.method || 'other'
   const level = Number(move.level || 0)
-  const name = getLocale() === 'en'
+  const locale = getLocale()
+  const name = locale === 'en'
     ? move.name_en || move.name || titleCase(move.key)
-    : move.name || move.name_en || titleCase(move.key)
+    : locale === 'zh-TW'
+      ? move.name_zh_tw || move.name || move.name_en || titleCase(move.key)
+      : move.name_zh_cn || move.name || move.name_en || titleCase(move.key)
   const nameEn = move.name_en || ''
   const type = move.type || ''
   return Object.assign({}, move, {
     name,
     name_en: nameEn,
+    description: locale === 'en'
+      ? move.description_en || move.short_effect_en || move.description || ''
+      : locale === 'zh-TW'
+        ? move.description_zh_tw || move.description || ''
+        : move.description_zh_cn || move.description || '',
     nameEnVisible: Boolean(nameEn && nameEn !== name),
     type,
     type_name: move.type_name || typeName(type),

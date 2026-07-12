@@ -25,6 +25,9 @@ async function main() {
     });
     assert.equal(headerLocale.headers.get('content-language'), 'zh-TW');
 
+    const sourcesHtml = await (await fetch(`${baseUrl}/pages/data-sources/index?lang=en`)).text();
+    assert.match(sourcesHtml, /<title>Data Sources &amp; Notices \| PokeChill<\/title>/);
+
     const preflight = await fetch(`${baseUrl}/api/pokemon`, {
       method: 'OPTIONS',
       headers: { 'Access-Control-Request-Headers': 'accept-language' }

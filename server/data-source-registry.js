@@ -51,6 +51,7 @@ const SOURCES = Object.freeze({
     url: 'https://github.com/chase-mew/pokemon-tcg-pocket-cards',
     license: 'MIT',
     commercialUse: 'allowed-subject-to-upstream-media-rights',
+    revision: 'e0d37b02bd29bbef77bcb3bed6d31cd991cb0196',
     enabled: true
   },
   flibustier: {
@@ -60,6 +61,7 @@ const SOURCES = Object.freeze({
     url: 'https://github.com/flibustier/pokemon-tcg-pocket-database',
     license: 'MIT',
     commercialUse: 'allowed-subject-to-upstream-media-rights',
+    revision: '484f88326e3aaa051fed46be2374fa85d5ab08ae',
     enabled: true
   },
   deckgym: {

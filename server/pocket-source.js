@@ -5,11 +5,11 @@ const SOURCE_URLS = {
   raenonxEvents: 'https://ptcgp.raenonx.cc/api/data/event-brief',
   raenonxLocale: 'https://ptcgp.raenonx.cc/zh/card',
   raenonxLocaleEn: 'https://ptcgp.raenonx.cc/en/card',
-  chaseCards: 'https://raw.githubusercontent.com/chase-mew/pokemon-tcg-pocket-cards/main/v4.json',
-  chaseExpansions: 'https://raw.githubusercontent.com/chase-mew/pokemon-tcg-pocket-cards/main/expansions.json',
-  flibustierSets: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist/sets.json',
-  flibustierRarities: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist/rarities.json',
-  flibustierPullRates: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/main/dist/pullRates.json',
+  chaseCards: 'https://raw.githubusercontent.com/chase-mew/pokemon-tcg-pocket-cards/e0d37b02bd29bbef77bcb3bed6d31cd991cb0196/v4.json',
+  chaseExpansions: 'https://raw.githubusercontent.com/chase-mew/pokemon-tcg-pocket-cards/e0d37b02bd29bbef77bcb3bed6d31cd991cb0196/expansions.json',
+  flibustierSets: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/484f88326e3aaa051fed46be2374fa85d5ab08ae/dist/sets.json',
+  flibustierRarities: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/484f88326e3aaa051fed46be2374fa85d5ab08ae/dist/rarities.json',
+  flibustierPullRates: 'https://raw.githubusercontent.com/flibustier/pokemon-tcg-pocket-database/484f88326e3aaa051fed46be2374fa85d5ab08ae/dist/pullRates.json',
   limitlessDecks: 'https://play.limitlesstcg.com/decks?game=POCKET'
 };
 

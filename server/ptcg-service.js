@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const seed = require('../wechat-miniapp/miniprogram/utils/pokemon');
+const { PtcgLocalizationStore } = require('./ptcg-localization-store');
 const {
   ENERGY_META,
   RARITY_NAMES,
@@ -206,24 +207,26 @@ function enrichStoredEnergyList(list, rawTypes) {
   return decorateEnergyList(rawTypes || []);
 }
 
-function decorateTextBlocks(card) {
+function decorateTextBlocks(card, official) {
+  const officialAbilities = (official && official.abilities) || {};
+  const officialAttacks = (official && official.attacks) || {};
   return {
     abilities: (card.abilities || []).map((ability) => Object.assign({}, ability, {
-      name_zh: ability.name_zh || '',
+      name_zh: (officialAbilities[ability.name] || {}).name_zh_cn || '',
       original_name: ability.name || '',
-      text_zh: ability.text_zh || '',
+      text_zh: (officialAbilities[ability.name] || {}).text_zh_cn || '',
       original_text: ability.text || ''
     })),
     attacks: (card.attacks || []).map((attack) => Object.assign({}, attack, {
-      name_zh: attack.name_zh || '',
+      name_zh: (officialAttacks[attack.name] || {}).name_zh_cn || '',
       original_name: attack.name || '',
       cost_energy: enrichStoredEnergyList(attack.cost_energy, attack.cost),
-      text_zh: attack.text_zh || '',
+      text_zh: (officialAttacks[attack.name] || {}).text_zh_cn || '',
       original_text: attack.text || ''
     })),
     rules: (card.rules || []).slice(),
-    ruleBlocks: (card.rules || []).map((rule) => ({
-      text_zh: '',
+    ruleBlocks: (card.rules || []).map((rule, index) => ({
+      text_zh: official && Array.isArray(official.rules_zh_cn) ? official.rules_zh_cn[index] || '' : '',
       original_text: rule || ''
     }))
   };
@@ -234,8 +237,9 @@ function decorateCard(card, context) {
   const pokemonMap = context.pokemonMap || {};
   const set = (context.setMap || {})[String(card.set_id || '')] || (card.set && card.set.id ? card.set : null);
   const decoratedSet = decorateSet(set, context);
-  const nameZh = card.name_zh || '';
-  const textBlocks = decorateTextBlocks(card);
+  const official = context.localizationStore ? context.localizationStore.get(card) : null;
+  const nameZh = official ? official.name_zh_cn : '';
+  const textBlocks = decorateTextBlocks(card, official);
   const next = Object.assign({}, card, {
     name_zh: nameZh,
     display_name: nameZh || card.name,
@@ -245,6 +249,9 @@ function decorateCard(card, context) {
     rules: textBlocks.rules,
     rule_blocks: textBlocks.ruleBlocks,
     flavor_text_en: card.flavor_text || '',
+    flavor_text_zh_cn: official ? official.flavor_text_zh_cn || '' : '',
+    description_zh: official ? official.flavor_text_zh_cn || '' : '',
+    localization_source: official ? official.source : null,
     retreat_cost_energy: enrichStoredEnergyList(card.retreat_cost_energy, card.retreat_cost),
     pokemon_refs: (card.national_pokedex_numbers || [])
       .map((id) => pokemonMap[Number(id)])
@@ -325,13 +332,15 @@ class PtcgService {
     this.publicBaseUrl = options.publicBaseUrl || '';
     this.pokemonStore = options.pokemonStore || null;
     this.dataDir = options.dataDir || path.join(__dirname, '.data');
+    this.localizationStore = options.localizationStore || new PtcgLocalizationStore({ filePath: options.localizationFile });
   }
 
   context() {
     return {
       publicBaseUrl: this.publicBaseUrl,
       pokemonMap: pokemonNameMap(this.pokemonStore),
-      setMap: setMap(this.store)
+      setMap: setMap(this.store),
+      localizationStore: this.localizationStore
     };
   }
 
@@ -486,6 +495,7 @@ class PtcgService {
     return {
       item: {
         release: this.store.getRelease(),
+        localization: this.localizationStore.status(),
         types,
         supertypes: Object.keys(SUPERTYPE_NAMES).map((id) => ({ id, name: SUPERTYPE_NAMES[id] })),
         subtypes: Object.keys(SUBTYPE_NAMES).map((id) => ({ id, name: SUBTYPE_NAMES[id] })),

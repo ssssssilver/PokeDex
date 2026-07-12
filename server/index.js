@@ -120,9 +120,9 @@ function buildSeoMetadata(pathname, searchParams, services, publicBaseUrl, accep
   const localeValue = String(searchParams.get('lang') || acceptLanguage || 'zh-CN').toLowerCase();
   const locale = localeValue.startsWith('en') ? 'en' : localeValue.includes('tw') || localeValue.includes('hk') || localeValue.includes('hant') ? 'zh-TW' : 'zh-CN';
   const copy = {
-    'zh-CN': { site: '宝批小站', home: '宝可梦、实体卡牌与 Pocket 图鉴', pokedex: '宝可梦图鉴', cards: '宝可梦实体卡牌图鉴', pocket: 'Pokémon TCG Pocket 图鉴' },
-    'zh-TW': { site: '寶批小站', home: '寶可夢、實體卡牌與 Pocket 圖鑑', pokedex: '寶可夢圖鑑', cards: '寶可夢實體卡牌圖鑑', pocket: 'Pokémon TCG Pocket 圖鑑' },
-    en: { site: 'PokeChill', home: 'Pokémon, Physical TCG and Pocket Database', pokedex: 'Pokédex', cards: 'Pokémon TCG Card Database', pocket: 'Pokémon TCG Pocket Card Database' }
+    'zh-CN': { site: '宝批小站', home: '宝可梦、实体卡牌与 Pocket 图鉴', pokedex: '宝可梦图鉴', cards: '宝可梦实体卡牌图鉴', pocket: 'Pokémon TCG Pocket 图鉴', sources: '数据来源与声明' },
+    'zh-TW': { site: '寶批小站', home: '寶可夢、實體卡牌與 Pocket 圖鑑', pokedex: '寶可夢圖鑑', cards: '寶可夢實體卡牌圖鑑', pocket: 'Pokémon TCG Pocket 圖鑑', sources: '資料來源與聲明' },
+    en: { site: 'PokeChill', home: 'Pokémon, Physical TCG and Pocket Database', pokedex: 'Pokédex', cards: 'Pokémon TCG Card Database', pocket: 'Pokémon TCG Pocket Card Database', sources: 'Data Sources & Notices' }
   }[locale];
   let title = `${copy.home} | ${copy.site}`;
   let description = locale === 'en'
@@ -162,7 +162,8 @@ function buildSeoMetadata(pathname, searchParams, services, publicBaseUrl, accep
           : (item.attacks || []).map((attack) => attack.description_zh_template).filter(Boolean).join(' ') || description;
         image = item.image || '';
       }
-    } else if (pathname.includes('/pokedex/')) title = `${copy.pokedex} | ${copy.site}`;
+    } else if (pathname.includes('/data-sources/')) title = `${copy.sources} | ${copy.site}`;
+    else if (pathname.includes('/pokedex/')) title = `${copy.pokedex} | ${copy.site}`;
     else if (pathname.includes('/carddex/')) title = `${copy.cards} | ${copy.site}`;
     else if (pathname.includes('/pocket/')) title = `${copy.pocket} | ${copy.site}`;
   } catch (error) {
@@ -709,6 +710,18 @@ function createApp(options = {}) {
             commercialModel: 'free-with-advertising-or-sponsorship',
             officialChineseOnly: true,
             traditionalChineseStandard: 'zh-TW-official-terminology'
+          }
+        });
+        return;
+      }
+
+      if (req.method === 'GET' && pathname === '/api/data-health') {
+        sendJson(res, 200, {
+          generatedAt: new Date().toISOString(),
+          products: {
+            pokedex: service.getSyncStatus(),
+            ptcg: ptcgService.getSyncStatus(),
+            pocket: pocketService.getMeta()
           }
         });
         return;

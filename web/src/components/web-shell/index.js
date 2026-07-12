@@ -23,7 +23,7 @@ function sectionForRoute(route) {
   if (/pokemon-detail|\/quiz\/|\/team\/|type-chart/.test(route)) return 'pokedex'
   if (/pocket/.test(route)) return 'pocket'
   if (/card-detail|card-pack|card-quiz|hot-decks|deck-detail/.test(route)) return 'cards'
-  if (/profile|\/play\//.test(route)) return 'profile'
+  if (/profile|data-sources|\/play\//.test(route)) return 'profile'
   return nav.find(item => route.includes(item.url))?.key || 'home'
 }
 

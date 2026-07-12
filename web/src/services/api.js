@@ -94,6 +94,14 @@ function validateCache(options) {
   return post('/api/cache/validate', options)
 }
 
+function getDataSources(product) {
+  return get('/api/data-sources', product ? { product } : {})
+}
+
+function getDataHealth() {
+  return get('/api/data-health')
+}
+
 function listCards(filters) {
   return get('/api/cards', filters)
 }
@@ -212,6 +220,8 @@ module.exports = {
   getSyncStatus,
   getSyncRuns,
   validateCache,
+  getDataSources,
+  getDataHealth,
   listCards,
   getCardById,
   getPokemonCards,

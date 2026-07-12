@@ -127,6 +127,7 @@ const EN = {
   '收藏、拥有状态与队伍保存在当前微信设备': 'Favorites, ownership and teams are stored in this browser',
   '猜谜记录': 'Quiz history', '已保存队伍成员': 'Saved team members', '等待添加宝可梦': 'Waiting for Pokémon',
   '更多': 'More', '查看全部轻玩法': 'View all tools', '版本号': 'Version', '用户意见反馈': 'Send Feedback',
+  '数据来源与声明': 'Data Sources & Notices', '来源、数据状态和使用边界': 'Sources, data status, and usage boundaries',
   '通过微信反馈问题或建议': 'Send a problem report or suggestion', '语言': 'Language',
   '第一世代': 'Generation I', '第二世代': 'Generation II', '第三世代': 'Generation III',
   '第四世代': 'Generation IV', '第五世代': 'Generation V', '第六世代': 'Generation VI',

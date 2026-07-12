@@ -87,6 +87,10 @@ async function main() {
     const dataSources = await requestJson(app.publicBaseUrl, 'GET', '/api/data-sources');
     assert.ok(dataSources.items.some((source) => source.id === 'pokeapi' && source.enabled));
     assert.ok(dataSources.items.some((source) => source.id === 'ptcg-chs-datasets' && source.importForbidden));
+    const dataHealth = await requestJson(app.publicBaseUrl, 'GET', '/api/data-health');
+    assert.ok(dataHealth.products.pokedex);
+    assert.ok(dataHealth.products.ptcg);
+    assert.ok(dataHealth.products.pocket);
 
     const seedList = await requestJson(app.publicBaseUrl, 'GET', '/api/pokemon?sort=id');
     assert.ok(seedList.items.length > 0);

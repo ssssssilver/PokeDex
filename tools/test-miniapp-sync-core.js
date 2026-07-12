@@ -176,6 +176,8 @@ const transformed = transformPokemonBundle({
 
 assert.strictEqual(transformed.summary.id, 25);
 assert.strictEqual(transformed.summary.name_zh, '皮卡丘');
+assert.strictEqual(transformed.summary.name_zh_cn, '皮卡丘');
+assert.strictEqual(transformed.summary.name_zh_tw, '皮卡丘');
 assert.strictEqual(transformed.summary.name_en, 'Pikachu');
 assert.strictEqual(transformed.summary.image, 'https://example.test/pikachu-art.png');
 assert.strictEqual(transformed.summary.image_remote, 'https://example.test/pikachu-art.png');

@@ -6,7 +6,8 @@ export default {
     'pages/hot-decks/index', 'pages/deck-detail/index', 'pages/quiz/index',
     'pages/team/index', 'pages/type-chart/index', 'pages/pocket-carddex/index',
     'pages/pocket-card-detail/index', 'pages/pocket-events/index',
-    'pages/pocket-hot-decks/index', 'pages/pocket-deck-detail/index', 'pages/pocket-pack/index'
+    'pages/pocket-hot-decks/index', 'pages/pocket-deck-detail/index', 'pages/pocket-pack/index',
+    'pages/data-sources/index'
   ],
   window: {
     navigationBarTitleText: '宝批小站', navigationBarBackgroundColor: '#f8fafc',

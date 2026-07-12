@@ -85,6 +85,11 @@ cacheOptions.setOptionsToCache({
       url: '/pages/play/index',
     })
   },
+  openDataSources() {
+    Taro.navigateTo({
+      url: '/pages/data-sources/index',
+    })
+  },
 })
 @withWeapp(cacheOptions.getOptionsFromCache())
 class _C extends React.Component {
@@ -209,6 +214,14 @@ class _C extends React.Component {
                 <Text>{t('appName')}</Text>
               </View>
               <View className="version-value">{'v' + version}</View>
+            </View>
+            <View className="settings-row" onClick={this.openDataSources}>
+              <View className="settings-icon source">i</View>
+              <View className="settings-copy">
+                <View className="settings-title">数据来源与声明</View>
+                <Text>来源、数据状态和使用边界</Text>
+              </View>
+              <View className="row-arrow">›</View>
             </View>
             <Button
               className="settings-row feedback-button"

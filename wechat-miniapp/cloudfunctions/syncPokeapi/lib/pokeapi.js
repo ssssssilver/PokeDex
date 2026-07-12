@@ -1077,16 +1077,26 @@ function buildAbilities(pokemon, abilityDetails) {
     const flavor = languageName((detail.flavor_text_entries || []).slice().reverse(), 'flavor_text', ['zh-hans', 'zh-hant', 'en']);
     const nameZh = languageName(detail.names || [], 'name', ['zh-hans', 'zh-hant']) || titleCaseResource(item.ability.name);
     const nameJa = languageName(detail.names || [], 'name', ['ja', 'ja-hrkt']);
+    const nameZhCn = languageName(detail.names || [], 'name', ['zh-hans']) || nameZh;
+    const nameZhTw = languageName(detail.names || [], 'name', ['zh-hant']) || nameZh;
+    const flavorZhCn = languageName((detail.flavor_text_entries || []).slice().reverse(), 'flavor_text', ['zh-hans']);
+    const flavorZhTw = languageName((detail.flavor_text_entries || []).slice().reverse(), 'flavor_text', ['zh-hant']);
+    const flavorEn = languageName((detail.flavor_text_entries || []).slice().reverse(), 'flavor_text', ['en']);
     return {
       id: Number(urlId(item.ability)),
       key: item.ability.name,
       name: nameZh,
+      name_zh_cn: nameZhCn,
+      name_zh_tw: nameZhTw,
       name_en: titleCaseResource(item.ability.name),
       name_ja: nameJa,
       is_hidden: Boolean(item.is_hidden),
       slot: Number(item.slot || 0),
       short_effect: cleanText(shortEffect || flavor),
-      flavor: cleanText(flavor || shortEffect)
+      flavor: cleanText(flavor || shortEffect),
+      flavor_zh_cn: cleanText(flavorZhCn || flavor || shortEffect),
+      flavor_zh_tw: cleanText(flavorZhTw || flavor || shortEffect),
+      flavor_en: cleanText(flavorEn || shortEffect)
     };
   });
 }
@@ -1146,6 +1156,8 @@ function buildMoveDetailFields(key, detail = {}) {
   const nameEn = languageName(detail.names || [], 'name', ['en']) || titleCaseResource(key || detail.name);
   const nameZh = languageName(detail.names || [], 'name', ['zh-hans', 'zh-hant']);
   const nameJa = languageName(detail.names || [], 'name', ['ja', 'ja-hrkt']);
+  const nameZhCn = languageName(detail.names || [], 'name', ['zh-hans']) || nameZh;
+  const nameZhTw = languageName(detail.names || [], 'name', ['zh-hant']) || nameZh;
   const type = detail.type ? detail.type.name : '';
   const damageClass = detail.damage_class ? detail.damage_class.name : '';
   const target = detail.target ? detail.target.name : '';
@@ -1153,6 +1165,10 @@ function buildMoveDetailFields(key, detail = {}) {
   const flavorEntry = latestLocalizedEntry(detail.flavor_text_entries || [], 'flavor_text', ['zh-hans', 'zh-hant', 'en']);
   const shortEffectEntry = latestLocalizedEntry(detail.effect_entries || [], 'short_effect', ['zh-hans', 'zh-hant', 'en']);
   const effectEntry = latestLocalizedEntry(detail.effect_entries || [], 'effect', ['zh-hans', 'zh-hant', 'en']);
+  const flavorZhCn = latestLocalizedEntry(detail.flavor_text_entries || [], 'flavor_text', ['zh-hans']);
+  const flavorZhTw = latestLocalizedEntry(detail.flavor_text_entries || [], 'flavor_text', ['zh-hant']);
+  const flavorEn = latestLocalizedEntry(detail.flavor_text_entries || [], 'flavor_text', ['en']);
+  const shortEffectEn = latestLocalizedEntry(detail.effect_entries || [], 'short_effect', ['en']);
   const meta = detail.meta || {};
   const ailment = meta.ailment ? meta.ailment.name : '';
   const category = meta.category ? meta.category.name : '';
@@ -1161,6 +1177,8 @@ function buildMoveDetailFields(key, detail = {}) {
     id: Number(detail.id || 0),
     key: key || detail.name || '',
     name: nameZh || nameEn,
+    name_zh_cn: nameZhCn,
+    name_zh_tw: nameZhTw,
     name_en: nameEn,
     name_ja: nameJa,
     type,
@@ -1177,9 +1195,13 @@ function buildMoveDetailFields(key, detail = {}) {
     target_name: MOVE_TARGET_LABELS[target] || titleCaseResource(target),
     effect_chance: effectChance,
     description: effectText(flavorEntry && flavorEntry.flavor_text, effectChance),
+    description_zh_cn: effectText(flavorZhCn && flavorZhCn.flavor_text, effectChance),
+    description_zh_tw: effectText(flavorZhTw && flavorZhTw.flavor_text, effectChance),
+    description_en: effectText(flavorEn && flavorEn.flavor_text, effectChance),
     description_version_group: flavorEntry && flavorEntry.version_group ? flavorEntry.version_group.name : '',
     description_version_group_name: flavorEntry && flavorEntry.version_group ? versionGroupLabel(flavorEntry.version_group.name) : '',
     short_effect: effectText(shortEffectEntry && shortEffectEntry.short_effect, effectChance),
+    short_effect_en: effectText(shortEffectEn && shortEffectEn.short_effect, effectChance),
     effect: effectText(effectEntry && effectEntry.effect, effectChance),
     generation: detail.generation ? Number(urlId(detail.generation)) : 0,
     generation_name: detail.generation ? `第 ${Number(urlId(detail.generation))} 世代` : '',
