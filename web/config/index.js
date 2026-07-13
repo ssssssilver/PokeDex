@@ -22,6 +22,10 @@ export default defineConfig(async (merge, { command, mode }) => {
     },
     copy: {
       patterns: [
+        {
+          from: 'static-games/monsters-and-chill',
+          to: 'dist/games/monsters-and-chill'
+        }
       ],
       options: {
       }

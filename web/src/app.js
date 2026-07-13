@@ -4,6 +4,7 @@ import React from "react";
 import Taro from "@tarojs/taro";
 const config = require("./config.js");
 import "./app.scss";
+import "./styles/web-polish.scss";
 import WebShell from './components/web-shell'
 cacheOptions.setOptionsToCache({
   onLaunch() {

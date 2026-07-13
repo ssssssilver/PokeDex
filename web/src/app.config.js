@@ -7,7 +7,7 @@ export default {
     'pages/team/index', 'pages/type-chart/index', 'pages/pocket-carddex/index',
     'pages/pocket-card-detail/index', 'pages/pocket-events/index',
     'pages/pocket-hot-decks/index', 'pages/pocket-deck-detail/index', 'pages/pocket-pack/index',
-    'pages/data-sources/index'
+    'pages/data-sources/index', 'pages/sponsor/index', 'pages/monsters-chill/index'
   ],
   window: {
     navigationBarTitleText: '宝批小站', navigationBarBackgroundColor: '#f8fafc',

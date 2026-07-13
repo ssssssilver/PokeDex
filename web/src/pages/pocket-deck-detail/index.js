@@ -5,6 +5,19 @@ import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
 const { getLocale, localize } = require('../../i18n/index.js')
 import './index.scss'
+const pageCopy = {
+  'zh-TW': {
+    missing: '牌組不存在', title: 'Pocket 牌組詳情', failed: '牌組詳情載入失敗', copied: '牌表已複製',
+    loading: '賽事牌表載入中', energy: '能量', total: '卡牌總數', usage: '使用率', winRate: '勝率',
+    fullList: '完整牌表', kinds: '種', copy: '複製完整牌表'
+  },
+  en: {
+    missing: 'Deck not found', title: 'Pocket Deck Details', failed: 'Failed to load deck details', copied: 'Deck list copied',
+    loading: 'Loading tournament deck list', energy: 'Energy', total: 'Total cards', usage: 'Usage', winRate: 'Win rate',
+    fullList: 'Full deck list', kinds: 'unique cards', copy: 'Copy full deck list'
+  }
+}
+function words() { return pageCopy[getLocale()] || pageCopy.en }
 function decorate(item) {
   const source = item || {}
   return Object.assign({}, source, {
@@ -50,20 +63,20 @@ cacheOptions.setOptionsToCache({
     api
       .getPocketHotDeck(this.deckId)
       .then((result) => {
-        if (!result.item) throw new Error('卡组不存在')
+        if (!result.item) throw new Error(words().missing)
         const deck = decorate(result.item)
         this.setData({
           loading: false,
           deck,
         })
         Taro.setNavigationBarTitle({
-          title: deck.name || 'Pocket 卡组详情',
+          title: deck.name || words().title,
         })
       })
       .catch((error) =>
         this.setData({
           loading: false,
-          error: error.message || '卡组详情加载失败',
+          error: error.message || words().failed,
         })
       )
   },
@@ -74,7 +87,7 @@ cacheOptions.setOptionsToCache({
       data: text,
       success: () =>
         Taro.showToast({
-          title: '牌表已复制',
+          title: words().copied,
           icon: 'success',
         }),
     })
@@ -105,10 +118,11 @@ cacheOptions.setOptionsToCache({
 class _C extends React.Component {
   render() {
     const { loading, error, deck } = this.data
+    const copy = words()
     return (
       <View className="page pocket-deck-detail">
         {loading ? (
-          <View className="detail-state">赛事牌表加载中</View>
+          <View className="detail-state">{copy.loading}</View>
         ) : error ? (
           <View className="detail-state error" onClick={this.retry}>
             {error}
@@ -134,27 +148,27 @@ class _C extends React.Component {
                   <View className="deck-sub">{deck.resultText}</View>
                 </View>
                 <View className="deck-energy">
-                  <Text>能量</Text>
+                  <Text>{copy.energy}</Text>
                   <Text className="strong">{deck.energy}</Text>
                 </View>
               </View>
               <View className="deck-metrics">
                 <View>
                   <Text className="strong">{deck.total_cards}</Text>
-                  <Text>卡牌总数</Text>
+                  <Text>{copy.total}</Text>
                 </View>
                 <View>
                   <Text className="strong">{deck.shareText}</Text>
-                  <Text>使用率</Text>
+                  <Text>{copy.usage}</Text>
                 </View>
                 <View>
                   <Text className="strong">{deck.winRateText}</Text>
-                  <Text>胜率</Text>
+                  <Text>{copy.winRate}</Text>
                 </View>
               </View>
               <View className="section-title">
-                <Text>完整牌表</Text>
-                <Text className="muted">{deck.cards.length + ' 种'}</Text>
+                <Text>{copy.fullList}</Text>
+                <Text className="muted">{`${deck.cards.length} ${copy.kinds}`}</Text>
               </View>
               <View className="deck-card-grid">
                 {deck.cards.map((item, index) => {
@@ -188,7 +202,7 @@ class _C extends React.Component {
         )}
         {deck && (
           <View className="copy-bar" onClick={this.copyDeck}>
-            复制完整牌表
+            {copy.copy}
           </View>
         )}
       </View>

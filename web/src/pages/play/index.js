@@ -2,6 +2,7 @@ import withWeapp, { getTarget, cacheOptions } from '@tarojs/with-weapp'
 import { Block, View, Text } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
+const { t } = require('../../i18n/index.js')
 import './index.scss'
 cacheOptions.setOptionsToCache({
   data: {
@@ -47,6 +48,11 @@ cacheOptions.setOptionsToCache({
   openTypes() {
     Taro.navigateTo({
       url: '/pages/type-chart/index',
+    })
+  },
+  openMonstersChill() {
+    Taro.navigateTo({
+      url: '/pages/monsters-chill/index',
     })
   },
   openCardQuiz() {
@@ -111,6 +117,13 @@ class _C extends React.Component {
             <View className="category-heading">
               <Text>宝可梦玩法</Text>
               <Text className="small">图鉴与属性数据</Text>
+            </View>
+            <View className="card play-card" onClick={this.openMonstersChill}>
+              <View className="play-icon game">▶</View>
+              <View className="play-copy">
+                <View className="play-title">{t('monstersChill')}</View>
+                <View className="muted">{t('gameProgress')}</View>
+              </View>
             </View>
             <View className="card play-card" onClick={this.openQuiz}>
               <View className="play-icon">猜</View>

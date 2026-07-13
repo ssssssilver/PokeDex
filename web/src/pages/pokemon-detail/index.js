@@ -603,6 +603,12 @@ function buildDefensiveRelations(pokemon) {
     immunities: [],
   }
 }
+function cleanModelLabel(value) {
+  return String(value || '')
+    .replace(/默认\s*形态|預設\s*(?:型態|形態)|default\s*form/gi, '')
+    .replace(/^\s*[·/|-]+|[·/|-]+\s*$/g, '')
+    .trim()
+}
 function normalizeModelForms(model3d) {
   if (!model3d) return []
   const rawForms =
@@ -613,8 +619,9 @@ function normalizeModelForms(model3d) {
     )
     .map((form, index) =>
       Object.assign({}, form, {
-        label:
-          form.label || form.formName || (index === 0 ? '默认形态' : form.slug),
+        label: index === 0
+          ? ''
+          : cleanModelLabel(form.label || form.formName || form.slug),
         image: form.image || form.normalImage || form.shinyImage,
         normalImage: form.normalImage || '',
         shinyImage: form.shinyImage || '',
@@ -1026,6 +1033,7 @@ class _C extends React.Component {
       favorite,
       modelForms,
       modelVariantOptions,
+      activeModelFormIndex,
       activeModelVariant,
       physicalRelatedCardTotal,
       pocketRelatedCardTotal,
@@ -1051,6 +1059,9 @@ class _C extends React.Component {
       evolution,
       relations,
     } = this.data
+    const activeModelDisplayLabel = activeModelFormIndex === 0
+      ? ''
+      : cleanModelLabel(activeModel && activeModel.label)
     return (
       pokemon && (
         <View className="page detail-page">
@@ -1063,7 +1074,6 @@ class _C extends React.Component {
               <View className="detail-name">{localize(pokemon)}</View>
               <View className="detail-subtitle">
                 {getLocale() !== 'en' && <Text>{pokemon.name_en}</Text>}
-                {getLocale() === 'zh-CN' && pokemon.name_ja && <Text>{'/ ' + pokemon.name_ja}</Text>}
               </View>
               <View className="type-line">
                 {pokemon.types.map((item, index) => {
@@ -1085,7 +1095,7 @@ class _C extends React.Component {
               ></Image>
               {activeModel && (
                 <View className="hero-model-pill">
-                  {activeModel.label + ' · ' + activeModelVariantText}
+                  {[activeModelDisplayLabel, activeModelVariantText].filter(Boolean).join(' · ')}
                 </View>
               )}
             </View>
@@ -1107,7 +1117,7 @@ class _C extends React.Component {
                 <View>
                   <View className="info-title">3D 动态图</View>
                   <View className="muted">
-                    {activeModel.label + ' · ' + activeModelVariantText}
+                    {[activeModelDisplayLabel, activeModelVariantText].filter(Boolean).join(' · ')}
                   </View>
                 </View>
                 <View className="model-source">
@@ -1127,7 +1137,7 @@ class _C extends React.Component {
                           data-index={index}
                           onClick={this.selectModelForm}
                         >
-                          {item.label}
+                          {cleanModelLabel(item.label) || localize(pokemon)}
                         </View>
                       )
                     })}
@@ -1291,9 +1301,6 @@ class _C extends React.Component {
                       <View className="hidden-pill">隐藏</View>
                     )}
                   </View>
-                  {getLocale() === 'zh-CN' && item.name_ja && (
-                    <View className="muted">{item.name_ja}</View>
-                  )}
                   {item.description && (
                     <View className="ability-text">{item.description}</View>
                   )}
@@ -1510,7 +1517,11 @@ class _C extends React.Component {
                     data-id={item.id}
                     onClick={this.openPokemon}
                   >
-                    <Image src={item.image} mode="aspectFit"></Image>
+                    <Image
+                      className="evolution-image"
+                      src={item.image}
+                      mode="aspectFit"
+                    ></Image>
                     <View className="evolution-name">{localize(item)}</View>
                     <View
                       className={

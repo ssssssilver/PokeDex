@@ -4,11 +4,11 @@
 const EN = {
   '宝批小站': 'PokeChill', '首页': 'Home', '我的': 'My Collection',
   '卡牌': 'Cards', '卡牌总数': 'Total cards', '种': 'unique cards', '张': 'cards',
-  '简体中文': 'Simplified Chinese', '繁體中文': 'Traditional Chinese', '简': '简', '繁': '繁',
+  '繁體中文': 'Traditional Chinese', '繁': '繁',
   '鉴': 'Dex', '猜': '?', '队': 'TM', '属': 'Type', '玩': 'Play', '包': 'Pack', '活': 'Live',
   '任': 'Task', '卡': 'TCG', '宝': 'PKM', '版': 'Ver.', '意': 'Note', '收': 'Fav', '组': 'Deck',
-  '宝可梦图鉴': 'Pokédex', '卡牌图鉴': 'TCG Cards', 'Pocket图鉴': 'Pocket Cards',
-  'Pocket 卡牌图鉴': 'Pocket Cards', '实体卡牌': 'Physical TCG', '宝可梦': 'Pokémon',
+  '宝可梦图鉴': 'Pokédex', '卡牌图鉴': 'TCG', 'Pocket图鉴': 'Pocket Cards',
+  'Pocket 卡牌图鉴': 'Pocket Cards', '实体卡牌': 'TCG', '宝可梦': 'Pokémon',
   '搜索': 'Search', '筛选': 'Filters', '搜索与筛选': 'Search & filters', '全部': 'All',
   '搜索宝可梦名称或编号': 'Search Pokémon by name or number',
   '搜索中文名、英文名、日文名或编号': 'Search by Chinese, English or Japanese name or number',
@@ -89,7 +89,7 @@ const EN = {
   '今日宝可梦': 'Pokémon of the Day', '今日实体卡牌': 'TCG Card of the Day', '今日 Pocket 卡牌': 'Pocket Card of the Day',
   '最近查看': 'Recently viewed', '最近看卡': 'Recently viewed cards', '还没有浏览记录': 'No viewing history yet',
   '还没有看过实体卡牌': 'No TCG cards viewed yet', '还没有看过 Pocket 卡牌': 'No Pocket cards viewed yet',
-  '去宝可梦图鉴': 'Open Pokédex', '去实体卡牌图鉴': 'Open TCG Cards', '去 Pocket 图鉴': 'Open Pocket Cards',
+  '去宝可梦图鉴': 'Open Pokédex', '去实体卡牌图鉴': 'Open TCG', '去 Pocket 图鉴': 'Open Pocket Cards',
   '基础资料': 'Basic Information', '基础数据': 'Basic Data', '全国编号': 'National Dex No.', '图鉴编号': 'Pokédex No.',
   '全国图鉴': 'National Pokédex', '地区图鉴': 'Regional Pokédex', '未收录地区编号': 'No regional Pokédex entry',
   '分类': 'Category', '身高': 'Height', '体重': 'Weight', '捕获率': 'Catch rate', '种族值': 'Base stats',
@@ -129,6 +129,7 @@ const EN = {
   '更多': 'More', '查看全部轻玩法': 'View all tools', '版本号': 'Version', '用户意见反馈': 'Send Feedback',
   '数据来源与声明': 'Data Sources & Notices', '来源、数据状态和使用边界': 'Sources, data status, and usage boundaries',
   '通过微信反馈问题或建议': 'Send a problem report or suggestion', '语言': 'Language',
+  '赞助本站': 'Sponsor PokeChill', '支持数据更新、服务器与持续开发': 'Support data updates, hosting, and continued development',
   '第一世代': 'Generation I', '第二世代': 'Generation II', '第三世代': 'Generation III',
   '第四世代': 'Generation IV', '第五世代': 'Generation V', '第六世代': 'Generation VI',
   '第七世代': 'Generation VII', '第八世代': 'Generation VIII', '第九世代': 'Generation IX',
@@ -148,7 +149,7 @@ const TW_PHRASES = {
   '宝可梦': '寶可夢', '图鉴': '圖鑑', '卡牌': '卡牌', '实体': '實體', '筛选': '篩選',
   '搜索': '搜尋', '加载': '載入', '数据': '資料', '队伍': '隊伍', '属性': '屬性',
   '热门': '熱門', '卡组': '牌組', '开包': '開包', '活动': '活動', '任务': '任務',
-  '拥有': '擁有', '愿望单': '願望清單', '简体中文': '簡體中文', '用户': '使用者',
+  '拥有': '擁有', '愿望单': '願望清單', '用户': '使用者',
   '反馈': '回饋', '设置': '設定', '重置': '重設', '确定': '確定', '关闭': '關閉',
   '编号': '編號', '名称': '名稱', '稀有度': '稀有度', '训练家': '訓練家', '扩展包': '擴充包',
   '继续': '繼續', '全部': '全部', '暂无': '暫無', '没有': '沒有', '查看': '查看',
@@ -228,7 +229,7 @@ function dynamicEnglish(text) {
     .replace(/超极巨化/g, 'Gigantamax')
     .replace(/普通/g, 'Normal')
     .replace(/(\d+)\s*形态/g, '$1 forms')
-    .replace(/实体卡牌/g, 'Physical TCG')
+    .replace(/实体卡牌/g, 'TCG')
     .replace(/Pocket卡牌/g, 'Pocket cards')
     .replace(/队伍\s*(\d+)/g, 'Team $1')
     .replace(/(\d+)\s*分/g, '$1 points')
@@ -243,7 +244,7 @@ function dynamicEnglish(text) {
 
 export function translateLegacyText(value, locale) {
   const source = String(value || '')
-  if (!source.trim() || locale === 'zh-CN') return source
+  if (!source.trim()) return source
   const leading = source.match(/^\s*/)[0]
   const trailing = source.match(/\s*$/)[0]
   const text = source.trim()

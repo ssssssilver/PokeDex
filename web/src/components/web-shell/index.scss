@@ -1,20 +1,40 @@
 .desktop-sidebar { display: none; }
-.mobile-locale-switch { position: fixed; z-index: 1200; top: 12px; right: 16px; display: flex; overflow: hidden; border: 1px solid #d9e2ec; border-radius: 6px; background: rgba(255,255,255,.96); box-shadow: 0 2px 8px rgba(15,23,42,.08); }
-.mobile-locale-switch button { min-width: 64px; height: 88px; padding: 0 10px; border: 0; border-right: 1px solid #e6eaf0; background: transparent; color: #52606d; font-size: 22px; }
-.mobile-locale-switch button:last-child { border-right: 0; }
-.mobile-locale-switch button.active { background: #0f766e; color: #fff; font-weight: 700; }
+.web-main { min-height: 100vh; padding-top: 52px; }
+.mobile-web-navigation { position: fixed; z-index: 1200; top: max(8px, env(safe-area-inset-top)); left: 12px; display: flex; gap: 6px; }
+.mobile-nav-button { display: grid; width: 36px; height: 36px; padding: 0; place-items: center; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-alpha); color: var(--text); box-shadow: var(--shadow-sm); font-size: 22px; line-height: 1; backdrop-filter: blur(10px); }
+.mobile-web-tools { position: fixed; z-index: 1200; top: max(8px, env(safe-area-inset-top)); right: 12px; display: flex; gap: 6px; }
+.language-toggle, .theme-toggle { display: flex; align-items: center; justify-content: center; gap: 5px; height: 36px; padding: 0 9px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-alpha); color: var(--muted); box-shadow: var(--shadow-sm); }
+.language-toggle { min-width: 68px; font-size: 12px; }
+.theme-toggle { min-width: 60px; font-size: 16px; }
+.mobile-language-toggle, .mobile-theme-toggle { width: 36px; min-width: 36px; padding: 0; }
+.language-toggle text, .theme-toggle text { min-width: auto; }
+.language-toggle .active, .theme-toggle .active { color: var(--primary); font-weight: 800; }
+.language-toggle-divider, .theme-toggle-divider { color: var(--border); font-weight: 400; }
+.mobile-drawer-layer { position: fixed; z-index: 1300; inset: 0; background: rgba(15, 23, 42, .48); backdrop-filter: blur(2px); }
+.mobile-drawer { display: flex; width: min(82vw, 320px); height: 100%; padding: max(18px, env(safe-area-inset-top)) 16px max(18px, env(safe-area-inset-bottom)); flex-direction: column; border-right: 1px solid var(--border); background: var(--surface); box-shadow: 16px 0 40px rgba(15, 23, 42, .2); animation: mobile-drawer-in .18s ease-out; }
+.mobile-drawer-head { display: flex; align-items: center; justify-content: space-between; min-height: 48px; padding: 0 6px 12px 12px; border-bottom: 1px solid var(--border); }
+.mobile-drawer-brand { color: var(--primary); font-size: 20px; font-weight: 800; }
+.mobile-drawer-close { display: grid; width: 36px; height: 36px; padding: 0; place-items: center; border: 0; background: transparent; color: var(--text); font-size: 28px; line-height: 1; }
+.mobile-drawer-nav { display: grid; gap: 6px; margin-top: 14px; }
+.mobile-drawer-item { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 0 14px; border-radius: 6px; color: var(--text-soft); font-size: 16px; }
+.mobile-drawer-item.active { background: var(--primary-soft); color: var(--primary); font-weight: 700; }
+.mobile-drawer-icon { display: grid; width: 24px; height: 24px; flex: 0 0 24px; place-items: center; }
+.mobile-drawer-sponsor { width: 100%; min-height: 42px; margin-top: auto; border: 1px solid var(--border); border-radius: 6px; background: var(--surface-2); color: var(--text-soft); font-size: 14px; }
+@keyframes mobile-drawer-in { from { transform: translateX(-100%); } to { transform: translateX(0); } }
 @media (min-width: 1024px) {
   .web-app-shell { min-height: 100vh; }
-  .desktop-sidebar { position: fixed; z-index: 1000; inset: 0 auto 0 0; display: flex; width: 248px; padding: 28px 18px; box-sizing: border-box; flex-direction: column; border-right: 1px solid #e2e8f0; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
+  .desktop-sidebar { position: fixed; z-index: 1000; inset: 0 auto 0 0; display: flex; width: 248px; padding: 28px 18px; box-sizing: border-box; flex-direction: column; border-right: 1px solid var(--border); background: var(--surface-alpha); backdrop-filter: blur(12px); }
   .desktop-brand { padding: 4px 14px 28px; color: #0f766e; font-size: 24px; font-weight: 800; }
   .desktop-nav { display: grid; gap: 6px; }
-  .desktop-nav-item { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 14px; border-radius: 6px; color: #465467; cursor: pointer; font-size: 15px; }
-  .desktop-nav-item:hover { background: #f1f5f9; }
-  .desktop-nav-item.active { background: #e6fffb; color: #0f766e; font-weight: 700; }
+  .desktop-nav-item { display: flex; align-items: center; gap: 12px; min-height: 46px; padding: 0 14px; border-radius: 6px; color: var(--text-soft); cursor: pointer; font-size: 15px; }
+  .desktop-nav-item:hover { background: var(--surface-2); }
+  .desktop-nav-item.active { background: var(--primary-soft); color: var(--primary); font-weight: 700; }
   .desktop-nav-icon { display: grid; width: 24px; height: 24px; place-items: center; font-weight: 700; }
-  .locale-control { display: grid; gap: 8px; margin-top: auto; padding: 14px; color: #64748b; font-size: 13px; }
-  .locale-control select { width: 100%; height: 38px; padding: 0 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; color: #1e293b; }
-  .web-main { min-height: 100vh; margin-left: 248px; }
-  .web-main > .taro_page { max-width: 1440px; margin: 0 auto; }
-  .mobile-locale-switch, .taro-tabbar__tabbar { display: none !important; }
+  .desktop-language-toggle { width: calc(100% - 28px); margin: auto 14px 8px; background: var(--surface); box-shadow: none; cursor: pointer; }
+  .sidebar-tools { display: grid; gap: 8px; padding: 0 14px 6px; }
+  .desktop-theme-toggle { width: 100%; background: var(--surface); box-shadow: none; cursor: pointer; }
+  .sponsor-link { height: 38px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); color: var(--text-soft); cursor: pointer; font-size: 13px; }
+  .web-main { min-height: 100vh; margin-left: 248px; padding-top: 0; }
+  .web-main > .taro_page { max-width: 1600px; margin: 0 auto; }
+  .mobile-web-navigation, .mobile-web-tools, .mobile-drawer-layer, .taro-tabbar__tabbar { display: none !important; }
 }

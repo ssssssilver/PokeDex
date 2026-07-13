@@ -3,7 +3,18 @@ import { Block, View, Text, Image } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
+const { getLocale } = require('../../i18n/index.js')
 import './index.scss'
+const pageCopy = {
+  'zh-TW': {
+    archetypes: '目前賽制牌組原型', loading: '排行榜載入中', failed: '熱門牌組載入失敗',
+    empty: '暫無熱門牌組', decklists: '副牌表', usage: '使用率', winRate: '勝率'
+  },
+  en: {
+    archetypes: 'Current format archetypes', loading: 'Loading rankings', failed: 'Failed to load popular decks',
+    empty: 'No popular decks available', decklists: 'deck lists', usage: 'Usage', winRate: 'Win rate'
+  }
+}
 function decorate(deck) {
   return Object.assign({}, deck, {
     shareText: `${Number(deck.share || 0).toFixed(2)}%`,
@@ -46,7 +57,7 @@ cacheOptions.setOptionsToCache({
       .catch(() =>
         this.setData({
           loading: false,
-          error: '热门卡组加载失败',
+          error: pageCopy[getLocale()].failed,
         })
       )
   },
@@ -65,18 +76,19 @@ cacheOptions.setOptionsToCache({
 class _C extends React.Component {
   render() {
     const { total, loading, error, decks } = this.data
+    const words = pageCopy[getLocale()] || pageCopy.en
     return (
       <View className="page pocket-decks-page">
         <View className="deck-summary">
           <View>
             <Text>{total}</Text>
-            <View>当前赛制卡组原型</View>
+            <View>{words.archetypes}</View>
           </View>
           <View className="summary-source">LIMITLESS POCKET</View>
         </View>
         <View className="ranking-panel">
           {loading ? (
-            <View className="deck-state">排行榜加载中</View>
+            <View className="deck-state">{words.loading}</View>
           ) : error ? (
             <View className="deck-state error" onClick={this.retry}>
               {error}
@@ -102,21 +114,21 @@ class _C extends React.Component {
                     <View className="ranking-copy">
                       <View className="ranking-name">{item.name}</View>
                       <View className="ranking-score">
-                        {item.scoreText + ' · ' + item.count + ' 副牌表'}
+                        {`${item.scoreText} · ${item.count} ${words.decklists}`}
                       </View>
                     </View>
                     <View className="ranking-metrics">
                       <Text className="strong">{item.shareText}</Text>
-                      <Text>使用率</Text>
+                      <Text>{words.usage}</Text>
                       <Text className="strong">{item.winRateText}</Text>
-                      <Text>胜率</Text>
+                      <Text>{words.winRate}</Text>
                     </View>
                   </View>
                 )
               })}
             </View>
           ) : (
-            <View className="deck-state">暂无热门卡组</View>
+            <View className="deck-state">{words.empty}</View>
           )}
         </View>
       </View>

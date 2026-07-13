@@ -210,6 +210,11 @@ cacheOptions.setOptionsToCache({
       url: '/pages/type-chart/index',
     })
   },
+  openMonstersChill() {
+    Taro.navigateTo({
+      url: '/pages/monsters-chill/index',
+    })
+  },
   openCardQuiz() {
     Taro.navigateTo({
       url: '/pages/card-quiz/index',
@@ -302,7 +307,7 @@ class _C extends React.Component {
       <View className="page home-page">
         <View className="home-banner">
           <Image
-            src={require('../../assets/banner/home-banner.jpg')}
+            src={require('../../assets/banner/home-banner.webp')}
             mode="aspectFill"
           ></Image>
           <View className="home-banner-title">{t('appName')}</View>
@@ -340,10 +345,10 @@ class _C extends React.Component {
             confirmType="search"
             placeholder={
               homeMode === 'pokemon'
-                ? '搜索宝可梦名称或编号'
+                ? t('searchPokemon')
                 : homeMode === 'card'
-                ? '搜索实体卡牌、系列或编号'
-                : '搜索 Pocket 卡牌'
+                ? t('searchCards')
+                : t('searchPocket')
             }
           ></Input>
           <View className="search-action" onClick={this.submitSearch}>
@@ -357,27 +362,27 @@ class _C extends React.Component {
           {homeMode === 'pokemon' ? (
             <View className="quick-grid">
               <View className="quick-card" onClick={this.openPokedex}>
-                <View className="quick-icon">鉴</View>
+                <View className="quick-icon">◉</View>
                 <View className="quick-title">{t('pokedex')}</View>
                 <View className="quick-sub">搜索与筛选</View>
               </View>
               <View className="quick-card" onClick={this.openQuiz}>
-                <View className="quick-icon">猜</View>
+                <View className="quick-icon">?</View>
                 <View className="quick-title">宝可梦猜谜</View>
                 <View className="quick-sub">随机 4 选 1</View>
               </View>
               <View className="quick-card" onClick={this.openTeam}>
-                <View className="quick-icon">队</View>
+                <View className="quick-icon">+</View>
                 <View className="quick-title">队伍分析</View>
                 <View className="quick-sub">多队伍编辑</View>
               </View>
-              <View className="quick-card" onClick={this.openTypes}>
-                <View className="quick-icon gold">属</View>
-                <View className="quick-title">属性速查</View>
-                <View className="quick-sub">克制关系</View>
+              <View className="quick-card" onClick={this.openMonstersChill}>
+                <View className="quick-icon game">▶</View>
+                <View className="quick-title">{t('monstersChill')}</View>
+                <View className="quick-sub">{t('gameProgress')}</View>
               </View>
               <View className="quick-card" onClick={this.openPlay}>
-                <View className="quick-icon ink">玩</View>
+                <View className="quick-icon ink">▦</View>
                 <View className="quick-title">玩法盒子</View>
                 <View className="quick-sub">宝可梦玩法</View>
               </View>
@@ -385,27 +390,27 @@ class _C extends React.Component {
           ) : homeMode === 'card' ? (
             <View className="quick-grid">
               <View className="quick-card" onClick={this.openCarddex}>
-                <View className="quick-icon">鉴</View>
+                <View className="quick-icon">▣</View>
                 <View className="quick-title">{t('cards')}</View>
                 <View className="quick-sub">实体卡牌</View>
               </View>
               <View className="quick-card" onClick={this.openCardQuiz}>
-                <View className="quick-icon">猜</View>
+                <View className="quick-icon">?</View>
                 <View className="quick-title">猜卡牌</View>
                 <View className="quick-sub">今日挑战</View>
               </View>
               <View className="quick-card" onClick={this.openCardPack}>
-                <View className="quick-icon blue">包</View>
+                <View className="quick-icon blue">◇</View>
                 <View className="quick-title">每日开包</View>
                 <View className="quick-sub">手动开启</View>
               </View>
               <View className="quick-card" onClick={this.openHotDecks}>
-                <View className="quick-icon coral">组</View>
+                <View className="quick-icon coral">≡</View>
                 <View className="quick-title">热门卡组</View>
                 <View className="quick-sub">排行榜</View>
               </View>
               <View className="quick-card" onClick={this.openPlay}>
-                <View className="quick-icon ink">玩</View>
+                <View className="quick-icon ink">▦</View>
                 <View className="quick-title">玩法盒子</View>
                 <View className="quick-sub">实体卡玩法</View>
               </View>
@@ -413,7 +418,7 @@ class _C extends React.Component {
           ) : (
             <View className="quick-grid">
               <View className="quick-card" onClick={this.openPocketCarddex}>
-                <View className="quick-icon">鉴</View>
+                <View className="quick-icon">P</View>
                 <View className="quick-title">{t('pocket')}</View>
                 <View className="quick-sub">搜索与筛选</View>
               </View>
@@ -422,22 +427,22 @@ class _C extends React.Component {
                 data-tab="events"
                 onClick={this.openPocketEvents}
               >
-                <View className="quick-icon coral">活</View>
+                <View className="quick-icon coral">•</View>
                 <View className="quick-title">活动</View>
                 <View className="quick-sub">当前与预告</View>
               </View>
               <View className="quick-card" onClick={this.openCardPack}>
-                <View className="quick-icon blue">包</View>
+                <View className="quick-icon blue">◇</View>
                 <View className="quick-title">模拟开包</View>
                 <View className="quick-sub">5 张一包</View>
               </View>
               <View className="quick-card" onClick={this.openPocketDecks}>
-                <View className="quick-icon ink">组</View>
+                <View className="quick-icon ink">≡</View>
                 <View className="quick-title">热门卡组</View>
                 <View className="quick-sub">赛事数据</View>
               </View>
               <View className="quick-card" onClick={this.openPlay}>
-                <View className="quick-icon gold">玩</View>
+                <View className="quick-icon gold">▦</View>
                 <View className="quick-title">玩法盒子</View>
                 <View className="quick-sub">Pocket玩法</View>
               </View>

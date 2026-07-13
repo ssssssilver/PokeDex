@@ -90,6 +90,9 @@ cacheOptions.setOptionsToCache({
       url: '/pages/data-sources/index',
     })
   },
+  openSponsor() {
+    Taro.navigateTo({ url: '/pages/sponsor/index' })
+  },
 })
 @withWeapp(cacheOptions.getOptionsFromCache())
 class _C extends React.Component {
@@ -199,6 +202,14 @@ class _C extends React.Component {
         <View className="settings-section">
           <View className="section-label">更多</View>
           <View className="settings-list">
+            <View className="settings-row" onClick={this.openSponsor}>
+              <View className="settings-icon support">♡</View>
+              <View className="settings-copy">
+                <View className="settings-title">赞助本站</View>
+                <Text>支持数据更新、服务器与持续开发</Text>
+              </View>
+              <View className="row-arrow">›</View>
+            </View>
             <View className="settings-row" onClick={this.openPlay}>
               <View className="settings-icon">玩</View>
               <View className="settings-copy">

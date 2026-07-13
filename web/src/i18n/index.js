@@ -1,18 +1,13 @@
 import Taro from '@tarojs/taro'
 
 const STORAGE_KEY = 'pokechill:locale'
-export const SUPPORTED_LOCALES = ['zh-CN', 'zh-TW', 'en']
+export const SUPPORTED_LOCALES = ['zh-TW', 'en']
+export const CHINESE_TIMEZONES = new Set([
+  'Asia/Shanghai', 'Asia/Chongqing', 'Asia/Harbin', 'Asia/Urumqi',
+  'Asia/Hong_Kong', 'Asia/Macau', 'Asia/Taipei'
+])
 
 const messages = {
-  'zh-CN': {
-    appName: '宝批小站', home: '首页', pokedex: '宝可梦图鉴', cards: '卡牌图鉴',
-    pocket: 'Pocket图鉴', profile: '我的', language: '语言', search: '搜索',
-    loading: '加载中', retry: '重试', all: '全部', filter: '筛选', reset: '重置',
-    confirm: '确定', favorite: '收藏', owned: '已拥有', wishlist: '愿望单',
-    play: '玩法盒子', decks: '热门卡组', events: '活动动态', openPack: '每日开包',
-    pokemon: '宝可梦', physicalCards: '实体卡牌', version: '版本号',
-    feedback: '用户意见反馈', noData: '暂无数据', viewDetails: '查看详情'
-  },
   'zh-TW': {
     appName: '寶批小站', home: '首頁', pokedex: '寶可夢圖鑑', cards: '卡牌圖鑑',
     pocket: 'Pocket圖鑑', profile: '我的', language: '語言', search: '搜尋',
@@ -20,24 +15,41 @@ const messages = {
     confirm: '確定', favorite: '收藏', owned: '已擁有', wishlist: '願望清單',
     play: '玩法盒子', decks: '熱門牌組', events: '活動動態', openPack: '每日開包',
     pokemon: '寶可夢', physicalCards: '實體卡牌', version: '版本號',
-    feedback: '使用者意見回饋', noData: '暫無資料', viewDetails: '查看詳情'
+    feedback: '使用者意見回饋', noData: '暫無資料', viewDetails: '查看詳情',
+    searchPokemon: '搜尋寶可夢名稱或編號', searchCards: '搜尋實體卡牌、系列或編號', searchPocket: '搜尋 Pocket 卡牌',
+    monstersChill: '寶可夢放置冒險', gameProgress: '探索、培育與隊伍養成',
+    gameBack: '返回', gameFullscreen: '全螢幕', gameExitFullscreen: '退出全螢幕',
+    gameLoading: '正在載入遊戲', gameHint: '遊戲進度儲存在目前瀏覽器'
   },
   en: {
-    appName: 'PokeChill', home: 'Home', pokedex: 'Pokédex', cards: 'TCG Cards',
+    appName: 'PokeChill', home: 'Home', pokedex: 'Pokédex', cards: 'TCG',
     pocket: 'Pocket Cards', profile: 'My Collection', language: 'Language', search: 'Search',
     loading: 'Loading', retry: 'Retry', all: 'All', filter: 'Filters', reset: 'Reset',
     confirm: 'Apply', favorite: 'Favorites', owned: 'Owned', wishlist: 'Wishlist',
     play: 'Play', decks: 'Popular Decks', events: 'Events', openPack: 'Daily Pack',
-    pokemon: 'Pokémon', physicalCards: 'Physical TCG', version: 'Version',
-    feedback: 'Send Feedback', noData: 'No data available', viewDetails: 'View details'
+    pokemon: 'Pokémon', physicalCards: 'TCG', version: 'Version',
+    feedback: 'Send Feedback', noData: 'No data available', viewDetails: 'View details',
+    searchPokemon: 'Search Pokémon by name or number', searchCards: 'Search physical cards, sets, or numbers',
+    searchPocket: 'Search Pocket cards',
+    monstersChill: 'Monsters & Chill', gameProgress: 'Explore, train, and build your team',
+    gameBack: 'Back', gameFullscreen: 'Fullscreen', gameExitFullscreen: 'Exit fullscreen',
+    gameLoading: 'Loading game', gameHint: 'Game progress is saved in this browser'
   }
 }
 
 function normalizeLocale(value) {
   const locale = String(value || '').replace('_', '-').toLowerCase()
-  if (locale.startsWith('zh-tw') || locale.startsWith('zh-hk') || locale.startsWith('zh-hant')) return 'zh-TW'
+  if (locale.startsWith('zh')) return 'zh-TW'
   if (locale.startsWith('en')) return 'en'
-  return 'zh-CN'
+  return 'en'
+}
+
+export function defaultLocaleForTimeZone(timeZone) {
+  return CHINESE_TIMEZONES.has(String(timeZone || '')) ? 'zh-TW' : 'en'
+}
+
+function currentTimeZone() {
+  try { return Intl.DateTimeFormat().resolvedOptions().timeZone || '' } catch (error) { return '' }
 }
 
 function detectLocale() {
@@ -49,8 +61,7 @@ function detectLocale() {
     const saved = Taro.getStorageSync(STORAGE_KEY)
     if (saved) return normalizeLocale(saved)
   } catch (error) {}
-  if (typeof navigator !== 'undefined') return normalizeLocale(navigator.languages?.[0] || navigator.language)
-  return 'zh-CN'
+  return defaultLocaleForTimeZone(currentTimeZone())
 }
 
 let currentLocale = detectLocale()
@@ -58,7 +69,7 @@ const listeners = new Set()
 
 export function getLocale() { return currentLocale }
 export function t(key, values = {}) {
-  const template = messages[currentLocale]?.[key] || messages['zh-CN'][key] || key
+  const template = messages[currentLocale]?.[key] || messages['zh-TW'][key] || messages.en[key] || key
   return Object.keys(values).reduce((text, name) => text.replaceAll(`{${name}}`, values[name]), template)
 }
 export function setLocale(locale) {
@@ -77,9 +88,7 @@ export function localize(entity, field = 'name') {
   if (!entity) return ''
   const candidates = currentLocale === 'en'
     ? [`${field}_en`, field, `${field}_zh`, `${field}_zh_cn`, `${field}_zh_tw`]
-    : currentLocale === 'zh-TW'
-      ? [`${field}_zh_tw`, `${field}_zh`, `${field}_zh_cn`, field, `${field}_en`]
-      : [`${field}_zh_cn`, `${field}_zh`, field, `${field}_zh_tw`, `${field}_en`]
+    : [`${field}_zh_tw`, `${field}_zh`, `${field}_zh_cn`, field, `${field}_en`]
   for (const key of candidates) if (entity[key]) return entity[key]
   return ''
 }

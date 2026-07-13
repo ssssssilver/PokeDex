@@ -3,17 +3,10 @@ import { View, Text } from '@tarojs/components'
 import React from 'react'
 import Taro from '@tarojs/taro'
 const api = require('../../services/api.js')
-const { getLocale } = require('../../i18n/index.js')
+const { getLocale, t } = require('../../i18n/index.js')
 import './index.scss'
 
 const COPY = {
-  'zh-CN': {
-    title: '数据来源与声明', subtitle: '当前公开数据的来源、状态与使用边界',
-    active: '使用中', inactive: '未启用', healthy: '数据可用', unavailable: '状态未知',
-    policy: '使用政策', policyText: '本站免费使用并可能包含广告或赞助。实体卡只有可确认的官方简体中文版才显示中文；其他卡牌保留英文。繁体中文采用台湾官方术语。',
-    rights: '版权声明', rightsText: 'Pokémon 名称、角色、卡图及游戏素材的权利归各自权利人所有。本站是非官方资料工具，与 Nintendo、The Pokémon Company、Creatures 或 DeNA 无隶属或赞助关系。',
-    source: '来源', license: '许可/条款', revision: '固定版本'
-  },
   'zh-TW': {
     title: '資料來源與聲明', subtitle: '目前公開資料的來源、狀態與使用界線',
     active: '使用中', inactive: '未啟用', healthy: '資料可用', unavailable: '狀態未知',
@@ -40,9 +33,9 @@ function productHealth(health, product) {
 cacheOptions.setOptionsToCache({
   data: { loading: true, error: '', sources: [], health: null },
   onLoad() {
-    const copy = COPY[getLocale()] || COPY['zh-CN']
+    const copy = COPY[getLocale()] || COPY['zh-TW']
     Taro.setNavigationBarTitle({ title: copy.title }).then(() => {
-      if (typeof document !== 'undefined') document.title = `${copy.title} | ${getLocale() === 'en' ? 'PokeChill' : '宝批小站'}`
+      if (typeof document !== 'undefined') document.title = `${copy.title} | ${t('appName')}`
     })
     Promise.all([api.getDataSources(), api.getDataHealth()])
       .then(([sources, health]) => this.setData({ loading: false, sources: sources.items || [], health }))
@@ -54,17 +47,15 @@ cacheOptions.setOptionsToCache({
 class DataSourcesPage extends React.Component {
   render() {
     const locale = getLocale()
-    const copy = COPY[locale] || COPY['zh-CN']
+    const copy = COPY[locale] || COPY['zh-TW']
     const grouped = ['pokedex', 'ptcg', 'pocket'].map(product => ({
       product,
       healthy: productHealth(this.data.health, product),
       items: (this.data.sources || []).filter(source => source.product === product)
     }))
     const productNames = locale === 'en'
-      ? { pokedex: 'Pokédex', ptcg: 'Physical TCG', pocket: 'Pokémon TCG Pocket' }
-      : locale === 'zh-TW'
-        ? { pokedex: '寶可夢圖鑑', ptcg: '實體卡牌', pocket: 'Pokémon TCG Pocket' }
-        : { pokedex: '宝可梦图鉴', ptcg: '实体卡牌', pocket: 'Pokémon TCG Pocket' }
+      ? { pokedex: 'Pokédex', ptcg: 'TCG', pocket: 'Pokémon TCG Pocket' }
+      : { pokedex: '寶可夢圖鑑', ptcg: '實體卡牌', pocket: 'Pokémon TCG Pocket' }
     return <View className="page data-sources-page">
       <View className="source-heading"><View className="source-title">{copy.title}</View><Text>{copy.subtitle}</Text></View>
       {this.data.error ? <View className="source-empty">{copy.unavailable}</View> : grouped.map(group => <View className="source-section" key={group.product}>

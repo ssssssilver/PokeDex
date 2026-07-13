@@ -198,7 +198,7 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 18px;
-  color: #182230;
+  color: var(--text);
   font-size: 28px;
   font-weight: 800;
 }
@@ -491,9 +491,20 @@
   text-align: center;
 }
 
-.evolution-item image {
-  width: 96px;
-  height: 96px;
+.evolution-image {
+  display: block;
+  width: 112px;
+  height: 112px;
+  margin: 0 auto;
+  overflow: visible;
+}
+
+.evolution-image img,
+.evolution-image .taro-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
 }
 
 .evolution-item view {
@@ -590,10 +601,47 @@
   box-sizing: border-box;
 }
 
-.related-card image {
-  width: 104px;
-  height: 146px;
+.related-card > image,
+.related-card > taro-image-core,
+.related-card .taro-img,
+.related-card img {
+  display: block;
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 245 / 342;
   border-radius: 8px;
+  object-fit: contain !important;
+}
+
+@media (min-width: 1024px) {
+  .related-card-scroll {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 18px;
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .related-card {
+    display: flex;
+    width: 100%;
+    margin: 0;
+    padding: 12px;
+  }
+
+  .info-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .info-cell view:last-child {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .breeding-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 
 .relation-block {

@@ -4,5 +4,7 @@ const defaults = {
   apiBaseUrl: '',
   requestTimeoutMs: 15000,
   pageSize: 30,
+  sponsorUrl: '',
+  sponsorContact: 'modone@qq.com',
 }
 module.exports = defaults

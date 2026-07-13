@@ -1,0 +1,72 @@
+.monsters-chill-page {
+  width: 100%;
+  min-height: calc(100vh - 52px);
+  min-height: calc(100dvh - 52px);
+  background: #182230;
+}
+
+.game-shell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: calc(100vh - 52px);
+  height: calc(100dvh - 52px);
+  overflow: hidden;
+  background: #36342f;
+}
+
+.game-toolbar {
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(92px, auto) minmax(0, 1fr) minmax(92px, auto);
+  align-items: center;
+  flex: 0 0 58px;
+  min-height: 58px;
+  padding: 8px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  background: #182230;
+  color: #fff;
+  box-sizing: border-box;
+}
+
+.game-heading { min-width: 0; text-align: center; }
+.game-title { display: block; overflow: hidden; font-size: 16px; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+.game-save-hint { display: block; overflow: hidden; margin-top: 2px; color: #aeb9c8; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+
+.game-tool-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: end;
+  gap: 6px;
+  min-width: 0;
+  min-height: 40px;
+  padding: 0 12px;
+  border: 1px solid #415066;
+  border-radius: 6px;
+  background: #243146;
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.game-back { justify-self: start; }
+.game-tool-button:focus-visible { outline: 3px solid #5eead4; outline-offset: 2px; }
+.game-frame { flex: 1; width: 100%; min-height: 0; border: 0; opacity: 0; background: #36342f; }
+.game-frame.loaded { opacity: 1; }
+.game-loading { position: absolute; inset: 58px 0 0; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 15px; font-weight: 800; }
+
+.game-shell:fullscreen { width: 100vw; height: 100vh; height: 100dvh; }
+
+@media (max-width: 767px) {
+  .game-toolbar { grid-template-columns: 52px minmax(0, 1fr) 52px; padding-right: max(8px, env(safe-area-inset-right)); padding-left: max(8px, env(safe-area-inset-left)); }
+  .game-tool-button { width: 42px; min-height: 40px; padding: 0; font-size: 20px; }
+  .game-tool-label, .game-back text:last-child, .game-save-hint { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .monsters-chill-page, .game-shell { min-height: 100vh; min-height: 100dvh; height: 100vh; height: 100dvh; }
+}

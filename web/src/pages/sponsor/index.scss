@@ -1,0 +1,9 @@
+.sponsor-page { display: grid; place-items: center; }
+.sponsor-panel { width: min(100%, 680px); padding: 44px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); box-shadow: var(--shadow); text-align: center; }
+.sponsor-mark { display: block; color: #e25567; font-size: 58px; line-height: 1; }
+.sponsor-title { margin-top: 18px; color: var(--text); font-size: 34px; font-weight: 800; }
+.sponsor-intro { margin-top: 18px; color: var(--text-soft); line-height: 1.75; }
+.sponsor-principle { margin-top: 18px; padding: 16px; border-radius: 6px; background: var(--surface-2); color: var(--muted); line-height: 1.6; }
+.sponsor-action { width: 100%; margin-top: 26px; border: 0; }
+@media (max-width: 479px) { .sponsor-panel { padding: 30px 22px; } .sponsor-title { font-size: 30px; } }
+@media (min-width: 1024px) { .sponsor-title { font-size: 30px; } .sponsor-intro, .sponsor-principle { font-size: 15px; } }

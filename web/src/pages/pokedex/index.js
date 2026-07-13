@@ -553,7 +553,6 @@ class _C extends React.Component {
                       <View className="row-name">{localize(item)}</View>
                       <View className="row-subtitle">
                         {getLocale() !== 'en' && <Text>{item.name_en}</Text>}
-                        {getLocale() === 'zh-CN' && item.name_ja && <Text>{'/ ' + item.name_ja}</Text>}
                       </View>
                       <View className="row-types">
                         {item.types.map((type, typeIndex) => {
